@@ -12,14 +12,20 @@ class AccountRevise extends StatefulWidget {
 
 class _ProfileState extends State<AccountRevise> {
   String? heightValue;
+  String? weightValue;
+  String? ageValue;
+
   final heightController = TextEditingController();
-  late final Size size;
+  final weightController = TextEditingController();
+  final ageController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     heightController.addListener(() => setState(() {}));
-    getHeight();
+    weightController.addListener(() => setState(() {}));
+    ageController.addListener(() => setState(() {}));
+    getProfile();
   }
 
   @override
@@ -37,17 +43,23 @@ class _ProfileState extends State<AccountRevise> {
                 decoration: InputDecoration(
                   labelText: '身高',
                   hintText: heightValue,
+                  focusedBorder: OutlineInputBorder(
+                    borderSide:
+                        const BorderSide(color: kPrimaryColor, width: 2.0),
+                    borderRadius: BorderRadius.circular(25.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide:
+                        const BorderSide(color: kSecondaryColor, width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                   suffixIcon: heightController.text.isEmpty
                       ? Container(width: 0)
                       : IconButton(
                           icon: Icon(Icons.close),
                           onPressed: () => heightController.clear(),
                         ),
-                  prefixIcon: Icon(Icons.height),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 1.5),
-                  ),
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.boy),
                 ),
               ),
               Padding(
@@ -56,22 +68,30 @@ class _ProfileState extends State<AccountRevise> {
                 ),
               ),
               TextField(
-                controller: heightController,
+                controller: weightController,
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
-                  labelText: '身高',
-                  hintText: heightValue,
-                  suffixIcon: heightController.text.isEmpty
+                  labelText: '體重',
+                  hintText: weightValue,
+                  focusedBorder: OutlineInputBorder(
+                    borderSide:
+                        const BorderSide(color: kPrimaryColor, width: 2.0),
+                    borderRadius: BorderRadius.circular(25.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide:
+                        const BorderSide(color: kSecondaryColor, width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  suffixIcon: weightController.text.isEmpty
                       ? Container(width: 0)
                       : IconButton(
                           icon: Icon(Icons.close),
-                          onPressed: () => heightController.clear(),
+                          onPressed: () => weightController.clear(),
                         ),
-                  prefixIcon: Icon(Icons.height),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 1.5),
+                  prefixIcon: Icon(
+                    Icons.accessibility,
                   ),
-                  border: OutlineInputBorder(),
                 ),
               ),
               Padding(
@@ -80,60 +100,44 @@ class _ProfileState extends State<AccountRevise> {
                 ),
               ),
               TextField(
-                controller: heightController,
+                controller: ageController,
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
-                  labelText: '身高',
-                  hintText: heightValue,
-                  suffixIcon: heightController.text.isEmpty
+                  labelText: '年齡',
+                  hintText: ageValue,
+                  focusedBorder: OutlineInputBorder(
+                    borderSide:
+                        const BorderSide(color: kPrimaryColor, width: 2.0),
+                    borderRadius: BorderRadius.circular(25.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide:
+                        const BorderSide(color: kSecondaryColor, width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  suffixIcon: ageController.text.isEmpty
                       ? Container(width: 0)
                       : IconButton(
                           icon: Icon(Icons.close),
-                          onPressed: () => heightController.clear(),
+                          onPressed: () => ageController.clear(),
                         ),
-                  prefixIcon: Icon(Icons.height),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 1.5),
-                  ),
-                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.edit),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.only(
                   top: 20.0,
-                ),
-              ),
-              TextField(
-                controller: heightController,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration(
-                  labelText: '身高',
-                  hintText: heightValue,
-                  suffixIcon: heightController.text.isEmpty
-                      ? Container(width: 0)
-                      : IconButton(
-                          icon: Icon(Icons.close),
-                          onPressed: () => heightController.clear(),
-                        ),
-                  prefixIcon: Icon(Icons.height),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 1.5),
-                  ),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  top: 30.0,
                 ),
               ),
               ElevatedButton(
                 child: Text('Save'),
                 onPressed: () {
-                  setHeight(heightController.text);
+                  setProfile(heightController.text, weightController.text,
+                      ageController.text);
                   CoolAlert.show(
                     context: context,
                     type: CoolAlertType.success,
+                    confirmBtnColor: kPrimaryColor,
                     text: "修改成功!",
                   );
                 },
@@ -145,14 +149,18 @@ class _ProfileState extends State<AccountRevise> {
     );
   }
 
-  Future<void> setHeight(heightValue) async {
+  Future<void> setProfile(heightValue, weightValue, ageValue) async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString('height', heightValue);
+    pref.setString('weight', weightValue);
+    pref.setString('age', ageValue);
   }
 
-  Future<void> getHeight() async {
+  Future<void> getProfile() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     heightValue = pref.getString('height');
+    weightValue = pref.getString('weight');
+    ageValue = pref.getString('age');
     setState(() {});
   }
 }
