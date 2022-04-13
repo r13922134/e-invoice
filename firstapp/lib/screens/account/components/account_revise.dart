@@ -42,6 +42,7 @@ class _ProfileState extends State<AccountRevise> {
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
                   labelText: '身高',
+                  labelStyle: TextStyle(color: kPrimaryColor),
                   hintText: heightValue,
                   focusedBorder: OutlineInputBorder(
                     borderSide:
@@ -59,7 +60,10 @@ class _ProfileState extends State<AccountRevise> {
                           icon: Icon(Icons.close),
                           onPressed: () => heightController.clear(),
                         ),
-                  prefixIcon: Icon(Icons.boy),
+                  prefixIcon: Icon(
+                    Icons.boy,
+                    color: kPrimaryColor,
+                  ),
                 ),
               ),
               Padding(
@@ -72,6 +76,7 @@ class _ProfileState extends State<AccountRevise> {
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
                   labelText: '體重',
+                  labelStyle: TextStyle(color: kPrimaryColor),
                   hintText: weightValue,
                   focusedBorder: OutlineInputBorder(
                     borderSide:
@@ -91,6 +96,7 @@ class _ProfileState extends State<AccountRevise> {
                         ),
                   prefixIcon: Icon(
                     Icons.accessibility,
+                    color: kPrimaryColor,
                   ),
                 ),
               ),
@@ -104,6 +110,7 @@ class _ProfileState extends State<AccountRevise> {
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
                   labelText: '年齡',
+                  labelStyle: TextStyle(color: kPrimaryColor),
                   hintText: ageValue,
                   focusedBorder: OutlineInputBorder(
                     borderSide:
@@ -121,7 +128,10 @@ class _ProfileState extends State<AccountRevise> {
                           icon: Icon(Icons.close),
                           onPressed: () => ageController.clear(),
                         ),
-                  prefixIcon: Icon(Icons.edit),
+                  prefixIcon: Icon(
+                    Icons.edit,
+                    color: kPrimaryColor,
+                  ),
                 ),
               ),
               Padding(
