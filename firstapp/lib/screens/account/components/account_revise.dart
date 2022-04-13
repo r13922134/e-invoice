@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../constants.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:cool_alert/cool_alert.dart';
 
 class AccountRevise extends StatefulWidget {
   const AccountRevise({Key? key}) : super(key: key);
@@ -24,13 +24,6 @@ class _ProfileState extends State<AccountRevise> {
 
   @override
   Widget build(BuildContext context) {
-    showalert() {
-      Alert(
-        context: context,
-        title: '修改成功!',
-      ).show();
-    }
-
     return Padding(
       padding: EdgeInsets.all(25),
       child: Center(
@@ -38,22 +31,7 @@ class _ProfileState extends State<AccountRevise> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
-                  icon: SvgPicture.asset("assets/icons/back_arrow.svg"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  top: 80.0,
-                ),
-              ),
-              TextFormField(
+              TextField(
                 controller: heightController,
                 textInputAction: TextInputAction.done,
                 decoration: InputDecoration(
@@ -67,31 +45,7 @@ class _ProfileState extends State<AccountRevise> {
                         ),
                   prefixIcon: Icon(Icons.height),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 0.0),
-                  ),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  top: 20.0,
-                ),
-              ),
-              TextFormField(
-                controller: heightController,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration(
-                  labelText: '身高',
-                  hintText: heightValue,
-                  suffixIcon: heightController.text.isEmpty
-                      ? Container(width: 0)
-                      : IconButton(
-                          icon: Icon(Icons.close),
-                          onPressed: () => heightController.clear(),
-                        ),
-                  prefixIcon: Icon(Icons.height),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 0.0),
+                    borderSide: BorderSide(color: kPrimaryColor, width: 1.5),
                   ),
                   border: OutlineInputBorder(),
                 ),
@@ -115,7 +69,7 @@ class _ProfileState extends State<AccountRevise> {
                         ),
                   prefixIcon: Icon(Icons.height),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 0.0),
+                    borderSide: BorderSide(color: kPrimaryColor, width: 1.5),
                   ),
                   border: OutlineInputBorder(),
                 ),
@@ -139,7 +93,7 @@ class _ProfileState extends State<AccountRevise> {
                         ),
                   prefixIcon: Icon(Icons.height),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 0.0),
+                    borderSide: BorderSide(color: kPrimaryColor, width: 1.5),
                   ),
                   border: OutlineInputBorder(),
                 ),
@@ -163,79 +117,7 @@ class _ProfileState extends State<AccountRevise> {
                         ),
                   prefixIcon: Icon(Icons.height),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 0.0),
-                  ),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  top: 20.0,
-                ),
-              ),
-              TextField(
-                controller: heightController,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration(
-                  labelText: '身高',
-                  hintText: heightValue,
-                  suffixIcon: heightController.text.isEmpty
-                      ? Container(width: 0)
-                      : IconButton(
-                          icon: Icon(Icons.close),
-                          onPressed: () => heightController.clear(),
-                        ),
-                  prefixIcon: Icon(Icons.height),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 0.0),
-                  ),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  top: 20.0,
-                ),
-              ),
-              TextField(
-                controller: heightController,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration(
-                  labelText: '身高',
-                  hintText: heightValue,
-                  suffixIcon: heightController.text.isEmpty
-                      ? Container(width: 0)
-                      : IconButton(
-                          icon: Icon(Icons.close),
-                          onPressed: () => heightController.clear(),
-                        ),
-                  prefixIcon: Icon(Icons.height),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 0.0),
-                  ),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  top: 20.0,
-                ),
-              ),
-              TextField(
-                controller: heightController,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration(
-                  labelText: '身高',
-                  hintText: heightValue,
-                  suffixIcon: heightController.text.isEmpty
-                      ? Container(width: 0)
-                      : IconButton(
-                          icon: Icon(Icons.close),
-                          onPressed: () => heightController.clear(),
-                        ),
-                  prefixIcon: Icon(Icons.height),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kPrimaryColor, width: 0.0),
+                    borderSide: BorderSide(color: kPrimaryColor, width: 1.5),
                   ),
                   border: OutlineInputBorder(),
                 ),
@@ -249,22 +131,17 @@ class _ProfileState extends State<AccountRevise> {
                 child: Text('Save'),
                 onPressed: () {
                   setHeight(heightController.text);
-                  showalert();
+                  CoolAlert.show(
+                    context: context,
+                    type: CoolAlertType.success,
+                    text: "修改成功!",
+                  );
                 },
-              ),
-              SizedBox(
-                height: 20,
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Future<void> _refresh() {
-    return Future.delayed(
-      Duration(seconds: 0),
     );
   }
 
