@@ -1,56 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'view_screen.dart';
 
-class Body extends StatefulWidget {
-  const Body({Key? key}) : super(key: key);
-  @override
-  _ProfileState createState() => _ProfileState();
-}
+import 'profile_menu.dart';
+import 'profile_pic.dart';
+import 'package:firstapp/screens/account/account_screen.dart';
 
-class _ProfileState extends State<Body> {
-  final profileController = TextEditingController();
+class Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(vertical: 20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextField(
-            controller: profileController,
-            decoration: InputDecoration(hintText: "Enter proifle"),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          ElevatedButton(
-            child: Text('Save'),
-            onPressed: () {
-              setProfile(profileController.text);
-            },
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          ElevatedButton(
-            child: Text('View'),
-            onPressed: () {
+          ProfilePic(),
+          SizedBox(height: 20),
+          ProfileMenu(
+            text: "My Account",
+            icon: "assets/icons/User Icon.svg",
+            press: () => {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ViewProfile(),
+                  builder: (context) => AccountScreen(),
                 ),
-              );
+              ),
             },
+          ),
+          ProfileMenu(
+            text: "Notifications",
+            icon: "assets/icons/Bell.svg",
+            press: () {},
+          ),
+          ProfileMenu(
+            text: "Settings",
+            icon: "assets/icons/Settings.svg",
+            press: () {},
+          ),
+          ProfileMenu(
+            text: "Help Center",
+            icon: "assets/icons/Question mark.svg",
+            press: () {},
+          ),
+          ProfileMenu(
+            text: "Log Out",
+            icon: "assets/icons/Log out.svg",
+            press: () {},
           ),
         ],
       ),
     );
-  }
-
-  Future<void> setProfile(profileValue) async {
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setString('profileData', profileValue);
   }
 }
