@@ -3,11 +3,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../constants.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:cool_alert/cool_alert.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class AccountRevise extends StatefulWidget {
   const AccountRevise({Key? key}) : super(key: key);
   @override
   _ProfileState createState() => _ProfileState();
+}
+
+class Disease {
+  final int id;
+  final String name;
+
+  Disease({
+    required this.id,
+    required this.name,
+  });
 }
 
 class _ProfileState extends State<AccountRevise> {
@@ -19,9 +30,21 @@ class _ProfileState extends State<AccountRevise> {
   final weightController = TextEditingController();
   final ageController = TextEditingController();
 
+  static List<Disease> _diseases = [
+    Disease(id: 1, name: "糖尿病"),
+    Disease(id: 2, name: "心血管疾病"),
+    Disease(id: 3, name: "腎功能異常"),
+  ];
+  final _items = _diseases
+      .map((diseases) => MultiSelectItem<Disease>(diseases, diseases.name))
+      .toList();
+  List<Disease> _selectedDisease = [];
+  final _multiSelectKey = GlobalKey<FormFieldState>();
+
   @override
   void initState() {
     super.initState();
+    _selectedDisease = _diseases;
     heightController.addListener(() => setState(() {}));
     weightController.addListener(() => setState(() {}));
     ageController.addListener(() => setState(() {}));
@@ -139,8 +162,73 @@ class _ProfileState extends State<AccountRevise> {
                   top: 20.0,
                 ),
               ),
+              Container(
+                decoration: BoxDecoration(
+                  color: kBackgroundColor,
+                  border: Border.all(
+                    color: kSecondaryColor,
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  shape: BoxShape.rectangle,
+                ),
+                child: Column(
+                  children: <Widget>[
+                    MultiSelectBottomSheetField(
+                      initialChildSize: 0.4,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          shape: BoxShape.rectangle,
+                          color: kBackgroundColor,
+                          border: Border.all(color: kSecondaryColor, width: 1)),
+                      listType: MultiSelectListType.CHIP,
+                      searchable: true,
+                      buttonText: Text(
+                        "疾病史",
+                        style: TextStyle(color: kPrimaryColor),
+                      ),
+                      buttonIcon:
+                          Icon(Icons.arrow_drop_down, color: kPrimaryColor),
+                      title: Text("疾病"),
+                      items: _items,
+                      onConfirm: (values) {
+                        _selectedDisease = values as List<Disease>;
+                      },
+                      chipDisplay: MultiSelectChipDisplay(
+                        chipColor: kSecondaryColor,
+                        icon:
+                            Icon(Icons.discount_rounded, color: kPrimaryColor),
+                        textStyle: TextStyle(
+                          color: Color.fromARGB(255, 129, 129, 129),
+                        ),
+                        onTap: (value) {
+                          setState(() {
+                            _selectedDisease.remove(value);
+                          });
+                        },
+                      ),
+                    ),
+                    _selectedDisease == null || _selectedDisease.isEmpty
+                        ? Container(
+                            padding: EdgeInsets.all(10),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "None selected",
+                              style: TextStyle(color: Colors.black54),
+                            ))
+                        : Container(),
+                  ],
+                ),
+              ),
+              SizedBox(height: 40),
               ElevatedButton(
-                child: Text('Save'),
+                child: Text('儲存'),
+                style: ElevatedButton.styleFrom(
+                    shape: StadiumBorder(),
+                    primary: kPrimaryColor,
+                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                    textStyle:
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 onPressed: () {
                   setProfile(heightController.text, weightController.text,
                       ageController.text);
