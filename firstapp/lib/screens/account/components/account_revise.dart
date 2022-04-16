@@ -4,6 +4,7 @@ import '../../../constants.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:cool_alert/cool_alert.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'dart:convert';
 
 class AccountRevise extends StatefulWidget {
   const AccountRevise({Key? key}) : super(key: key);
@@ -189,17 +190,16 @@ class _ProfileState extends State<AccountRevise> {
                       ),
                       buttonIcon:
                           Icon(Icons.arrow_drop_down, color: kPrimaryColor),
-                      title: Text("疾病"),
+                      title: Text("選擇"),
                       items: _items,
                       onConfirm: (values) {
                         _selectedDisease = values as List<Disease>;
                       },
-                      chipDisplay: MultiSelectChipDisplay(
+                      chipDisplay: MultiSelectChipDisplay<Disease>(
                         chipColor: kSecondaryColor,
-                        icon:
-                            Icon(Icons.discount_rounded, color: kPrimaryColor),
+                        icon: Icon(Icons.cancel_sharp, color: kTextColor),
                         textStyle: TextStyle(
-                          color: Color.fromARGB(255, 129, 129, 129),
+                          color: kTextColor,
                         ),
                         onTap: (value) {
                           setState(() {
