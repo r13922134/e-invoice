@@ -11,7 +11,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
       scaffoldBackgroundColor: kBackgroundColor,
-      primaryColor: kTextColor,
+      primaryColor: kPrimaryColor,
       textTheme: TextTheme(
         bodyText2: TextStyle(color: kTextColor),
       ),
