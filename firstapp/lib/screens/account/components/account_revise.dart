@@ -45,7 +45,7 @@ class _ProfileState extends State<AccountRevise> {
   @override
   void initState() {
     super.initState();
-    _selectedDisease = _diseases;
+    _selectedDisease = [_diseases[1], _diseases[0], _diseases[2]];
     heightController.addListener(() => setState(() {}));
     weightController.addListener(() => setState(() {}));
     ageController.addListener(() => setState(() {}));
@@ -92,7 +92,7 @@ class _ProfileState extends State<AccountRevise> {
               ),
               Padding(
                 padding: EdgeInsets.only(
-                  top: 20.0,
+                  top: 10.0,
                 ),
               ),
               TextField(
@@ -126,7 +126,7 @@ class _ProfileState extends State<AccountRevise> {
               ),
               Padding(
                 padding: EdgeInsets.only(
-                  top: 20.0,
+                  top: 10.0,
                 ),
               ),
               TextField(
@@ -160,7 +160,7 @@ class _ProfileState extends State<AccountRevise> {
               ),
               Padding(
                 padding: EdgeInsets.only(
-                  top: 20.0,
+                  top: 10.0,
                 ),
               ),
               Container(
@@ -177,6 +177,7 @@ class _ProfileState extends State<AccountRevise> {
                   children: <Widget>[
                     MultiSelectBottomSheetField(
                       initialChildSize: 0.4,
+                      initialValue: _selectedDisease,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           shape: BoxShape.rectangle,
@@ -184,6 +185,7 @@ class _ProfileState extends State<AccountRevise> {
                           border: Border.all(color: kSecondaryColor, width: 1)),
                       listType: MultiSelectListType.CHIP,
                       searchable: true,
+                      unselectedColor: Color.fromARGB(255, 179, 178, 178),
                       buttonText: Text(
                         "疾病史",
                         style: TextStyle(color: kPrimaryColor),
@@ -202,21 +204,11 @@ class _ProfileState extends State<AccountRevise> {
                           color: kTextColor,
                         ),
                         onTap: (value) {
-                          setState(() {
-                            _selectedDisease.remove(value);
-                          });
+                          _selectedDisease.remove(value);
+                          return _selectedDisease;
                         },
                       ),
                     ),
-                    _selectedDisease == null || _selectedDisease.isEmpty
-                        ? Container(
-                            padding: EdgeInsets.all(10),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "None selected",
-                              style: TextStyle(color: Colors.black54),
-                            ))
-                        : Container(),
                   ],
                 ),
               ),
