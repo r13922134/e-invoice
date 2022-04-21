@@ -54,10 +54,11 @@ class Disease {
 }
 
 class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
-  static List<Disease> _diseases = [
+  static final List<Disease> _diseases = [
     Disease(id: 1, name: "糖尿病"),
-    Disease(id: 2, name: "心血管疾病"),
-    Disease(id: 3, name: "腎功能異常"),
+    Disease(id: 2, name: "高血壓"),
+    Disease(id: 3, name: "高血脂"),
+    Disease(id: 4, name: "腎功能異常"),
   ];
 
   final _items = _diseases
@@ -78,7 +79,9 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
   Future<void> getProfile() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     final String? listString = await pref.getString('select_siseases');
-    _selectedDisease = Disease.decode(listString!);
+    if (listString != null) {
+      _selectedDisease = Disease.decode(listString);
+    }
     genderValue = pref.getInt('gender')!;
     heightValue = pref.getInt('height')!;
     weightValue = pref.getInt('weight')!;
@@ -95,242 +98,213 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(45),
-      child: Center(
-        child: Form(
-          child: ListView(
-            children: <Widget>[
-              SizedBox(height: 30),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(Icons.supervisor_account_outlined),
-                    Text(
-                      "性別",
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 80, 80, 80),
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text("  "),
-                  ]),
-              SizedBox(height: 10),
-              DefaultTabController(
-                initialIndex: genderValue,
-                length: 2,
-                child: Column(
-                  children: <Widget>[
-                    ButtonsTabBar(
-                        borderColor: Color.fromARGB(255, 36, 145, 126),
-                        unselectedBorderColor: kSecondaryColor,
-                        backgroundColor: Color.fromARGB(255, 36, 145, 126),
-                        unselectedBackgroundColor: Colors.white,
-                        unselectedLabelStyle: TextStyle(
-                            color: kSecondaryColor,
-                            fontWeight: FontWeight.bold),
-                        borderWidth: 2,
-                        contentPadding: EdgeInsets.all(10),
-                        radius: 15,
-                        tabs: [
-                          Tab(icon: Icon(Icons.male)),
-                          Tab(icon: Icon(Icons.female))
-                        ],
-                        onTap: (index) {
-                          genderValue = index;
-                        }),
-                  ],
-                ),
+      padding: const EdgeInsets.all(18),
+      child: ListView(
+        children: <Widget>[
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            Icon(Icons.supervisor_account_outlined),
+            Text(
+              "性別",
+              style: TextStyle(
+                color: Color.fromARGB(255, 80, 80, 80),
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
               ),
-              SizedBox(height: 20),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(Icons.edit),
-                    Text(
-                      "年齡",
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 80, 80, 80),
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text("  "),
-                  ]),
-              SizedBox(height: 10),
-              NumberPicker(
-                textStyle: TextStyle(color: kPrimaryColor),
-                selectedTextStyle: TextStyle(
-                  color: Color.fromARGB(255, 36, 145, 126),
-                  fontSize: 25,
-                  fontWeight: FontWeight.w700,
-                ),
-                value: ageValue,
-                minValue: 1,
-                maxValue: 100,
-                step: 1,
-                itemHeight: 50,
-                axis: Axis.horizontal,
-                onChanged: (value) => setState(() => ageValue = value),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: kPrimaryColor),
-                ),
+            ),
+            Text("  "),
+          ]),
+          SizedBox(height: 10),
+          DefaultTabController(
+            initialIndex: genderValue,
+            length: 2,
+            child: Column(
+              children: <Widget>[
+                ButtonsTabBar(
+                    borderColor: Color.fromARGB(255, 36, 145, 126),
+                    unselectedBorderColor: kSecondaryColor,
+                    backgroundColor: Color.fromARGB(255, 36, 145, 126),
+                    unselectedBackgroundColor: Colors.white,
+                    unselectedLabelStyle: TextStyle(
+                        color: kSecondaryColor, fontWeight: FontWeight.bold),
+                    borderWidth: 2,
+                    contentPadding: EdgeInsets.all(10),
+                    radius: 15,
+                    height: 55,
+                    tabs: [
+                      Tab(icon: Icon(Icons.male)),
+                      Tab(icon: Icon(Icons.female))
+                    ],
+                    onTap: (index) {
+                      genderValue = index;
+                    }),
+              ],
+            ),
+          ),
+          SizedBox(height: 20),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            Icon(Icons.edit),
+            Text(
+              "年齡",
+              style: TextStyle(
+                color: Color.fromARGB(255, 80, 80, 80),
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
               ),
-              SizedBox(height: 20),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(Icons.boy),
-                    Text(
-                      "身高",
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 80, 80, 80),
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text("   "),
-                  ]),
-              SizedBox(height: 2),
-              NumberPicker(
-                textStyle: TextStyle(color: kPrimaryColor),
-                selectedTextStyle: TextStyle(
-                  color: Color.fromARGB(255, 36, 145, 126),
-                  fontSize: 25,
-                  fontWeight: FontWeight.w700,
-                ),
-                value: heightValue,
-                minValue: 120,
-                maxValue: 220,
-                step: 1,
-                itemHeight: 50,
-                onChanged: (value) => setState(() => heightValue = value),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: kPrimaryColor),
-                ),
+            ),
+            Text("  "),
+          ]),
+          NumberPicker(
+            textStyle: TextStyle(color: kPrimaryColor),
+            selectedTextStyle: TextStyle(
+              color: Color.fromARGB(255, 36, 145, 126),
+              fontSize: 35,
+              fontWeight: FontWeight.w700,
+            ),
+            value: ageValue,
+            minValue: 1,
+            maxValue: 100,
+            step: 1,
+            itemHeight: 38,
+            onChanged: (value) => setState(() => ageValue = value),
+          ),
+          SizedBox(height: 20),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            Icon(Icons.boy),
+            Text(
+              "身高(cm)",
+              style: TextStyle(
+                color: Color.fromARGB(255, 80, 80, 80),
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
               ),
-              SizedBox(height: 20),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(Icons.accessibility),
-                    Text(
-                      "體重",
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 80, 80, 80),
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text("   "),
-                  ]),
-              SizedBox(height: 2),
-              NumberPicker(
-                textStyle: TextStyle(color: kPrimaryColor),
-                selectedTextStyle: TextStyle(
-                  color: Color.fromARGB(255, 36, 145, 126),
-                  fontSize: 25,
-                  fontWeight: FontWeight.w700,
-                ),
-                value: weightValue,
-                minValue: 30,
-                maxValue: 150,
-                step: 1,
-                itemHeight: 50,
-                onChanged: (value) => setState(() => weightValue = value),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: kPrimaryColor),
-                ),
+            ),
+            Text("   "),
+          ]),
+          NumberPicker(
+            textStyle: TextStyle(color: kPrimaryColor),
+            selectedTextStyle: TextStyle(
+              color: Color.fromARGB(255, 36, 145, 126),
+              fontSize: 35,
+              fontWeight: FontWeight.w700,
+            ),
+            value: heightValue,
+            minValue: 120,
+            maxValue: 220,
+            step: 1,
+            itemHeight: 38,
+            onChanged: (value) => setState(() => heightValue = value),
+          ),
+          SizedBox(height: 20),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            Icon(Icons.accessibility),
+            Text(
+              "體重(kg)",
+              style: TextStyle(
+                color: Color.fromARGB(255, 80, 80, 80),
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
               ),
-              SizedBox(height: 20),
-              Container(
-                decoration: BoxDecoration(
-                  color: kBackgroundColor,
-                  border: Border.all(
-                    color: kSecondaryColor,
-                    width: 1,
+            ),
+            Text("   "),
+          ]),
+          NumberPicker(
+            textStyle: TextStyle(color: kPrimaryColor),
+            selectedTextStyle: TextStyle(
+              color: Color.fromARGB(255, 36, 145, 126),
+              fontSize: 35,
+              fontWeight: FontWeight.w700,
+            ),
+            value: weightValue,
+            minValue: 30,
+            maxValue: 150,
+            step: 1,
+            itemHeight: 38,
+            onChanged: (value) => setState(() => weightValue = value),
+          ),
+          SizedBox(height: 20),
+          Container(
+            decoration: BoxDecoration(
+              color: kBackgroundColor,
+              border: Border.all(
+                color: kSecondaryColor,
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(10),
+              shape: BoxShape.rectangle,
+            ),
+            child: Column(
+              children: <Widget>[
+                MultiSelectBottomSheetField(
+                  initialValue: _selectedDisease,
+                  selectedItemsTextStyle: TextStyle(color: Colors.white),
+                  selectedColor: kPrimaryColor,
+                  initialChildSize: 0.4,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      shape: BoxShape.rectangle,
+                      color: kBackgroundColor,
+                      border: Border.all(color: kSecondaryColor, width: 1)),
+                  listType: MultiSelectListType.CHIP,
+                  searchable: true,
+                  unselectedColor: Color.fromARGB(255, 179, 178, 178),
+                  buttonText: Text(
+                    "疾病史",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 80, 80, 80),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(10),
-                  shape: BoxShape.rectangle,
-                ),
-                child: Column(
-                  children: <Widget>[
-                    MultiSelectBottomSheetField(
-                      initialValue: _selectedDisease,
-                      selectedItemsTextStyle: TextStyle(color: Colors.white),
-                      selectedColor: kPrimaryColor,
-                      initialChildSize: 0.4,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          shape: BoxShape.rectangle,
-                          color: kBackgroundColor,
-                          border: Border.all(color: kSecondaryColor, width: 1)),
-                      listType: MultiSelectListType.CHIP,
-                      searchable: true,
-                      unselectedColor: Color.fromARGB(255, 179, 178, 178),
-                      buttonText: Text(
-                        "疾病史",
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 80, 80, 80),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      buttonIcon:
-                          Icon(Icons.arrow_drop_down, color: kPrimaryColor),
-                      title: Text("選擇"),
-                      items: _items,
-                      onConfirm: (values) {
-                        _selectedDisease = values as List<Disease>;
-                      },
-                      chipDisplay: MultiSelectChipDisplay<Disease>(
-                        chipColor: kSecondaryColor,
-                        icon: Icon(Icons.cancel_sharp, color: kTextColor),
-                        textStyle: TextStyle(
-                          color: kTextColor,
-                        ),
-                        onTap: (value) {
-                          _selectedDisease.remove(value);
-                          return _selectedDisease;
-                        },
-                      ),
+                  buttonIcon: Icon(Icons.arrow_drop_down, color: kPrimaryColor),
+                  title: Text("選擇"),
+                  items: _items,
+                  onConfirm: (values) {
+                    _selectedDisease = values as List<Disease>;
+                  },
+                  chipDisplay: MultiSelectChipDisplay<Disease>(
+                    chipColor: kSecondaryColor,
+                    icon: Icon(Icons.cancel_sharp, color: kTextColor),
+                    textStyle: TextStyle(
+                      color: kTextColor,
                     ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 40),
-              ElevatedButton(
-                child: Text('儲存'),
-                style: ElevatedButton.styleFrom(
-                    shape: StadiumBorder(),
-                    primary: kPrimaryColor,
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                    textStyle:
-                        TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                onPressed: () {
-                  setProfile(heightValue, weightValue, ageValue, genderValue);
-                  CoolAlert.show(
-                    context: context,
-                    type: CoolAlertType.success,
-                    confirmBtnColor: kPrimaryColor,
-                    onConfirmBtnTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProfileScreen(),
-                        ),
-                      );
+                    onTap: (value) {
+                      _selectedDisease.remove(value);
+                      return _selectedDisease;
                     },
-                    text: "修改成功!",
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 50),
+          ElevatedButton(
+            child: Text('儲存'),
+            style: ElevatedButton.styleFrom(
+                shape: StadiumBorder(),
+                primary: kPrimaryColor,
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                textStyle:
+                    TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            onPressed: () {
+              setProfile(heightValue, weightValue, ageValue, genderValue);
+              CoolAlert.show(
+                context: context,
+                type: CoolAlertType.success,
+                confirmBtnColor: kPrimaryColor,
+                onConfirmBtnTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileScreen(),
+                    ),
                   );
                 },
-              ),
-            ],
+                text: "修改成功!",
+              );
+            },
           ),
-        ),
+          SizedBox(height: 50),
+        ],
       ),
     );
   }
