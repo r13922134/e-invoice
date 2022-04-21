@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: Colors.transparent,
         key: _NavKey,
         items: [
-          Icon((myindex == 0) ? Icons.home_outlined : Icons.home,
+          Icon((myindex == 0) ? Icons.cloud_upload : Icons.home,
               color: kBackgroundColor),
           Icon(
               (myindex == 1)
@@ -53,13 +53,9 @@ class _MyAppState extends State<MyApp> {
               color: kBackgroundColor),
           Icon((myindex == 2) ? Icons.insights_outlined : Icons.fastfood,
               color: kBackgroundColor),
-          Icon(
-              (myindex == 3)
-                  ? Icons.perm_identity
-                  : Icons.perm_contact_cal_rounded,
+          Icon((myindex == 3) ? Icons.person : Icons.perm_contact_cal_rounded,
               color: kBackgroundColor),
         ],
-        buttonBackgroundColor: kPrimaryColor,
         onTap: (index) {
           setState(() {
             myindex = index;

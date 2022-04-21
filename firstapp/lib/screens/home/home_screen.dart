@@ -14,6 +14,7 @@ class _IdentityPageState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       appBar: buildAppBar(),
       body: Body(),
     );
