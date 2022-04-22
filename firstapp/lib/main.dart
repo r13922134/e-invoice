@@ -12,7 +12,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
       scaffoldBackgroundColor: kBackgroundColor,
-      primaryColor: kTextColor,
+      primaryColor: kPrimaryColor,
       textTheme: TextTheme(
         bodyText2: TextStyle(color: kTextColor),
       ),
@@ -45,16 +45,18 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: Colors.transparent,
         key: _NavKey,
         items: [
-          Icon((myindex == 0) ? Icons.home_outlined : Icons.home),
-          Icon((myindex == 1)
-              ? Icons.qr_code_2_outlined
-              : Icons.add_a_photo_rounded),
-          Icon((myindex == 2) ? Icons.insights_outlined : Icons.fastfood),
-          Icon((myindex == 3)
-              ? Icons.perm_identity
-              : Icons.perm_contact_cal_rounded),
+          Icon((myindex == 0) ? Icons.cloud_upload : Icons.home,
+              color: kBackgroundColor),
+          Icon(
+              (myindex == 1)
+                  ? Icons.qr_code_2_outlined
+                  : Icons.add_a_photo_rounded,
+              color: kBackgroundColor),
+          Icon((myindex == 2) ? Icons.insights_outlined : Icons.fastfood,
+              color: kBackgroundColor),
+          Icon((myindex == 3) ? Icons.person : Icons.perm_contact_cal_rounded,
+              color: kBackgroundColor),
         ],
-        buttonBackgroundColor: kBackgroundColor,
         onTap: (index) {
           setState(() {
             myindex = index;

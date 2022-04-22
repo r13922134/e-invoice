@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'profile_menu.dart';
 import 'profile_pic.dart';
 import 'package:firstapp/screens/account/account_screen.dart';
