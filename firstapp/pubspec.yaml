@@ -37,6 +37,7 @@ dependencies:
   cool_alert: any
   flutter_swiper : any
   multi_select_flutter: ^4.1.2
+  liquid_pull_to_refresh: ^3.0.1
   numberpicker: ^2.1.1
   buttons_tabbar: ^1.3.4
   http: ^0.13.1
