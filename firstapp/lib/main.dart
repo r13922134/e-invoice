@@ -4,14 +4,14 @@ import 'package:firstapp/screens/home/home_screen.dart';
 import 'package:firstapp/screens/profile/profile_screen.dart';
 import 'package:firstapp/screens/scan/scan_screen.dart';
 import 'package:firstapp/screens/analysis/analysis_screen.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';  
-import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
       scaffoldBackgroundColor: kBackgroundColor,
+      primarySwatch: Colors.blueGrey,
       primaryColor: kPrimaryColor,
       textTheme: TextTheme(
         bodyText2: TextStyle(color: kTextColor),
@@ -42,6 +42,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(
+        height: 65,
         backgroundColor: Colors.transparent,
         key: _NavKey,
         items: [
