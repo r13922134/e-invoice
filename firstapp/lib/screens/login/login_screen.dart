@@ -1,28 +1,36 @@
 import 'package:firstapp/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
-import 'package:firstapp/screens/home/home_screen.dart';
 import 'package:firstapp/screens/login/login_model.dart';
 import 'package:http/http.dart' as http;
+import '../../../constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+import 'package:firstapp/database/invoice_database.dart';
 
 const users = const {
   'dribbble@gmail.com': '12345',
   'hunter@gmail.com': 'hunter',
 };
+main() {
+  WidgetsFlutterBinding.ensureInitialized();
+}
 
 class LoginScreen extends StatelessWidget {
   Duration get loginTime => Duration(milliseconds: 2250);
-  late LoginModel _loginModel;
+
+  Future<void> setDevice(barcode, password) async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('barcode', barcode);
+    pref.setString('password', password);
+  }
 
   Future<String?> _authUser(LoginData data) {
     debugPrint('Name: ${data.name}, Password: ${data.password}');
     print(data.password.runtimeType);
-    return Future.delayed(loginTime).then((_) async {
-      //if (!users.containsKey(data.name)) {
-      //return 'User not exists';
-      //}
-
-      //_loginModel = await _createLogin(data.name, data.password);
+    return Future.delayed(loginTime).then((_) {
+      setDevice(data.name, data.password);
+      _createLogin(data.name, data.password);
       return null;
     });
   }
@@ -44,24 +52,96 @@ class LoginScreen extends StatelessWidget {
     });
   }
 
-  Future<LoginModel> _createLogin(String phoneNo, String password) async {
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 10;
+  Future<LoginModel?> _createLogin(String barcode, String password) async {
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 20;
+    int exp = timestamp + 200;
+    var now = new DateTime.now();
+    var formatter = new DateFormat('yyyy/MM/dd');
+    var formatter2 = new DateFormat('yyyy/MM/01');
+    String formattedDate = formatter.format(now);
+    String startDate = formatter2.format(now);
+    List<Detail> tmp = [];
+    List<Header> header = [];
+    var last;
+    var start;
+
+    for (int j = 5; j > 0; j--) {
+      start = new DateTime(now.year, now.month - j, 01);
+      last = new DateTime(start.year, start.month + 1, 0);
+      String sdate = formatter.format(start);
+      String edate = formatter.format(last);
+      var response = await http.post(
+          Uri.https("api.einvoice.nat.gov.tw", "/PB2CAPIVAN/invServ/InvServ"),
+          body: {
+            "version": "0.5",
+            "cardType": "3J0002",
+            "cardNo": barcode,
+            "expTimeStamp": exp.toString(),
+            "action": "carrierInvChk",
+            "timeStamp": timestamp.toString(),
+            "startDate": sdate,
+            "endDate": edate,
+            "onlyWinningInv": 'N',
+            "uuid": '1000',
+            "appID": 'EINV0202204156709',
+            "cardEncrypt": password,
+          });
+      String responseString = response.body;
+      tmp = loginModelFromJson(responseString).details;
+      header = [];
+
+      for (int i = 0; i < tmp.length; i++) {
+        header.add(Header(
+            date: tmp[i].invDate.year.toString() +
+                '/' +
+                tmp[i].invDate.month.toString() +
+                '/' +
+                tmp[i].invDate.date.toString(),
+            time: tmp[i].invoiceTime,
+            seller: tmp[i].sellerName,
+            address: tmp[i].sellerAddress,
+            inv_num: tmp[i].invNum,
+            barcode: tmp[i].cardNo,
+            amount: tmp[i].amount));
+        await HeaderHelper.instance.add(header[i]);
+      }
+    }
     var response = await http.post(
-        Uri.https(
-            "api.einvoice.nat.gov.tw", "/PB2CAPIVAN/Carrier/AppGetBarcode"),
+        Uri.https("api.einvoice.nat.gov.tw", "/PB2CAPIVAN/invServ/InvServ"),
         body: {
-          "action": "getBarcode",
-          "appID": "EINV0202204156709",
-          "phoneNo": phoneNo,
+          "version": "0.5",
+          "cardType": "3J0002",
+          "cardNo": barcode,
+          "expTimeStamp": exp.toString(),
+          "action": "carrierInvChk",
           "timeStamp": timestamp.toString(),
-          "uuid": "1000",
-          "verificationCode": password,
-          "version": "1.0"
+          "startDate": startDate,
+          "endDate": formattedDate,
+          "onlyWinningInv": 'N',
+          "uuid": '1000',
+          "appID": 'EINV0202204156709',
+          "cardEncrypt": password,
         });
-    var data = response.body;
-    print(data);
     String responseString = response.body;
-    return loginModelFromJson(responseString);
+    tmp = loginModelFromJson(responseString).details;
+    header = [];
+
+    for (int i = 0; i < tmp.length; i++) {
+      header.add(Header(
+          date: tmp[i].invDate.year.toString() +
+              '/' +
+              tmp[i].invDate.month.toString() +
+              '/' +
+              tmp[i].invDate.date.toString(),
+          time: tmp[i].invoiceTime,
+          seller: tmp[i].sellerName,
+          address: tmp[i].sellerAddress,
+          inv_num: tmp[i].invNum,
+          barcode: tmp[i].cardNo,
+          amount: tmp[i].amount));
+      await HeaderHelper.instance.add(header[i]);
+    }
+    return null;
   }
 
   @override

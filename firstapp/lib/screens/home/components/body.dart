@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import '../../../constants.dart';
 import 'package:firstapp/screens/details/details_screen.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import 'package:firstapp/database/invoice_database.dart';
+
+main() {
+  WidgetsFlutterBinding.ensureInitialized();
+}
 
 class Body extends StatefulWidget {
   @override
@@ -16,10 +21,10 @@ class _State extends State<Body> {
 
   List<Widget> itemsData = [];
 
-  void getPostsData() {
-    List<dynamic> responseList = FOOD_DATA;
+  void getPostsData() async {
+    List<Header> responseList = await HeaderHelper.instance.getHeader();
     List<Widget> listItems = [];
-    responseList.forEach((post) {
+    for (int i = responseList.length - 1; i > -1; i--) {
       listItems.add(
         GestureDetector(
             onTap: () {
@@ -50,21 +55,32 @@ class _State extends State<Body> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  responseList[i].inv_num,
+                                  style: const TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  '    ' + responseList[i].date,
+                                  style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ]),
                           Text(
-                            post["name"],
+                            responseList[i].seller,
                             style: const TextStyle(
-                                fontSize: 28, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            post["brand"],
-                            style: const TextStyle(
-                                fontSize: 17, color: Colors.grey),
+                                fontSize: 12, color: Colors.black),
                           ),
                           SizedBox(
                             height: 10,
                           ),
                           Text(
-                            "\$ ${post["price"]}",
+                            "\$" + responseList[i].amount,
                             style: const TextStyle(
                                 fontSize: 25,
                                 color: Colors.black,
@@ -73,14 +89,15 @@ class _State extends State<Body> {
                         ],
                       ),
                       Image.asset(
-                        "assets/images/${post["image"]}",
-                        height: double.infinity,
+                        "assets/images/image_1.png",
+                        height: 80,
                       )
                     ],
                   ),
                 ))),
       );
-    });
+    }
+    ;
     setState(() {
       itemsData = listItems;
     });
@@ -119,10 +136,10 @@ class _State extends State<Body> {
                 height: 10,
               ),
               AnimatedOpacity(
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 500),
                 opacity: closeTopContainer ? 0 : 1,
                 child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 500),
                     width: size.width,
                     alignment: Alignment.topCenter,
                     height: closeTopContainer ? 0 : categoryHeight,
@@ -233,7 +250,7 @@ class CategoriesScroller extends StatelessWidget {
                           "Newest",
                           style: TextStyle(
                               fontSize: 25,
-                              color: Colors.white,
+                              color: Colors.grey,
                               fontWeight: FontWeight.bold),
                         ),
                         SizedBox(
