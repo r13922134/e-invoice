@@ -80,4 +80,9 @@ class HeaderHelper {
     Database db = await instance.database;
     return await db.insert('header', header.toMap());
   }
+
+  Future<void> delete() async {
+    Database db = await instance.database;
+    await db.delete('header');
+  }
 }

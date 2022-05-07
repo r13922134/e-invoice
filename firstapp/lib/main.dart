@@ -41,8 +41,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       bottomNavigationBar: CurvedNavigationBar(
-        height: 65,
+        height: 64,
         backgroundColor: Colors.transparent,
         key: _NavKey,
         items: [

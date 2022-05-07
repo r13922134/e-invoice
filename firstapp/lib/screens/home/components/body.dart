@@ -21,7 +21,7 @@ class _State extends State<Body> {
 
   List<Widget> itemsData = [];
 
-  void getPostsData() async {
+  Future getPostsData() async {
     List<Header> responseList = await HeaderHelper.instance.getHeader();
     List<Widget> listItems = [];
     for (int i = responseList.length - 1; i > -1; i--) {
@@ -74,7 +74,7 @@ class _State extends State<Body> {
                           Text(
                             responseList[i].seller,
                             style: const TextStyle(
-                                fontSize: 12, color: Colors.black),
+                                fontSize: 11, color: Colors.black),
                           ),
                           SizedBox(
                             height: 10,
@@ -127,59 +127,63 @@ class _State extends State<Body> {
     final double categoryHeight = size.height * 0.30;
     return SafeArea(
       child: Scaffold(
-        backgroundColor: kBackgroundColor,
-        body: Container(
-          height: size.height,
-          child: Column(
-            children: <Widget>[
-              const SizedBox(
-                height: 10,
-              ),
-              AnimatedOpacity(
-                duration: const Duration(milliseconds: 500),
-                opacity: closeTopContainer ? 0 : 1,
-                child: AnimatedContainer(
+        body: FutureBuilder(
+          future: getPostsData(),
+          builder: (BuildContext context, snapshot) {
+            return Container(
+              height: size.height,
+              child: Column(
+                children: <Widget>[
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  AnimatedOpacity(
                     duration: const Duration(milliseconds: 500),
-                    width: size.width,
-                    alignment: Alignment.topCenter,
-                    height: closeTopContainer ? 0 : categoryHeight,
-                    child: categoriesScroller),
+                    opacity: closeTopContainer ? 0 : 1,
+                    child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        width: size.width,
+                        alignment: Alignment.topCenter,
+                        height: closeTopContainer ? 0 : categoryHeight,
+                        child: categoriesScroller),
+                  ),
+                  Expanded(
+                    child: LiquidPullToRefresh(
+                        height: 90,
+                        color: kSecondaryColor,
+                        onRefresh: _handleRefresh,
+                        child: ListView.builder(
+                            controller: controller,
+                            itemCount: itemsData.length,
+                            physics: BouncingScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              double scale = 1.0;
+                              if (topContainer > 0.5) {
+                                scale = index + 0.5 - topContainer;
+                                if (scale < 0) {
+                                  scale = 0;
+                                } else if (scale > 1) {
+                                  scale = 1;
+                                }
+                              }
+                              return Opacity(
+                                opacity: scale,
+                                child: Transform(
+                                  transform: Matrix4.identity()
+                                    ..scale(scale, scale),
+                                  alignment: Alignment.bottomCenter,
+                                  child: Align(
+                                      heightFactor: 0.7,
+                                      alignment: Alignment.topCenter,
+                                      child: itemsData[index]),
+                                ),
+                              );
+                            })),
+                  ),
+                ],
               ),
-              Expanded(
-                child: LiquidPullToRefresh(
-                    height: 90,
-                    color: kSecondaryColor,
-                    onRefresh: _handleRefresh,
-                    child: ListView.builder(
-                        controller: controller,
-                        itemCount: itemsData.length,
-                        physics: BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          double scale = 1.0;
-                          if (topContainer > 0.5) {
-                            scale = index + 0.5 - topContainer;
-                            if (scale < 0) {
-                              scale = 0;
-                            } else if (scale > 1) {
-                              scale = 1;
-                            }
-                          }
-                          return Opacity(
-                            opacity: scale,
-                            child: Transform(
-                              transform: Matrix4.identity()
-                                ..scale(scale, scale),
-                              alignment: Alignment.bottomCenter,
-                              child: Align(
-                                  heightFactor: 0.7,
-                                  alignment: Alignment.topCenter,
-                                  child: itemsData[index]),
-                            ),
-                          );
-                        })),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

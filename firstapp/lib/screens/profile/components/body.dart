@@ -1,10 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'profile_menu.dart';
 import 'profile_pic.dart';
 import 'package:firstapp/screens/account/account_screen.dart';
 import 'package:firstapp/screens/login/login_screen.dart';
+import 'package:firstapp/screens/profile/profile_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cool_alert/cool_alert.dart';
+import '../../../constants.dart';
+import 'package:firstapp/database/invoice_database.dart';
 
-class Body extends StatelessWidget {
+class Body extends StatefulWidget {
+  @override
+  ProfileBody createState() => ProfileBody();
+}
+
+class ProfileBody extends State<Body> {
+  late String barcode;
+
+  Future<void> getBarcode() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    barcode = pref.getString('barcode')!;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getBarcode();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -52,6 +78,21 @@ class Body extends StatelessWidget {
               ),
             },
           ),
+          ProfileMenu(
+              text: "Log Out",
+              icon: "assets/icons/Log out.svg",
+              press: () => {
+                    CoolAlert.show(
+                      context: context,
+                      type: CoolAlertType.confirm,
+                      confirmBtnColor: kPrimaryColor,
+                      onConfirmBtnTap: () async {
+                        await HeaderHelper.instance.delete();
+                        Navigator.pop(context);
+                      },
+                      text: "登出確認",
+                    )
+                  }),
         ],
       ),
     );
