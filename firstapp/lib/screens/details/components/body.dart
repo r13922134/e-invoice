@@ -5,6 +5,15 @@ import 'image_and_icons.dart';
 import 'title_and_price.dart';
 
 class Body extends StatelessWidget {
+  const Body({
+    Key? key,
+    required this.text,
+    required this.icon,
+    this.press,
+  }) : super(key: key);
+
+  final String text, icon;
+  final VoidCallback? press;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;

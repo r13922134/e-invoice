@@ -31,7 +31,13 @@ class _State extends State<Body> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DetailsScreen(),
+                  builder: (context) => DetailsScreen(
+                    tag: responseList[i].tag,
+                    seller: responseList[i].seller,
+                    address: responseList[i].address,
+                    invNum: responseList[i].inv_num,
+                    amount: responseList[i].amount,
+                  ),
                 ),
               );
             },
@@ -65,9 +71,9 @@ class _State extends State<Body> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  '    ' + responseList[i].date,
+                                  ' ' + responseList[i].date,
                                   style: const TextStyle(
-                                      fontSize: 15,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.bold),
                                 ),
                               ]),

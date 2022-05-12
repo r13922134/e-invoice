@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Header {
+  String tag;
   String date;
   String time;
   String seller;
@@ -14,6 +15,7 @@ class Header {
   String amount;
 
   Header({
+    required this.tag,
     required this.date,
     required this.time,
     required this.seller,
@@ -23,6 +25,7 @@ class Header {
     required this.amount,
   });
   factory Header.fromMap(Map<String, dynamic> json) => new Header(
+        tag: json['tag'],
         date: json['date'],
         time: json['time'],
         seller: json['seller'],
@@ -33,6 +36,7 @@ class Header {
       );
   Map<String, dynamic> toMap() {
     return {
+      'tag': tag,
       'date': date,
       'time': time,
       'seller': seller,
@@ -64,7 +68,7 @@ class HeaderHelper {
 
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE HEADER(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,date TEXT,time TEXT,seller TEXT,address TEXT,inv_num TEXT,barcode TEXT,amount TEXT)
+      CREATE TABLE HEADER(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,tag TEXT,date TEXT,time TEXT,seller TEXT,address TEXT,inv_num TEXT,barcode TEXT,amount TEXT)
 ''');
   }
 

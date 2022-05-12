@@ -2,11 +2,13 @@ import 'package:firstapp/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:firstapp/screens/login/login_model.dart';
+import 'package:firstapp/screens/details/detail_model.dart';
 import 'package:http/http.dart' as http;
 import '../../../constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:firstapp/database/invoice_database.dart';
+import 'package:firstapp/database/details_database.dart';
 
 const users = const {
   'dribbble@gmail.com': '12345',
@@ -53,18 +55,22 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<LoginModel?> _createLogin(String barcode, String password) async {
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 20;
-    int exp = timestamp + 200;
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 100;
+    int exp = timestamp + 300;
     var now = new DateTime.now();
     var formatter = new DateFormat('yyyy/MM/dd');
     List<Detail> tmp = [];
     List<Header> header = [];
+    List<Details> tmp2 = [];
+    List<invoice_details> detail = [];
     String responseString;
     String sdate;
     String edate;
     var last;
     var start;
     var response;
+    int tmpyear;
+    var invDate;
 
     for (int j = 5; j >= 0; j--) {
       start = new DateTime(now.year, now.month - j, 01);
@@ -92,12 +98,15 @@ class LoginScreen extends StatelessWidget {
       header = [];
 
       for (int i = 0; i < tmp.length; i++) {
+        tmpyear = tmp[i].invDate.year + 1911;
+        invDate =
+            new DateTime(tmpyear, tmp[i].invDate.month, tmp[i].invDate.date);
+        invDate = formatter.format(invDate);
+        print(invDate);
         header.add(Header(
-            date: tmp[i].invDate.year.toString() +
-                '/' +
-                tmp[i].invDate.month.toString() +
-                '/' +
-                tmp[i].invDate.date.toString(),
+            tag: tmp[i].invDate.year.toString() +
+                tmp[i].invDate.month.toString(),
+            date: invDate.toString(),
             time: tmp[i].invoiceTime,
             seller: tmp[i].sellerName,
             address: tmp[i].sellerAddress,
@@ -105,6 +114,39 @@ class LoginScreen extends StatelessWidget {
             barcode: tmp[i].cardNo,
             amount: tmp[i].amount));
         await HeaderHelper.instance.add(header[i]);
+
+        response = await http.post(
+            Uri.https("api.einvoice.nat.gov.tw", "/PB2CAPIVAN/invServ/InvServ"),
+            body: {
+              "version": "0.5",
+              "cardType": "3J0002",
+              "cardNo": barcode,
+              "expTimeStamp": exp.toString(),
+              "action": "carrierInvDetail",
+              "timeStamp": timestamp.toString(),
+              "invNum": tmp[i].invNum,
+              "invDate": invDate.toString(),
+              "uuid": '1000',
+              "sellerName": tmp[i].sellerName,
+              "amount": tmp[i].amount,
+              "appID": 'EINV0202204156709',
+              "cardEncrypt": password,
+            });
+        responseString = response.body;
+        print(responseString);
+        tmp2 = detailModelFromJson(responseString).details;
+        detail = [];
+        for (int j = 0; j < tmp2.length; j++) {
+          detail.add(invoice_details(
+              tag: tmp[i].invDate.year.toString() +
+                  tmp[i].invDate.month.toString(),
+              invNum: tmp[i].invNum,
+              name: tmp2[j].description,
+              date: invDate,
+              quantity: tmp2[j].quantity,
+              unitPrice: tmp2[j].unitPrice));
+          await DetailHelper.instance.add(detail[j]);
+        }
       }
     }
     return null;

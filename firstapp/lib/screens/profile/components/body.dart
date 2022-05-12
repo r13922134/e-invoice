@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'profile_menu.dart';
 import 'profile_pic.dart';
 import 'package:firstapp/screens/account/account_screen.dart';
 import 'package:firstapp/screens/login/login_screen.dart';
-import 'package:firstapp/screens/profile/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cool_alert/cool_alert.dart';
 import '../../../constants.dart';
 import 'package:firstapp/database/invoice_database.dart';
+import 'package:firstapp/database/details_database.dart';
 
 class Body extends StatefulWidget {
   @override
@@ -88,6 +87,7 @@ class ProfileBody extends State<Body> {
                       confirmBtnColor: kPrimaryColor,
                       onConfirmBtnTap: () async {
                         await HeaderHelper.instance.delete();
+                        await DetailHelper.instance.delete();
                         Navigator.pop(context);
                       },
                       text: "登出確認",
