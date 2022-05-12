@@ -21,7 +21,7 @@ class _State extends State<Body> {
 
   List<Widget> itemsData = [];
 
-  Future getPostsData() async {
+  Future<List<Widget>> getPostsData() async {
     List<Header> responseList = await HeaderHelper.instance.getHeader();
     List<Widget> listItems = [];
     for (int i = responseList.length - 1; i > -1; i--) {
@@ -107,6 +107,7 @@ class _State extends State<Body> {
     setState(() {
       itemsData = listItems;
     });
+    return listItems;
   }
 
   @override
@@ -133,9 +134,16 @@ class _State extends State<Body> {
     final double categoryHeight = size.height * 0.30;
     return SafeArea(
       child: Scaffold(
-        body: FutureBuilder(
+        body: FutureBuilder<List<Widget>>(
           future: getPostsData(),
-          builder: (BuildContext context, snapshot) {
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator.adaptive();
+            }
+            if (snapshot.data!.isEmpty) {
+              return Text('You have no messages.');
+            }
+
             return Container(
               height: size.height,
               child: Column(

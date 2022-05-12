@@ -95,14 +95,12 @@ class LoginScreen extends StatelessWidget {
           });
       responseString = response.body;
       tmp = loginModelFromJson(responseString).details;
-      header = [];
 
       for (int i = 0; i < tmp.length; i++) {
         tmpyear = tmp[i].invDate.year + 1911;
         invDate =
             new DateTime(tmpyear, tmp[i].invDate.month, tmp[i].invDate.date);
         invDate = formatter.format(invDate);
-        print(invDate);
         header.add(Header(
             tag: tmp[i].invDate.year.toString() +
                 tmp[i].invDate.month.toString(),
@@ -113,7 +111,6 @@ class LoginScreen extends StatelessWidget {
             inv_num: tmp[i].invNum,
             barcode: tmp[i].cardNo,
             amount: tmp[i].amount));
-        await HeaderHelper.instance.add(header[i]);
 
         response = await http.post(
             Uri.https("api.einvoice.nat.gov.tw", "/PB2CAPIVAN/invServ/InvServ"),
@@ -133,9 +130,7 @@ class LoginScreen extends StatelessWidget {
               "cardEncrypt": password,
             });
         responseString = response.body;
-        print(responseString);
         tmp2 = detailModelFromJson(responseString).details;
-        detail = [];
         for (int j = 0; j < tmp2.length; j++) {
           detail.add(invoice_details(
               tag: tmp[i].invDate.year.toString() +
@@ -145,10 +140,16 @@ class LoginScreen extends StatelessWidget {
               date: invDate,
               quantity: tmp2[j].quantity,
               unitPrice: tmp2[j].unitPrice));
-          await DetailHelper.instance.add(detail[j]);
         }
       }
     }
+    for (int k = 0; k < header.length; k++) {
+      await HeaderHelper.instance.add(header[k]);
+    }
+    for (int f = 0; f < detail.length; f++) {
+      await DetailHelper.instance.add(detail[f]);
+    }
+
     return null;
   }
 

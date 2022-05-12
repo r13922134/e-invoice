@@ -21,10 +21,20 @@ class DetailsScreen extends StatefulWidget {
 class _InvoiceDetail extends State<DetailsScreen> {
   List<invoice_details> responseList = [];
   bool _slowAnimations = false;
+  List<Widget> listItems = [];
 
-  Future getDetail() async {
+  Future<List<Widget>> getDetail() async {
     responseList =
         await DetailHelper.instance.getDetail(widget.tag, widget.invNum);
+    for (int i = 0; i < responseList.length; i++) {
+      listItems.add(
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+        Text('${responseList[i].name}'),
+        Text('${responseList[i].quantity}'),
+        Text('${responseList[i].unitPrice}')
+      ]));
+    }
+    return listItems;
   }
 
   @override
@@ -46,9 +56,9 @@ class _InvoiceDetail extends State<DetailsScreen> {
                 color: Colors.white),
             onPressed: () => Navigator.pop(context)),
       ),
-      body: FutureBuilder(
+      body: FutureBuilder<List<Widget>>(
         future: getDetail(),
-        builder: (BuildContext context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
           return SingleChildScrollView(
             child: Column(
               children: <Widget>[
@@ -67,8 +77,9 @@ class _InvoiceDetail extends State<DetailsScreen> {
                           ),
                         ),
                         child: Column(
-                          children: [
-                            for (var i in responseList) Text(i.name.toString())
+                          children: <Widget>[
+                            for (int i = 0; i < listItems.length; i++)
+                              listItems[i]
                           ],
                         ),
                       ),
