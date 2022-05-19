@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
   GlobalKey<CurvedNavigationBarState> _NavKey = GlobalKey();
   var PagesAll = [
     HomeScreen(),
-    ScanScreen(),
+    QRViewExample(),
     AnalysisScreen(),
     ProfileScreen()
   ];
