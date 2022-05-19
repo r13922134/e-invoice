@@ -23,7 +23,7 @@ class _IdentityPageState extends State<HomeScreen> {
       animateChildDecoration: true,
       rtlOpening: false,
       // openScale: 1.0,
-      disabledGestures: true,
+      disabledGestures: false,
       childDecoration: const BoxDecoration(
         // NOTICE: Uncomment if you want to add shadow behind the page.
         // Keep in mind that it may cause animation jerks.

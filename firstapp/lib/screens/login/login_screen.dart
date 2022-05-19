@@ -2,7 +2,6 @@ import 'package:firstapp/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:firstapp/screens/login/login_model.dart';
-import 'package:firstapp/screens/details/detail_model.dart';
 import 'package:http/http.dart' as http;
 import '../../../constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,14 +11,13 @@ import 'package:firstapp/database/details_database.dart';
 
 const users = const {
   'dribbble@gmail.com': '12345',
-  'hunter@gmail.com': 'hunter',
 };
 main() {
   WidgetsFlutterBinding.ensureInitialized();
 }
 
 class LoginScreen extends StatelessWidget {
-  Duration get loginTime => Duration(milliseconds: 2550);
+  Duration get loginTime => Duration(milliseconds: 5550);
 
   Future<void> setDevice(barcode, password) async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
@@ -29,7 +27,6 @@ class LoginScreen extends StatelessWidget {
 
   Future<String?> _authUser(LoginData data) {
     debugPrint('Name: ${data.name}, Password: ${data.password}');
-    print(data.password.runtimeType);
     return Future.delayed(loginTime).then((_) {
       setDevice(data.name, data.password);
       _createLogin(data.name, data.password);
@@ -61,8 +58,6 @@ class LoginScreen extends StatelessWidget {
     var formatter = new DateFormat('yyyy/MM/dd');
     List<Detail> tmp = [];
     List<Header> header = [];
-    List<Details> tmp2 = [];
-    List<invoice_details> detail = [];
     String responseString;
     String sdate;
     String edate;
@@ -111,43 +106,10 @@ class LoginScreen extends StatelessWidget {
             inv_num: tmp[i].invNum,
             barcode: tmp[i].cardNo,
             amount: tmp[i].amount));
-
-        response = await http.post(
-            Uri.https("api.einvoice.nat.gov.tw", "/PB2CAPIVAN/invServ/InvServ"),
-            body: {
-              "version": "0.5",
-              "cardType": "3J0002",
-              "cardNo": barcode,
-              "expTimeStamp": exp.toString(),
-              "action": "carrierInvDetail",
-              "timeStamp": timestamp.toString(),
-              "invNum": tmp[i].invNum,
-              "invDate": invDate.toString(),
-              "uuid": '1000',
-              "sellerName": tmp[i].sellerName,
-              "amount": tmp[i].amount,
-              "appID": 'EINV0202204156709',
-              "cardEncrypt": password,
-            });
-        responseString = response.body;
-        tmp2 = detailModelFromJson(responseString).details;
-        for (int j = 0; j < tmp2.length; j++) {
-          detail.add(invoice_details(
-              tag: tmp[i].invDate.year.toString() +
-                  tmp[i].invDate.month.toString(),
-              invNum: tmp[i].invNum,
-              name: tmp2[j].description,
-              date: invDate,
-              quantity: tmp2[j].quantity,
-              unitPrice: tmp2[j].unitPrice));
-        }
       }
     }
     for (int k = 0; k < header.length; k++) {
       await HeaderHelper.instance.add(header[k]);
-    }
-    for (int f = 0; f < detail.length; f++) {
-      await DetailHelper.instance.add(detail[f]);
     }
 
     return null;
@@ -157,6 +119,8 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlutterLogin(
       title: 'Cloud-rie',
+      messages: LoginMessages(
+          userHint: "手機條碼", passwordHint: "驗證碼", loginButton: "登入"),
       theme: LoginTheme(
         accentColor: kSecondaryColor,
         primaryColor: kPrimaryColor,
@@ -168,7 +132,7 @@ class LoginScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(70)),
         ),
       ),
-      userType: LoginUserType.phone,
+      userType: LoginUserType.name,
       userValidator: (str) {},
       logo: AssetImage('assets/images/image_1.png'),
       onLogin: _authUser,

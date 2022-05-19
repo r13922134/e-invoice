@@ -22,7 +22,7 @@ class _State extends State<Body> {
   List<Widget> itemsData = [];
 
   Future<List<Widget>> getPostsData() async {
-    List<Header> responseList = await HeaderHelper.instance.getHeader();
+    List<Header>? responseList = await HeaderHelper.instance.getHeader();
     List<Widget> listItems = [];
     for (int i = responseList.length - 1; i > -1; i--) {
       listItems.add(
@@ -33,9 +33,11 @@ class _State extends State<Body> {
                 MaterialPageRoute(
                   builder: (context) => DetailsScreen(
                     tag: responseList[i].tag,
+                    invDate: responseList[i].date,
                     seller: responseList[i].seller,
                     address: responseList[i].address,
                     invNum: responseList[i].inv_num,
+                    time: responseList[i].time,
                     amount: responseList[i].amount,
                   ),
                 ),
@@ -71,7 +73,7 @@ class _State extends State<Body> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  ' ' + responseList[i].date,
+                                  '  ' + responseList[i].date,
                                   style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold),
@@ -96,18 +98,21 @@ class _State extends State<Body> {
                       ),
                       Image.asset(
                         "assets/images/image_1.png",
-                        height: 80,
+                        height: 70,
                       )
                     ],
                   ),
                 ))),
       );
     }
-    ;
-    setState(() {
-      itemsData = listItems;
-    });
+
+    itemsData = listItems;
     return listItems;
+  }
+
+  Future<void> _handleRefresh() async {
+    getPostsData();
+    return await Future.delayed(Duration(milliseconds: 550));
   }
 
   @override
@@ -124,10 +129,6 @@ class _State extends State<Body> {
     });
   }
 
-  Future<void> _handleRefresh() async {
-    return await Future.delayed(Duration(seconds: 1));
-  }
-
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -136,14 +137,36 @@ class _State extends State<Body> {
       child: Scaffold(
         body: FutureBuilder<List<Widget>>(
           future: getPostsData(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator.adaptive();
+          builder: (BuildContext context, AsyncSnapshot? snapshot) {
+            if (snapshot?.data?.isEmpty ?? true) {
+              return Container(
+                height: size.height,
+                child: Column(
+                  children: <Widget>[
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 500),
+                      opacity: closeTopContainer ? 0 : 1,
+                      child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 500),
+                          width: size.width,
+                          alignment: Alignment.topCenter,
+                          height: closeTopContainer ? 0 : categoryHeight,
+                          child: categoriesScroller),
+                    ),
+                    Expanded(
+                      child: LiquidPullToRefresh(
+                          height: 90,
+                          color: kSecondaryColor,
+                          onRefresh: _handleRefresh,
+                          child: Text("查無發票")),
+                    ),
+                  ],
+                ),
+              );
             }
-            if (snapshot.data!.isEmpty) {
-              return Text('You have no messages.');
-            }
-
             return Container(
               height: size.height,
               child: Column(
@@ -152,10 +175,10 @@ class _State extends State<Body> {
                     height: 10,
                   ),
                   AnimatedOpacity(
-                    duration: const Duration(milliseconds: 500),
+                    duration: const Duration(milliseconds: 300),
                     opacity: closeTopContainer ? 0 : 1,
                     child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
+                        duration: const Duration(milliseconds: 300),
                         width: size.width,
                         alignment: Alignment.topCenter,
                         height: closeTopContainer ? 0 : categoryHeight,
@@ -189,7 +212,7 @@ class _State extends State<Body> {
                                   child: Align(
                                       heightFactor: 0.7,
                                       alignment: Alignment.topCenter,
-                                      child: itemsData[index]),
+                                      child: snapshot?.data[index]),
                                 ),
                               );
                             })),
