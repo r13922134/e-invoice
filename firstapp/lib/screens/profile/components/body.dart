@@ -17,16 +17,9 @@ class Body extends StatefulWidget {
 class ProfileBody extends State<Body> {
   late String barcode;
 
-  Future<void> getBarcode() async {
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-    barcode = pref.getString('barcode')!;
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
-    getBarcode();
     setState(() {});
   }
 
