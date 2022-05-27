@@ -3,7 +3,7 @@ import 'dart:convert';
 LoginModel loginModelFromJson(String str) =>
     LoginModel.fromJson(json.decode(str));
 
-String loginModelToJson(LoginModel data) => json.encode(data.toJson());
+// String loginModelToJson(LoginModel data) => json.encode(data.toJson());
 
 class LoginModel {
   LoginModel({
@@ -29,13 +29,13 @@ class LoginModel {
             List<Detail>.from(json["details"].map((x) => Detail.fromJson(x))),
       );
 
-  Map<String, dynamic> toJson() => {
-        "v": v,
-        "code": code,
-        "msg": msg,
-        "onlyWinningInv": onlyWinningInv,
-        "details": List<dynamic>.from(details.map((x) => x.toJson())),
-      };
+  // Map<String, dynamic> toJson() => {
+  //       "v": v,
+  //       "code": code,
+  //       "msg": msg,
+  //       "onlyWinningInv": onlyWinningInv,
+  //       "details": List<dynamic>.from(details.map((x) => x.toJson())),
+  //     };
 }
 
 class Detail {
@@ -94,24 +94,24 @@ class Detail {
         currency: json["currency"],
       );
 
-  Map<String, dynamic> toJson() => {
-        "rowNum": rowNum,
-        "invNum": invNum,
-        "cardType": cardType,
-        "cardNo": cardNo,
-        "sellerName": sellerName,
-        "invStatus": invStatus,
-        "invDonatable": invDonatable,
-        "amount": amount,
-        "invPeriod": invPeriod,
-        "donateMark": donateMark,
-        "invDate": invDate.toJson(),
-        "sellerBan": sellerBan,
-        "sellerAddress": sellerAddress,
-        "invoiceTime": invoiceTime,
-        "buyerBan": buyerBan,
-        "currency": currency,
-      };
+  // Map<String, dynamic> toJson() => {
+  //       "rowNum": rowNum,
+  //       "invNum": invNum,
+  //       "cardType": cardType,
+  //       "cardNo": cardNo,
+  //       "sellerName": sellerName,
+  //       "invStatus": invStatus,
+  //       "invDonatable": invDonatable,
+  //       "amount": amount,
+  //       "invPeriod": invPeriod,
+  //       "donateMark": donateMark,
+  //       "invDate": invDate.toJson(),
+  //       "sellerBan": sellerBan,
+  //       "sellerAddress": sellerAddress,
+  //       "invoiceTime": invoiceTime,
+  //       "buyerBan": buyerBan,
+  //       "currency": currency,
+  //     };
 }
 
 class InvDate {
@@ -149,15 +149,15 @@ class InvDate {
         timezoneOffset: json["timezoneOffset"],
       );
 
-  Map<String, dynamic> toJson() => {
-        "year": year,
-        "month": month,
-        "date": date,
-        "day": day,
-        "hours": hours,
-        "minutes": minutes,
-        "seconds": seconds,
-        "time": time,
-        "timezoneOffset": timezoneOffset,
-      };
+  // Map<String, dynamic> toJson() => {
+  //       "year": year,
+  //       "month": month,
+  //       "date": date,
+  //       "day": day,
+  //       "hours": hours,
+  //       "minutes": minutes,
+  //       "seconds": seconds,
+  //       "time": time,
+  //       "timezoneOffset": timezoneOffset,
+  //     };
 }

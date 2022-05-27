@@ -37,7 +37,7 @@ class _InvoiceDetail extends State<DetailsScreen> {
     responseList =
         await DetailHelper.instance.getDetail(widget.tag, widget.invNum);
     if (responseList.isEmpty) {
-      var response;
+      http.Response response;
       response = await http.post(
           Uri.https("api.einvoice.nat.gov.tw", "/PB2CAPIVAN/invServ/InvServ"),
           body: {
@@ -57,17 +57,15 @@ class _InvoiceDetail extends State<DetailsScreen> {
           });
       String responseString = response.body;
       List<Details> tmp = detailModelFromJson(responseString).details;
-      List<invoice_details> detail = [];
 
       for (int j = 0; j < tmp.length; j++) {
-        detail.add(invoice_details(
+        await DetailHelper.instance.add(invoice_details(
             tag: widget.tag.toString(),
             invNum: widget.invNum.toString(),
             name: tmp[j].description,
             date: widget.invDate.toString(),
             quantity: tmp[j].quantity,
             amount: tmp[j].amount));
-        await DetailHelper.instance.add(detail[j]);
       }
       responseList =
           await DetailHelper.instance.getDetail(widget.tag, widget.invNum);
