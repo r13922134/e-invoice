@@ -66,12 +66,11 @@ class _InvoiceDetail extends State<DetailsScreen> {
             name: tmp[j].description,
             date: widget.invDate.toString(),
             quantity: tmp[j].quantity,
-            unitPrice: tmp[j].unitPrice));
+            amount: tmp[j].amount));
         await DetailHelper.instance.add(detail[j]);
       }
       responseList =
           await DetailHelper.instance.getDetail(widget.tag, widget.invNum);
-      print(responseList);
     }
     return responseList;
   }
@@ -108,7 +107,7 @@ class _InvoiceDetail extends State<DetailsScreen> {
                       children: <Widget>[
                         Container(
                           margin: EdgeInsets.only(top: size.height * 0.3),
-                          height: 500,
+                          height: 700,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
@@ -116,26 +115,31 @@ class _InvoiceDetail extends State<DetailsScreen> {
                               topRight: Radius.circular(24),
                             ),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              SizedBox(height: 30),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [Text("品名"), Text("數量"), Text("小計")],
-                              ),
-                              SizedBox(height: 30),
-                              for (invoice_details value
-                                  in snapshot.data ?? tmp)
-                                (Text(value.name +
-                                    '                          ' +
-                                    'x' +
-                                    value.quantity +
-                                    '             ' +
-                                    value.unitPrice)),
-                              Text("\n\n\n\n總計   \$" + widget.amount)
-                            ],
+                          child: Padding(
+                            padding: const EdgeInsets.all(25),
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(height: 30),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("品名"),
+                                    Text(
+                                        "                                                               數量"),
+                                    Text("小計  ")
+                                  ],
+                                ),
+                                SizedBox(height: 30),
+                                for (invoice_details value
+                                    in snapshot.data ?? tmp)
+                                  (CustomRow(
+                                      name: value.name,
+                                      quentity: value.quantity,
+                                      price: value.amount)),
+                                Text("\n\n\n\n總計   \$" + widget.amount)
+                              ],
+                            ),
                           ),
                         ),
                         Padding(
@@ -145,7 +149,7 @@ class _InvoiceDetail extends State<DetailsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Text(
-                                widget.seller,
+                                widget.invNum,
                                 style: Theme.of(context)
                                     .textTheme
                                     .headline4
@@ -153,9 +157,10 @@ class _InvoiceDetail extends State<DetailsScreen> {
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold),
                               ),
-                              Text(widget.address,
+                              SizedBox(height: 15),
+                              Text(widget.seller,
                                   style: TextStyle(color: Colors.white)),
-                              Text(widget.invNum,
+                              Text(widget.address,
                                   style: TextStyle(color: Colors.white)),
                               Text(widget.invDate,
                                   style: TextStyle(color: Colors.white)),
@@ -173,6 +178,71 @@ class _InvoiceDetail extends State<DetailsScreen> {
           }
           return Center(child: CircularProgressIndicator());
         },
+      ),
+    );
+  }
+}
+
+class CustomRow extends StatelessWidget {
+  final String name;
+  final String quentity;
+  final String price;
+
+  const CustomRow(
+      {Key? key,
+      required this.name,
+      required this.quentity,
+      required this.price})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {},
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            flex: 6, // Change this property to align your content
+
+            child: Text(
+              name, // Name
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.black,
+                decoration: TextDecoration.none,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          SizedBox(height: 40),
+          Expanded(
+            flex: 1, // Change this property to align your content
+            child: Text(
+              "x" + quentity, // Name
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.black,
+                decoration: TextDecoration.none,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1, // Change this property to align your content
+            child: Text(
+              price, // Name
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.black,
+                decoration: TextDecoration.none,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

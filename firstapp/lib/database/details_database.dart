@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -10,7 +11,7 @@ class invoice_details {
   String name;
   String date;
   String quantity;
-  String unitPrice;
+  String amount;
 
   invoice_details({
     required this.tag,
@@ -18,7 +19,7 @@ class invoice_details {
     required this.name,
     required this.date,
     required this.quantity,
-    required this.unitPrice,
+    required this.amount,
   });
   factory invoice_details.fromMap(Map<String, dynamic> json) =>
       new invoice_details(
@@ -27,7 +28,7 @@ class invoice_details {
         name: json['name'],
         date: json['date'],
         quantity: json['quantity'],
-        unitPrice: json['unitPrice'],
+        amount: json['amount'],
       );
   Map<String, dynamic> toMap() {
     return {
@@ -36,7 +37,7 @@ class invoice_details {
       'name': name,
       'date': date,
       'quantity': quantity,
-      'unitPrice': unitPrice,
+      'amount': amount,
     };
   }
 }
@@ -61,7 +62,7 @@ class DetailHelper {
 
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE DETAIL(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,tag TEXT,invNum TEXT,name TEXT,date TEXT,quantity TEXT,unitPrice TEXT)
+      CREATE TABLE DETAIL(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,tag TEXT,invNum TEXT,name TEXT,date TEXT,quantity TEXT,amount TEXT)
 ''');
   }
 
