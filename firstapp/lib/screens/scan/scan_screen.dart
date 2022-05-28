@@ -1,5 +1,5 @@
-
-
+import '../../../constants.dart';
+import 'package:firstapp/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -71,13 +71,13 @@ class _QRViewExampleState extends State<QRViewExample> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            appBar: AppBar(title: const Text('Barcode scan')),
+            appBar: AppBar(title: const Text('Barcode scan',), backgroundColor: kPrimaryColor,),
             body: Builder(builder: (BuildContext context) {
               return Container(
                   alignment: Alignment.center,
                   child: Flex(
                       direction: Axis.vertical,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,                     
                       children: <Widget>[
                         ElevatedButton(
                             onPressed: () => scanBarcodeNormal(),
