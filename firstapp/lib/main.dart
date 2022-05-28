@@ -7,6 +7,7 @@ import 'package:firstapp/screens/analysis/analysis_screen.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
