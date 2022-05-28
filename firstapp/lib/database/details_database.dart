@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -21,8 +20,7 @@ class invoice_details {
     required this.quantity,
     required this.amount,
   });
-  factory invoice_details.fromMap(Map<String, dynamic> json) =>
-      new invoice_details(
+  factory invoice_details.fromMap(Map<String, dynamic> json) => invoice_details(
         tag: json['tag'],
         invNum: json['invNum'],
         name: json['name'],
@@ -83,6 +81,6 @@ class DetailHelper {
 
   Future<void> delete() async {
     Database db = await instance.database;
-    await db.delete('detail');
+    await db.rawQuery('DELETE * FROM detail');
   }
 }

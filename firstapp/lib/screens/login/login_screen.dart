@@ -8,15 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:firstapp/database/invoice_database.dart';
 
-const users = const {
-  'dribbble@gmail.com': '12345',
-};
-main() {
-  WidgetsFlutterBinding.ensureInitialized();
-}
-
 class LoginScreen extends StatelessWidget {
-  Duration get loginTime => Duration(seconds: 1);
+  const LoginScreen({Key? key}) : super(key: key);
+
+  Duration get loginTime => const Duration(seconds: 1);
 
   Future<void> setDevice(barcode, password) async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
@@ -29,10 +24,10 @@ class LoginScreen extends StatelessWidget {
     return Future.delayed(loginTime).then((_) async {
       setDevice(data.name, data.password);
 
-      int timestamp = DateTime.now().millisecondsSinceEpoch + 100;
+      int timestamp = DateTime.now().millisecondsSinceEpoch + 20;
       int exp = timestamp + 300;
-      var now = new DateTime.now();
-      var formatter = new DateFormat('yyyy/MM/dd');
+      var now = DateTime.now();
+      var formatter = DateFormat('yyyy/MM/dd');
       List<Detail> tmp = [];
       String responseString;
       String sdate;
@@ -42,11 +37,11 @@ class LoginScreen extends StatelessWidget {
       http.Response response;
       int tmpyear;
       DateTime invDate;
-      String inv_date;
+      String invdate;
 
       for (int j = 5; j >= 0; j--) {
-        start = new DateTime(now.year, now.month - j, 01);
-        last = new DateTime(start.year, start.month + 1, 0);
+        start = DateTime(now.year, now.month - j, 01);
+        last = DateTime(start.year, start.month + 1, 0);
         sdate = formatter.format(start);
         edate = formatter.format(last);
         response = await http.post(
@@ -66,22 +61,23 @@ class LoginScreen extends StatelessWidget {
               "cardEncrypt": data.password,
             });
         responseString = response.body;
+        debugPrint(responseString);
         tmp = loginModelFromJson(responseString).details;
 
         for (int i = 0; i < tmp.length; i++) {
           tmpyear = tmp[i].invDate.year + 1911;
           invDate =
-              new DateTime(tmpyear, tmp[i].invDate.month, tmp[i].invDate.date);
-          inv_date = formatter.format(invDate);
+              DateTime(tmpyear, tmp[i].invDate.month, tmp[i].invDate.date);
+          invdate = formatter.format(invDate);
 
           await HeaderHelper.instance.add(Header(
               tag: tmp[i].invDate.year.toString() +
                   tmp[i].invDate.month.toString(),
-              date: inv_date,
+              date: invdate,
               time: tmp[i].invoiceTime,
               seller: tmp[i].sellerName,
               address: tmp[i].sellerAddress,
-              inv_num: tmp[i].invNum,
+              invNum: tmp[i].invNum,
               barcode: tmp[i].cardNo,
               amount: tmp[i].amount));
         }
@@ -101,9 +97,6 @@ class LoginScreen extends StatelessWidget {
   Future<String?> _recoverPassword(String name) {
     debugPrint('Name: $name');
     return Future.delayed(loginTime).then((_) {
-      if (!users.containsKey(name)) {
-        return 'User not exists';
-      }
       return null;
     });
   }
@@ -120,14 +113,16 @@ class LoginScreen extends StatelessWidget {
         cardTheme: CardTheme(
           color: Colors.grey.shade100,
           elevation: 5,
-          margin: EdgeInsets.only(top: 15),
+          margin: const EdgeInsets.only(top: 15),
           shape: ContinuousRectangleBorder(
               borderRadius: BorderRadius.circular(70)),
         ),
       ),
       userType: LoginUserType.name,
-      userValidator: (str) {},
-      logo: AssetImage('assets/images/image_1.png'),
+      userValidator: (str) {
+        return null;
+      },
+      logo: const AssetImage('assets/images/image_1.png'),
       onLogin: _authUser,
       onSignup: _signupUser,
       onSubmitAnimationCompleted: () {
