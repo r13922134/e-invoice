@@ -61,7 +61,7 @@ class LoginScreen extends StatelessWidget {
               "cardEncrypt": data.password,
             });
         responseString = response.body;
-        debugPrint(responseString);
+
         tmp = loginModelFromJson(responseString).details;
 
         for (int i = 0; i < tmp.length; i++) {
