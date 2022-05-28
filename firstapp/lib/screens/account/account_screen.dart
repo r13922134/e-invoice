@@ -4,11 +4,13 @@ import 'package:flutter_svg/svg.dart';
 import '../../../constants.dart';
 
 class AccountScreen extends StatelessWidget {
+  const AccountScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(context),
-      body: AccountRevise(),
+      body: const AccountRevise(),
     );
   }
 
