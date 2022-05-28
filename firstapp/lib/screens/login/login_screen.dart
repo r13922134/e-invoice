@@ -24,7 +24,7 @@ class LoginScreen extends StatelessWidget {
     return Future.delayed(loginTime).then((_) async {
       setDevice(data.name, data.password);
 
-      int timestamp = DateTime.now().millisecondsSinceEpoch + 20;
+      int timestamp = DateTime.now().millisecondsSinceEpoch + 30;
       int exp = timestamp + 300;
       var now = DateTime.now();
       var formatter = DateFormat('yyyy/MM/dd');
