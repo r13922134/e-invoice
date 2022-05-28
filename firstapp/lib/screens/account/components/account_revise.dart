@@ -103,37 +103,39 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
       padding: const EdgeInsets.all(18),
       child: ListView(
         children: <Widget>[
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Icon(Icons.supervisor_account_outlined),
-            Text(
-              "性別",
-              style: TextStyle(
-                color: Color.fromARGB(255, 80, 80, 80),
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ]),
-          SizedBox(height: 10),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
+                Icon(Icons.supervisor_account_outlined),
+                Text(
+                  "性別",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 80, 80, 80),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ]),
+          const SizedBox(height: 10),
           DefaultTabController(
             initialIndex: genderValue,
             length: 2,
             child: Column(
               children: <Widget>[
                 ButtonsTabBar(
-                    borderColor: Color.fromARGB(255, 36, 145, 126),
+                    borderColor: const Color.fromARGB(255, 36, 145, 126),
                     unselectedBorderColor: kSecondaryColor,
-                    backgroundColor: Color.fromARGB(255, 36, 145, 126),
+                    backgroundColor: const Color.fromARGB(255, 36, 145, 126),
                     unselectedBackgroundColor: Colors.white,
-                    unselectedLabelStyle: TextStyle(
+                    unselectedLabelStyle: const TextStyle(
                         color: kSecondaryColor, fontWeight: FontWeight.bold),
                     borderWidth: 2,
-                    contentPadding: EdgeInsets.all(10),
+                    contentPadding: const EdgeInsets.all(10),
                     radius: 15,
                     height: 55,
                     tabs: [
-                      Tab(icon: Icon(Icons.male)),
-                      Tab(icon: Icon(Icons.female))
+                      const Tab(icon: Icon(Icons.male)),
+                      const Tab(icon: Icon(Icons.female))
                     ],
                     onTap: (index) {
                       genderValue = index;
@@ -141,21 +143,23 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
               ],
             ),
           ),
-          SizedBox(height: 10),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Icon(Icons.edit),
-            Text(
-              "年齡",
-              style: TextStyle(
-                color: Color.fromARGB(255, 80, 80, 80),
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ]),
+          const SizedBox(height: 10),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
+                Icon(Icons.edit),
+                Text(
+                  "年齡",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 80, 80, 80),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ]),
           NumberPicker(
-            textStyle: TextStyle(color: kPrimaryColor),
-            selectedTextStyle: TextStyle(
+            textStyle: const TextStyle(color: kPrimaryColor),
+            selectedTextStyle: const TextStyle(
               color: Color.fromARGB(255, 36, 145, 126),
               fontSize: 35,
               fontWeight: FontWeight.w700,
@@ -167,21 +171,23 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
             itemHeight: 38,
             onChanged: (value) => setState(() => ageValue = value),
           ),
-          SizedBox(height: 10),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Icon(Icons.boy),
-            Text(
-              "身高(cm)",
-              style: TextStyle(
-                color: Color.fromARGB(255, 80, 80, 80),
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ]),
+          const SizedBox(height: 10),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
+                Icon(Icons.boy),
+                Text(
+                  "身高(cm)",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 80, 80, 80),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ]),
           NumberPicker(
-            textStyle: TextStyle(color: kPrimaryColor),
-            selectedTextStyle: TextStyle(
+            textStyle: const TextStyle(color: kPrimaryColor),
+            selectedTextStyle: const TextStyle(
               color: Color.fromARGB(255, 36, 145, 126),
               fontSize: 35,
               fontWeight: FontWeight.w700,
@@ -193,21 +199,23 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
             itemHeight: 38,
             onChanged: (value) => setState(() => heightValue = value),
           ),
-          SizedBox(height: 10),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Icon(Icons.accessibility),
-            Text(
-              "體重(kg)",
-              style: TextStyle(
-                color: Color.fromARGB(255, 80, 80, 80),
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ]),
+          const SizedBox(height: 10),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const <Widget>[
+                Icon(Icons.accessibility),
+                Text(
+                  "體重(kg)",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 80, 80, 80),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ]),
           NumberPicker(
-            textStyle: TextStyle(color: kPrimaryColor),
-            selectedTextStyle: TextStyle(
+            textStyle: const TextStyle(color: kPrimaryColor),
+            selectedTextStyle: const TextStyle(
               color: Color.fromARGB(255, 36, 145, 126),
               fontSize: 35,
               fontWeight: FontWeight.w700,
@@ -219,7 +227,7 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
             itemHeight: 38,
             onChanged: (value) => setState(() => weightValue = value),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
               color: kBackgroundColor,
@@ -234,7 +242,7 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
               children: <Widget>[
                 MultiSelectBottomSheetField(
                   initialValue: _selectedDisease,
-                  selectedItemsTextStyle: TextStyle(color: Colors.white),
+                  selectedItemsTextStyle: const TextStyle(color: Colors.white),
                   selectedColor: kPrimaryColor,
                   initialChildSize: 0.4,
                   decoration: BoxDecoration(
@@ -244,8 +252,8 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
                       border: Border.all(color: kSecondaryColor, width: 1)),
                   listType: MultiSelectListType.CHIP,
                   searchable: true,
-                  unselectedColor: Color.fromARGB(255, 179, 178, 178),
-                  buttonText: Text(
+                  unselectedColor: const Color.fromARGB(255, 179, 178, 178),
+                  buttonText: const Text(
                     "疾病史",
                     style: TextStyle(
                       color: Color.fromARGB(255, 80, 80, 80),
@@ -253,16 +261,17 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  buttonIcon: Icon(Icons.arrow_drop_down, color: kPrimaryColor),
-                  title: Text("選擇"),
+                  buttonIcon:
+                      const Icon(Icons.arrow_drop_down, color: kPrimaryColor),
+                  title: const Text("選擇"),
                   items: _items,
                   onConfirm: (values) {
                     _selectedDisease = values as List<Disease>;
                   },
                   chipDisplay: MultiSelectChipDisplay<Disease>(
                     chipColor: kSecondaryColor,
-                    icon: Icon(Icons.cancel_sharp, color: kTextColor),
-                    textStyle: TextStyle(
+                    icon: const Icon(Icons.cancel_sharp, color: kTextColor),
+                    textStyle: const TextStyle(
                       color: kTextColor,
                     ),
                     onTap: (value) {
@@ -274,15 +283,16 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
               ],
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           ElevatedButton(
-            child: Text('儲存'),
+            child: const Text('儲存'),
             style: ElevatedButton.styleFrom(
-                shape: StadiumBorder(),
+                shape: const StadiumBorder(),
                 primary: kPrimaryColor,
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                 textStyle:
-                    TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
             onPressed: () {
               setProfile(heightValue, weightValue, ageValue, genderValue);
               CoolAlert.show(
@@ -297,7 +307,7 @@ class _ProfileState extends State<AccountRevise> with TickerProviderStateMixin {
               );
             },
           ),
-          SizedBox(height: 50),
+          const SizedBox(height: 50),
         ],
       ),
     );

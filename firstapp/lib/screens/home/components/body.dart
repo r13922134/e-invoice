@@ -36,7 +36,7 @@ class _State extends State<Body> {
                     invDate: responseList[i].date,
                     seller: responseList[i].seller,
                     address: responseList[i].address,
-                    invNum: responseList[i].inv_num,
+                    invNum: responseList[i].invNum,
                     time: responseList[i].time,
                     amount: responseList[i].amount,
                   ),
@@ -48,7 +48,7 @@ class _State extends State<Body> {
                 margin:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                    borderRadius: const BorderRadius.all(Radius.circular(20.0)),
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
@@ -67,7 +67,7 @@ class _State extends State<Body> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  responseList[i].inv_num,
+                                  responseList[i].invNum,
                                   style: const TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold),

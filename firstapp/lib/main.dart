@@ -13,12 +13,12 @@ void main() {
       scaffoldBackgroundColor: kBackgroundColor,
       primarySwatch: Colors.blueGrey,
       primaryColor: kPrimaryColor,
-      textTheme: TextTheme(
+      textTheme: const TextTheme(
         bodyText2: TextStyle(color: kTextColor),
       ),
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
-    home: MyApp(),
+    home: const MyApp(),
   ));
 }
 
@@ -30,11 +30,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   GlobalKey<CurvedNavigationBarState> _NavKey = GlobalKey();
+  // ignore: non_constant_identifier_names
   var PagesAll = [
-    HomeScreen(),
-    QRViewExample(),
-    AnalysisScreen(),
-    ProfileScreen()
+    const HomeScreen(),
+    const QRViewExample(),
+    const AnalysisScreen(),
+    const ProfileScreen()
   ];
   var myindex = 0;
 
