@@ -81,6 +81,6 @@ class DetailHelper {
 
   Future<void> delete() async {
     Database db = await instance.database;
-    await db.rawQuery('DELETE * FROM detail');
+    await db.rawDelete('DELETE FROM detail');
   }
 }

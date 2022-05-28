@@ -4,11 +4,9 @@ import 'package:firstapp/screens/details/details_screen.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:firstapp/database/invoice_database.dart';
 
-main() {
-  WidgetsFlutterBinding.ensureInitialized();
-}
-
 class Body extends StatefulWidget {
+  const Body({Key? key}) : super(key: key);
+
   @override
   _State createState() => _State();
 }
