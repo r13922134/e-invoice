@@ -82,6 +82,7 @@ class ProfileBody extends State<Body> {
                         await HeaderHelper.instance.delete();
                         await DetailHelper.instance.delete();
                         Navigator.pop(context);
+                        
                       },
                       text: "登出確認",
                     )
