@@ -31,7 +31,7 @@ class _InvoiceDetail extends State<DetailsScreen> {
     String? barcode = pref.getString('barcode')!;
     String? password = pref.getString('password')!;
     int timestamp = DateTime.now().millisecondsSinceEpoch + 100;
-    int exp = timestamp + 300;
+    int exp = timestamp + 200;
 
     List<invoice_details> responseList = [];
     responseList =
@@ -39,7 +39,7 @@ class _InvoiceDetail extends State<DetailsScreen> {
     if (responseList.isEmpty) {
       http.Response response;
       response = await http.post(
-          Uri.https("api.einvoice.nat.gov.tw", "/PB2CAPIVAN/invServ/InvServ"),
+          Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
           body: {
             "version": "0.5",
             "cardType": "3J0002",
@@ -58,14 +58,14 @@ class _InvoiceDetail extends State<DetailsScreen> {
       String responseString = response.body;
       List<Details> tmp = detailModelFromJson(responseString).details;
 
-      for (int j = 0; j < tmp.length; j++) {
+      for (Details element in tmp) {
         await DetailHelper.instance.add(invoice_details(
             tag: widget.tag.toString(),
             invNum: widget.invNum.toString(),
-            name: tmp[j].description,
+            name: element.description,
             date: widget.invDate.toString(),
-            quantity: tmp[j].quantity,
-            amount: tmp[j].amount));
+            quantity: element.quantity,
+            amount: element.amount));
       }
       responseList =
           await DetailHelper.instance.getDetail(widget.tag, widget.invNum);

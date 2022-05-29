@@ -25,7 +25,7 @@ class LoginScreen extends StatelessWidget {
       setDevice(data.name, data.password);
 
       int timestamp = DateTime.now().millisecondsSinceEpoch + 30;
-      int exp = timestamp + 300;
+      int exp = timestamp + 200;
       var now = DateTime.now();
       var formatter = DateFormat('yyyy/MM/dd');
       List<Detail> tmp = [];
@@ -64,22 +64,22 @@ class LoginScreen extends StatelessWidget {
 
         tmp = loginModelFromJson(responseString).details;
 
-        for (int i = 0; i < tmp.length; i++) {
-          tmpyear = tmp[i].invDate.year + 1911;
+        for (Detail element in tmp) {
+          tmpyear = element.invDate.year + 1911;
           invDate =
-              DateTime(tmpyear, tmp[i].invDate.month, tmp[i].invDate.date);
+              DateTime(tmpyear, element.invDate.month, element.invDate.date);
           invdate = formatter.format(invDate);
 
           await HeaderHelper.instance.add(Header(
-              tag: tmp[i].invDate.year.toString() +
-                  tmp[i].invDate.month.toString(),
+              tag: element.invDate.year.toString() +
+                  element.invDate.month.toString(),
               date: invdate,
-              time: tmp[i].invoiceTime,
-              seller: tmp[i].sellerName,
-              address: tmp[i].sellerAddress,
-              invNum: tmp[i].invNum,
-              barcode: tmp[i].cardNo,
-              amount: tmp[i].amount));
+              time: element.invoiceTime,
+              seller: element.sellerName,
+              address: element.sellerAddress,
+              invNum: element.invNum,
+              barcode: element.cardNo,
+              amount: element.amount));
         }
       }
 
