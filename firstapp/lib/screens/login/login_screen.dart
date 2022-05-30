@@ -6,12 +6,11 @@ import 'package:http/http.dart' as http;
 import '../../../constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
-import 'package:firstapp/database/invoice_database.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
-  Duration get loginTime => const Duration(seconds: 1);
+  Duration get loginTime => const Duration(seconds: 0);
 
   Future<void> setDevice(barcode, password) async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
@@ -28,16 +27,12 @@ class LoginScreen extends StatelessWidget {
       int exp = timestamp + 200;
       var now = DateTime.now();
       var formatter = DateFormat('yyyy/MM/dd');
-      List<Detail> tmp = [];
       String responseString;
       String sdate;
       String edate;
       DateTime last;
       DateTime start;
       http.Response response;
-      int tmpyear;
-      DateTime invDate;
-      String invdate;
 
       for (int j = 5; j >= 0; j--) {
         start = DateTime(now.year, now.month - j, 01);
@@ -62,25 +57,7 @@ class LoginScreen extends StatelessWidget {
             });
         responseString = response.body;
 
-        tmp = loginModelFromJson(responseString).details;
-
-        for (Detail element in tmp) {
-          tmpyear = element.invDate.year + 1911;
-          invDate =
-              DateTime(tmpyear, element.invDate.month, element.invDate.date);
-          invdate = formatter.format(invDate);
-
-          await HeaderHelper.instance.add(Header(
-              tag: element.invDate.year.toString() +
-                  element.invDate.month.toString(),
-              date: invdate,
-              time: element.invoiceTime,
-              seller: element.sellerName,
-              address: element.sellerAddress,
-              invNum: element.invNum,
-              barcode: element.cardNo,
-              amount: element.amount));
-        }
+        loginModelFromJson(responseString);
       }
 
       return null;

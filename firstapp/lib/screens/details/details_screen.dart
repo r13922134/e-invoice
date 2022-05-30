@@ -124,7 +124,7 @@ class _InvoiceDetail extends State<DetailsScreen> {
                                   children: [
                                     Text("品名"),
                                     Text(
-                                        "                                                               數量"),
+                                        "                                                              數量"),
                                     Text("小計  ")
                                   ],
                                 ),

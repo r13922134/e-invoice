@@ -1,7 +1,30 @@
 import 'dart:convert';
+import 'package:firstapp/database/invoice_database.dart';
+import 'package:intl/intl.dart';
 
-LoginModel loginModelFromJson(String str) =>
-    LoginModel.fromJson(json.decode(str));
+void loginModelFromJson(String str) async {
+  List<Detail> tmp = LoginModel.fromJson(json.decode(str)).details;
+  int tmpyear;
+  DateTime invDate;
+  String invdate;
+  var formatter = DateFormat('yyyy/MM/dd');
+
+  for (Detail element in tmp) {
+    tmpyear = element.invDate.year + 1911;
+    invDate = DateTime(tmpyear, element.invDate.month, element.invDate.date);
+    invdate = formatter.format(invDate);
+
+    await HeaderHelper.instance.add(Header(
+        tag: element.invDate.year.toString() + element.invDate.month.toString(),
+        date: invdate,
+        time: element.invoiceTime,
+        seller: element.sellerName,
+        address: element.sellerAddress,
+        invNum: element.invNum,
+        barcode: element.cardNo,
+        amount: element.amount));
+  }
+}
 
 // String loginModelToJson(LoginModel data) => json.encode(data.toJson());
 
