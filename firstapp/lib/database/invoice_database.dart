@@ -74,7 +74,7 @@ class HeaderHelper {
 
   Future<List<Header>> getHeader() async {
     Database db = await instance.database;
-    var header = await db.query('header', orderBy: 'id');
+    var header = await db.query('header', orderBy: 'tag');
     List<Header> headerList =
         header.isNotEmpty ? header.map((c) => Header.fromMap(c)).toList() : [];
     return headerList;
