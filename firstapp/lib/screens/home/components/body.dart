@@ -3,6 +3,10 @@ import '../../../constants.dart';
 import 'package:firstapp/screens/details/details_screen.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:firstapp/database/invoice_database.dart';
+import 'package:firstapp/screens/login/login_model.dart';
+import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -20,8 +24,10 @@ class _State extends State<Body> {
   List<Widget> itemsData = [];
 
   Future<List<Widget>> getPostsData() async {
-    List<Header>? responseList = await HeaderHelper.instance.getHeader();
     List<Widget> listItems = [];
+
+    List<Header>? responseList = await HeaderHelper.instance.getHeader();
+
     for (int i = responseList.length - 1; i > -1; i--) {
       listItems.add(
         GestureDetector(
@@ -82,7 +88,7 @@ class _State extends State<Body> {
                             style: const TextStyle(
                                 fontSize: 11, color: Colors.black),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Text(
@@ -105,18 +111,70 @@ class _State extends State<Body> {
     }
 
     itemsData = listItems;
+
     return listItems;
   }
 
   Future<void> _handleRefresh() async {
-    getPostsData();
-    return await Future.delayed(Duration(milliseconds: 550));
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String barcode = pref.getString('barcode')!;
+    String password = pref.getString('password')!;
+
+    var now = DateTime.now();
+    List<Header>? responseList2 = await HeaderHelper.instance.getHeader();
+
+    String tmpTag = responseList2[responseList2.length - 1].tag;
+    await HeaderHelper.instance.deleteMonth(tmpTag);
+    String tmpDate = responseList2[responseList2.length - 1].date;
+    final splitted = tmpDate.split('/');
+    int tmpYear = int.parse(splitted[0]);
+    int tmpMonth = int.parse(splitted[1]);
+
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 30;
+    int exp = timestamp + 200;
+    var formatter = DateFormat('yyyy/MM/dd');
+    String responseString;
+    String sdate;
+    String edate;
+    DateTime last;
+    DateTime start;
+    http.Response response;
+
+    while (true) {
+      start = DateTime(tmpYear, tmpMonth, 01);
+      last = DateTime(tmpYear, tmpMonth + 1, 0);
+      sdate = formatter.format(start);
+      edate = formatter.format(last);
+      response = await http.post(
+          Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
+          body: {
+            "version": "0.5",
+            "cardType": "3J0002",
+            "cardNo": barcode,
+            "expTimeStamp": exp.toString(),
+            "action": "carrierInvChk",
+            "timeStamp": timestamp.toString(),
+            "startDate": sdate,
+            "endDate": edate,
+            "onlyWinningInv": 'N',
+            "uuid": '1000',
+            "appID": 'EINV0202204156709',
+            "cardEncrypt": password,
+          });
+      responseString = response.body;
+      loginModelFromJson(responseString);
+      if (start.year == now.year && start.month == now.month) {
+        break;
+      }
+      tmpMonth += 1;
+    }
+    setState(() {});
+    return;
   }
 
   @override
   void initState() {
     super.initState();
-    getPostsData();
     controller.addListener(() {
       double value = controller.offset / 119;
 

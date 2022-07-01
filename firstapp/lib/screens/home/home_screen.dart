@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firstapp/screens/home/components/body.dart';
 import '../../../constants.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firstapp/screens/account/components/account_revise.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -12,6 +14,34 @@ class HomeScreen extends StatefulWidget {
 
 class _IdentityPageState extends State<HomeScreen> {
   final _advancedDrawerController = AdvancedDrawerController();
+
+  int heightValue = 120;
+  int weightValue = 30;
+  int ageValue = 1;
+  List<Disease> _selectedDisease = [];
+  String genderValue = '';
+  String listString = '';
+
+  Future<void> readData() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? listString = pref.getString('select_diseases');
+    if (listString != null) {
+      _selectedDisease = Disease.decode(listString);
+    }
+    genderValue = pref.getString('gender') ?? '';
+    heightValue = pref.getInt('height') ?? 120;
+    weightValue = pref.getInt('weight') ?? 30;
+    ageValue = pref.getInt('age') ?? 1;
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    readData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AdvancedDrawer(
@@ -58,7 +88,7 @@ class _IdentityPageState extends State<HomeScreen> {
             ),
           ),
         ),
-        body: Body(),
+        body: const Body(),
       ),
       drawer: SafeArea(
         child: ListTileTheme(
@@ -85,23 +115,35 @@ class _IdentityPageState extends State<HomeScreen> {
               ),
               ListTile(
                 onTap: () {},
-                leading: const Icon(Icons.home),
-                title: const Text('Home'),
+                leading: const Icon(Icons.supervisor_account_outlined),
+                title: Text(genderValue),
               ),
               ListTile(
                 onTap: () {},
-                leading: const Icon(Icons.account_circle_rounded),
-                title: const Text('Profile'),
+                leading: const Icon(Icons.edit),
+                title: Text("$ageValue"),
               ),
               ListTile(
                 onTap: () {},
-                leading: const Icon(Icons.favorite),
-                title: const Text('Favourites'),
+                leading: const Icon(Icons.boy),
+                title: Text("$heightValue"),
               ),
               ListTile(
                 onTap: () {},
-                leading: const Icon(Icons.settings),
-                title: const Text('Settings'),
+                leading: const Icon(Icons.accessibility),
+                title: Text("$weightValue"),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: <Widget>[
+                  Text("    "),
+                  const Icon(Icons.medical_information_outlined,
+                      color: Colors.white),
+                  Text("        "),
+                  for (Disease value in _selectedDisease)
+                    Text(value.name.toString() + ' ',
+                        style: TextStyle(color: Colors.white))
+                ],
               ),
               const Spacer(),
               DefaultTextStyle(
@@ -123,9 +165,9 @@ class _IdentityPageState extends State<HomeScreen> {
     );
   }
 
-  void _handleMenuButtonPressed() {
-    // NOTICE: Manage Advanced Drawer state through the Controller.
-    // _advancedDrawerController.value = AdvancedDrawerValue.visible();
+  void _handleMenuButtonPressed() async {
+    await readData();
+
     _advancedDrawerController.showDrawer();
   }
 }

@@ -89,4 +89,9 @@ class HeaderHelper {
     Database db = await instance.database;
     await db.rawDelete('DELETE FROM header');
   }
+
+  Future<void> deleteMonth(String month) async {
+    Database db = await instance.database;
+    await db.rawDelete('DELETE FROM header WHERE tag = ?', [month]);
+  }
 }

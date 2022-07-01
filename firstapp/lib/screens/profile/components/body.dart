@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'profile_menu.dart';
 import 'profile_pic.dart';
-import 'package:firstapp/screens/account/account_screen.dart';
+import 'package:firstapp/screens/account/components/account_revise.dart';
 import 'package:firstapp/screens/login/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cool_alert/cool_alert.dart';
@@ -26,11 +26,11 @@ class ProfileBody extends State<Body> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.symmetric(vertical: 20),
       child: Column(
         children: [
-          ProfilePic(),
-          SizedBox(height: 20),
+          const ProfilePic(),
+          const SizedBox(height: 20),
           ProfileMenu(
             text: "My Account",
             icon: "assets/icons/User Icon.svg",
@@ -38,7 +38,7 @@ class ProfileBody extends State<Body> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AccountScreen(),
+                  builder: (context) => const AccountRevise(),
                 ),
               ),
             },
@@ -65,7 +65,7 @@ class ProfileBody extends State<Body> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => LoginScreen(),
+                  builder: (context) => const LoginScreen(),
                 ),
               ),
             },
@@ -81,6 +81,9 @@ class ProfileBody extends State<Body> {
                       onConfirmBtnTap: () async {
                         await HeaderHelper.instance.delete();
                         await DetailHelper.instance.delete();
+                        SharedPreferences pref =
+                            await SharedPreferences.getInstance();
+                        await pref.clear();
                         Navigator.pop(context);
                       },
                       text: "登出確認",
