@@ -104,9 +104,9 @@ class _InvoiceDetail extends State<DetailsScreen> {
                     child: Stack(
                       children: <Widget>[
                         Container(
-                          margin: EdgeInsets.only(top: size.height * 0.3),
+                          margin: EdgeInsets.only(top: size.height * 0.30),
                           height: 700,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(24),
@@ -117,18 +117,18 @@ class _InvoiceDetail extends State<DetailsScreen> {
                             padding: const EdgeInsets.all(25),
                             child: Column(
                               children: <Widget>[
-                                SizedBox(height: 30),
+                                const SizedBox(height: 30),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
-                                  children: [
+                                  children: const [
                                     Text("品名"),
                                     Text(
-                                        "                                                              數量"),
+                                        "                                                             數量"),
                                     Text("小計  ")
                                   ],
                                 ),
-                                SizedBox(height: 30),
+                                const SizedBox(height: 30),
                                 for (invoice_details value
                                     in snapshot.data ?? tmp)
                                   (CustomRow(
@@ -146,6 +146,7 @@ class _InvoiceDetail extends State<DetailsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
+                              const SizedBox(height: 20),
                               Text(
                                 widget.invNum,
                                 style: Theme.of(context)
@@ -155,15 +156,45 @@ class _InvoiceDetail extends State<DetailsScreen> {
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 15),
-                              Text(widget.seller,
-                                  style: TextStyle(color: Colors.white)),
-                              Text(widget.address,
-                                  style: TextStyle(color: Colors.white)),
-                              Text(widget.invDate,
-                                  style: TextStyle(color: Colors.white)),
-                              Text(widget.time,
-                                  style: TextStyle(color: Colors.white)),
+                              const SizedBox(height: 35),
+                              Row(
+                                children: [
+                                  const Icon(Icons.store, color: Colors.white),
+                                  Text('  ' + widget.seller,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_on,
+                                      color: Colors.white),
+                                  Text('  ' + widget.address,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                children: [
+                                  const Icon(Icons.date_range,
+                                      color: Colors.white),
+                                  Text('  ' + widget.invDate,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                children: [
+                                  const Icon(Icons.access_time,
+                                      color: Colors.white),
+                                  Text('  ' + widget.time,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -174,7 +205,7 @@ class _InvoiceDetail extends State<DetailsScreen> {
               ),
             );
           }
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         },
       ),
     );
@@ -213,7 +244,7 @@ class CustomRow extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 40),
+          const SizedBox(height: 40),
           Expanded(
             flex: 1, // Change this property to align your content
             child: Text(

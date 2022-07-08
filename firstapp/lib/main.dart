@@ -12,6 +12,9 @@ import 'package:intl/intl.dart';
 import 'package:firstapp/screens/login/login_model.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  updateData();
+
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
@@ -25,6 +28,63 @@ void main() {
     ),
     home: const MyApp(),
   ));
+}
+
+void updateData() async {
+  final SharedPreferences pref = await SharedPreferences.getInstance();
+  String barcode = pref.getString('barcode') ?? "";
+  String password = pref.getString('password') ?? "";
+
+  var now = DateTime.now();
+  List<Header>? responseList2 = await HeaderHelper.instance.getAll();
+
+  if (responseList2.isEmpty == false) {
+    String tmpTag = responseList2[responseList2.length - 1].tag;
+    await HeaderHelper.instance.deleteMonth(tmpTag);
+    String tmpDate = responseList2[responseList2.length - 1].date;
+    final splitted = tmpDate.split('/');
+    int tmpYear = int.parse(splitted[0]);
+    int tmpMonth = int.parse(splitted[1]);
+
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 30;
+    int exp = timestamp + 200;
+    var formatter = DateFormat('yyyy/MM/dd');
+    String responseString;
+    String sdate;
+    String edate;
+    DateTime last;
+    DateTime start;
+    http.Response response;
+
+    while (true) {
+      start = DateTime(tmpYear, tmpMonth, 01);
+      last = DateTime(tmpYear, tmpMonth + 1, 0);
+      sdate = formatter.format(start);
+      edate = formatter.format(last);
+      response = await http.post(
+          Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
+          body: {
+            "version": "0.5",
+            "cardType": "3J0002",
+            "cardNo": barcode,
+            "expTimeStamp": exp.toString(),
+            "action": "carrierInvChk",
+            "timeStamp": timestamp.toString(),
+            "startDate": sdate,
+            "endDate": edate,
+            "onlyWinningInv": 'N',
+            "uuid": '1000',
+            "appID": 'EINV0202204156709',
+            "cardEncrypt": password,
+          });
+      responseString = response.body;
+      loginModelFromJson(responseString);
+      if (start.year == now.year && start.month == now.month) {
+        break;
+      }
+      tmpMonth += 1;
+    }
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -43,68 +103,6 @@ class _MyAppState extends State<MyApp> {
     const ProfileScreen()
   ];
   var myindex = 0;
-
-  void UpdateData() async {
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-    String barcode = pref.getString('barcode') ?? "";
-    String password = pref.getString('password') ?? "";
-
-    var now = DateTime.now();
-    List<Header>? responseList2 = await HeaderHelper.instance.getHeader();
-    if (responseList2 != []) {
-      String tmpTag = responseList2[responseList2.length - 1].tag;
-      await HeaderHelper.instance.deleteMonth(tmpTag);
-      String tmpDate = responseList2[responseList2.length - 1].date;
-      final splitted = tmpDate.split('/');
-      int tmpYear = int.parse(splitted[0]);
-      int tmpMonth = int.parse(splitted[1]);
-
-      int timestamp = DateTime.now().millisecondsSinceEpoch + 30;
-      int exp = timestamp + 200;
-      var formatter = DateFormat('yyyy/MM/dd');
-      String responseString;
-      String sdate;
-      String edate;
-      DateTime last;
-      DateTime start;
-      http.Response response;
-
-      while (true) {
-        start = DateTime(tmpYear, tmpMonth, 01);
-        last = DateTime(tmpYear, tmpMonth + 1, 0);
-        sdate = formatter.format(start);
-        edate = formatter.format(last);
-        response = await http.post(
-            Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
-            body: {
-              "version": "0.5",
-              "cardType": "3J0002",
-              "cardNo": barcode,
-              "expTimeStamp": exp.toString(),
-              "action": "carrierInvChk",
-              "timeStamp": timestamp.toString(),
-              "startDate": sdate,
-              "endDate": edate,
-              "onlyWinningInv": 'N',
-              "uuid": '1000',
-              "appID": 'EINV0202204156709',
-              "cardEncrypt": password,
-            });
-        responseString = response.body;
-        loginModelFromJson(responseString);
-        if (start.year == now.year && start.month == now.month) {
-          break;
-        }
-        tmpMonth += 1;
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    UpdateData();
-  }
 
   @override
   Widget build(BuildContext context) {

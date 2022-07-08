@@ -72,9 +72,18 @@ class HeaderHelper {
 ''');
   }
 
-  Future<List<Header>> getHeader() async {
+  Future<List<Header>> getAll() async {
     Database db = await instance.database;
     var header = await db.query('header', orderBy: 'tag');
+    List<Header> headerList =
+        header.isNotEmpty ? header.map((c) => Header.fromMap(c)).toList() : [];
+    return headerList;
+  }
+
+  Future<List<Header>> getHeader(String current) async {
+    Database db = await instance.database;
+    var header = await db.query('header',
+        orderBy: 'tag', where: '"tag" = ?', whereArgs: [current]);
     List<Header> headerList =
         header.isNotEmpty ? header.map((c) => Header.fromMap(c)).toList() : [];
     return headerList;

@@ -15,6 +15,10 @@ class Body extends StatefulWidget {
   _State createState() => _State();
 }
 
+var time = DateTime.now();
+var date = DateTime(time.year - 1911, time.month);
+String current = date.year.toString() + date.month.toString();
+
 class _State extends State<Body> {
   final CategoriesScroller categoriesScroller = CategoriesScroller();
   ScrollController controller = ScrollController();
@@ -23,10 +27,10 @@ class _State extends State<Body> {
 
   List<Widget> itemsData = [];
 
-  Future<List<Widget>> getPostsData() async {
+  Future<List<Widget>> getPostsData(String current) async {
     List<Widget> listItems = [];
 
-    List<Header>? responseList = await HeaderHelper.instance.getHeader();
+    List<Header>? responseList = await HeaderHelper.instance.getHeader(current);
 
     for (int i = responseList.length - 1; i > -1; i--) {
       listItems.add(
@@ -48,7 +52,7 @@ class _State extends State<Body> {
               );
             },
             child: Container(
-                height: 150,
+                height: 145,
                 margin:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
@@ -121,7 +125,7 @@ class _State extends State<Body> {
     String password = pref.getString('password')!;
 
     var now = DateTime.now();
-    List<Header>? responseList2 = await HeaderHelper.instance.getHeader();
+    List<Header>? responseList2 = await HeaderHelper.instance.getAll();
 
     String tmpTag = responseList2[responseList2.length - 1].tag;
     await HeaderHelper.instance.deleteMonth(tmpTag);
@@ -168,8 +172,24 @@ class _State extends State<Body> {
       }
       tmpMonth += 1;
     }
-    setState(() {});
+
     return;
+  }
+
+  void leftclick() {
+    date = DateTime(date.year, date.month - 1);
+    current = date.year.toString() + date.month.toString();
+    setState(() {
+      getPostsData(current);
+    });
+  }
+
+  void rightclick() {
+    date = DateTime(date.year, date.month + 1);
+    current = date.year.toString() + date.month.toString();
+    setState(() {
+      getPostsData(current);
+    });
   }
 
   @override
@@ -188,14 +208,15 @@ class _State extends State<Body> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    final double categoryHeight = size.height * 0.30;
+    final double categoryHeight = size.height * 0.25;
+
     return SafeArea(
       child: Scaffold(
         body: FutureBuilder<List<Widget>>(
-          future: getPostsData(),
+          future: getPostsData(current),
           builder: (BuildContext context, AsyncSnapshot? snapshot) {
             if (snapshot?.data?.isEmpty ?? true) {
-              return Container(
+              return SizedBox(
                 height: size.height,
                 child: Column(
                   children: <Widget>[
@@ -212,18 +233,51 @@ class _State extends State<Body> {
                           height: closeTopContainer ? 0 : categoryHeight,
                           child: categoriesScroller),
                     ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          TextButton(
+                            child: const Icon(Icons.arrow_circle_left),
+                            onPressed: leftclick,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.blueGrey,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Text(
+                                '  ' +
+                                    date.year.toString() +
+                                    '年' +
+                                    ' ' +
+                                    date.month.toString() +
+                                    '月' +
+                                    '  ',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                )),
+                          ),
+                          TextButton(
+                            child: const Icon(Icons.arrow_circle_right),
+                            onPressed: rightclick,
+                          )
+                        ]),
+                    const SizedBox(height: 10),
                     Expanded(
                       child: LiquidPullToRefresh(
                           height: 90,
                           color: kSecondaryColor,
                           onRefresh: _handleRefresh,
-                          child: Text("查無發票")),
+                          child: const Text("\n\n查無發票")),
                     ),
                   ],
                 ),
               );
             }
-            return Container(
+            return SizedBox(
               height: size.height,
               child: Column(
                 children: <Widget>[
@@ -231,48 +285,80 @@ class _State extends State<Body> {
                     height: 10,
                   ),
                   AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 350),
                     opacity: closeTopContainer ? 0 : 1,
                     child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 350),
                         width: size.width,
                         alignment: Alignment.topCenter,
                         height: closeTopContainer ? 0 : categoryHeight,
                         child: categoriesScroller),
                   ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        TextButton(
+                          child: const Icon(Icons.arrow_circle_left),
+                          onPressed: leftclick,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Text(
+                              '  ' +
+                                  date.year.toString() +
+                                  '年' +
+                                  ' ' +
+                                  date.month.toString() +
+                                  '月' +
+                                  '  ',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              )),
+                        ),
+                        TextButton(
+                          child: const Icon(Icons.arrow_circle_right),
+                          onPressed: rightclick,
+                        )
+                      ]),
+                  const SizedBox(height: 18),
                   Expanded(
-                    child: LiquidPullToRefresh(
-                        height: 90,
-                        color: kSecondaryColor,
-                        onRefresh: _handleRefresh,
-                        child: ListView.builder(
-                            controller: controller,
-                            itemCount: itemsData.length,
-                            physics: BouncingScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              double scale = 1.0;
-                              if (topContainer > 0.5) {
-                                scale = index + 0.5 - topContainer;
-                                if (scale < 0) {
-                                  scale = 0;
-                                } else if (scale > 1) {
-                                  scale = 1;
+                      child: LiquidPullToRefresh(
+                          height: 90,
+                          color: kSecondaryColor,
+                          onRefresh: _handleRefresh,
+                          child: ListView.builder(
+                              controller: controller,
+                              itemCount: snapshot?.data.length,
+                              physics: const BouncingScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                double scale = 1.0;
+                                if (topContainer > 0.5) {
+                                  scale = index + 0.5 - topContainer;
+                                  if (scale < 0) {
+                                    scale = 0;
+                                  } else if (scale > 1) {
+                                    scale = 1;
+                                  }
                                 }
-                              }
-                              return Opacity(
-                                opacity: scale,
-                                child: Transform(
-                                  transform: Matrix4.identity()
-                                    ..scale(scale, scale),
-                                  alignment: Alignment.bottomCenter,
-                                  child: Align(
-                                      heightFactor: 0.7,
-                                      alignment: Alignment.topCenter,
-                                      child: snapshot?.data[index]),
-                                ),
-                              );
-                            })),
-                  ),
+                                return Opacity(
+                                  opacity: scale,
+                                  child: Transform(
+                                    transform: Matrix4.identity()
+                                      ..scale(scale, scale),
+                                    alignment: Alignment.bottomCenter,
+                                    child: Align(
+                                        heightFactor: 0.7,
+                                        alignment: Alignment.topCenter,
+                                        child: snapshot?.data[index]),
+                                  ),
+                                );
+                              }))),
                 ],
               ),
             );
@@ -289,12 +375,12 @@ class CategoriesScroller extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double categoryHeight =
-        MediaQuery.of(context).size.height * 0.30 - 50;
+        MediaQuery.of(context).size.height * 0.30 - 85;
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       scrollDirection: Axis.horizontal,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
         child: FittedBox(
           fit: BoxFit.fill,
           alignment: Alignment.topCenter,
@@ -302,16 +388,16 @@ class CategoriesScroller extends StatelessWidget {
             children: <Widget>[
               Container(
                 width: 150,
-                margin: EdgeInsets.only(right: 20),
+                margin: const EdgeInsets.only(right: 20),
                 height: categoryHeight,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                     color: kPrimaryColor,
                     borderRadius: BorderRadius.all(Radius.circular(20.0))),
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
+                    children: const <Widget>[
                       Text(
                         "Most\nFavorites",
                         style: TextStyle(
@@ -332,48 +418,46 @@ class CategoriesScroller extends StatelessWidget {
               ),
               Container(
                 width: 150,
-                margin: EdgeInsets.only(right: 20),
+                margin: const EdgeInsets.only(right: 20),
                 height: categoryHeight,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                child: Container(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          "Newest",
-                          style: TextStyle(
-                              fontSize: 25,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          "20 Items",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
-                      ],
-                    ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const <Widget>[
+                      Text(
+                        "Newest",
+                        style: TextStyle(
+                            fontSize: 25,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        "20 Items",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ],
                   ),
                 ),
               ),
               Container(
                 width: 150,
-                margin: EdgeInsets.only(right: 20),
+                margin: const EdgeInsets.only(right: 20),
                 height: categoryHeight,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                     color: kSecondaryColor,
                     borderRadius: BorderRadius.all(Radius.circular(20.0))),
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
+                    children: const <Widget>[
                       Text(
                         "Super\nSaving",
                         style: TextStyle(

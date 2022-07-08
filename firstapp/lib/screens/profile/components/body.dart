@@ -8,6 +8,8 @@ import 'package:cool_alert/cool_alert.dart';
 import '../../../constants.dart';
 import 'package:firstapp/database/invoice_database.dart';
 import 'package:firstapp/database/details_database.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Body extends StatefulWidget {
   @override
@@ -15,82 +17,178 @@ class Body extends StatefulWidget {
 }
 
 class ProfileBody extends State<Body> {
-  late String barcode;
+  String barcode = '';
+
+  Future<String> getBarcode() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    barcode = pref.getString('barcode') ?? 'null';
+
+    return barcode;
+  }
 
   @override
   void initState() {
     super.initState();
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        children: [
-          const ProfilePic(),
-          const SizedBox(height: 20),
-          ProfileMenu(
-            text: "My Account",
-            icon: "assets/icons/User Icon.svg",
-            press: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AccountRevise(),
-                ),
-              ),
-            },
-          ),
-          ProfileMenu(
-            text: "Notifications",
-            icon: "assets/icons/Bell.svg",
-            press: () {},
-          ),
-          ProfileMenu(
-            text: "Settings",
-            icon: "assets/icons/Settings.svg",
-            press: () {},
-          ),
-          ProfileMenu(
-            text: "Help Center",
-            icon: "assets/icons/Question mark.svg",
-            press: () {},
-          ),
-          ProfileMenu(
-            text: "Log In",
-            icon: "assets/icons/Log out.svg",
-            press: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginScreen(),
-                ),
-              ),
-            },
-          ),
-          ProfileMenu(
-              text: "Log Out",
-              icon: "assets/icons/Log out.svg",
-              press: () => {
-                    CoolAlert.show(
-                      context: context,
-                      type: CoolAlertType.confirm,
-                      confirmBtnColor: kPrimaryColor,
-                      onConfirmBtnTap: () async {
-                        await HeaderHelper.instance.delete();
-                        await DetailHelper.instance.delete();
-                        SharedPreferences pref =
-                            await SharedPreferences.getInstance();
-                        await pref.clear();
-                        Navigator.pop(context);
+    return FutureBuilder<String>(
+        future: getBarcode(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.data == 'null') {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Column(
+                  children: [
+                    const ProfilePic(),
+                    const SizedBox(height: 20),
+                    ProfileMenu(
+                      text: "My Account",
+                      icon: "assets/icons/User Icon.svg",
+                      press: () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AccountRevise(),
+                          ),
+                        ),
                       },
-                      text: "登出確認",
-                    )
-                  }),
-        ],
-      ),
-    );
+                    ),
+                    ProfileMenu(
+                      text: "Notifications",
+                      icon: "assets/icons/Bell.svg",
+                      press: () {},
+                    ),
+                    ProfileMenu(
+                      text: "Settings",
+                      icon: "assets/icons/Settings.svg",
+                      press: () {},
+                    ),
+                    ProfileMenu(
+                      text: "Help Center",
+                      icon: "assets/icons/Question mark.svg",
+                      press: () {},
+                    ),
+                    ProfileMenu(
+                      text: "Log In",
+                      icon: "assets/icons/Log in.svg",
+                      press: () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        ),
+                      },
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Column(
+                  children: [
+                    const ProfilePic(),
+                    const SizedBox(height: 20),
+                    ProfileMenu(
+                      text: "My Account",
+                      icon: "assets/icons/User Icon.svg",
+                      press: () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AccountRevise(),
+                          ),
+                        ),
+                      },
+                    ),
+                    ProfileMenu(
+                      text: "Notifications",
+                      icon: "assets/icons/Bell.svg",
+                      press: () {},
+                    ),
+                    ProfileMenu(
+                      text: "Settings",
+                      icon: "assets/icons/Settings.svg",
+                      press: () {},
+                    ),
+                    ProfileMenu(
+                      text: "Help Center",
+                      icon: "assets/icons/Question mark.svg",
+                      press: () {},
+                    ),
+                    ProfileMenu(
+                        text: "Log Out",
+                        icon: "assets/icons/Log out.svg",
+                        press: () => {
+                              CoolAlert.show(
+                                context: context,
+                                type: CoolAlertType.confirm,
+                                confirmBtnColor: kPrimaryColor,
+                                onConfirmBtnTap: () async {
+                                  await HeaderHelper.instance.delete();
+                                  await DetailHelper.instance.delete();
+                                  SharedPreferences pref =
+                                      await SharedPreferences.getInstance();
+                                  await pref.clear();
+                                  setState(() {});
+                                  showTopSnackBar(
+                                    context,
+                                    const CustomSnackBar.success(
+                                      message: "登出成功",
+                                      backgroundColor: kSecondaryColor,
+                                    ),
+                                  );
+                                  Navigator.pop(context);
+                                },
+                                text: "登出確認",
+                              )
+                            }),
+                  ],
+                ),
+              );
+            }
+          } else {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                children: [
+                  const ProfilePic(),
+                  const SizedBox(height: 20),
+                  ProfileMenu(
+                    text: "My Account",
+                    icon: "assets/icons/User Icon.svg",
+                    press: () => {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AccountRevise(),
+                        ),
+                      ),
+                    },
+                  ),
+                  ProfileMenu(
+                    text: "Notifications",
+                    icon: "assets/icons/Bell.svg",
+                    press: () {},
+                  ),
+                  ProfileMenu(
+                    text: "Settings",
+                    icon: "assets/icons/Settings.svg",
+                    press: () {},
+                  ),
+                  ProfileMenu(
+                    text: "Help Center",
+                    icon: "assets/icons/Question mark.svg",
+                    press: () {},
+                  ),
+                ],
+              ),
+            );
+          }
+        });
   }
 }
