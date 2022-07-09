@@ -1,3 +1,5 @@
+import 'package:firstapp/screens/home/components/home_barcode.dart';
+import 'package:firstapp/screens/profile/components/profile_notification.dart';
 import 'package:flutter/material.dart';
 import 'profile_menu.dart';
 import 'profile_pic.dart';
@@ -46,7 +48,13 @@ class ProfileBody extends State<Body> {
           ProfileMenu(
             text: "Notifications",
             icon: "assets/icons/Bell.svg",
-            press: () {},
+            press: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => NotificationScreen(),
+                      maintainState: false));
+            },
           ),
           ProfileMenu(
             text: "Settings",

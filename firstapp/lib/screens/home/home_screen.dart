@@ -4,6 +4,8 @@ import 'package:firstapp/screens/home/components/body.dart';
 import '../../../constants.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 
+import 'components/home_barcode.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
   @override
@@ -31,33 +33,48 @@ class _IdentityPageState extends State<HomeScreen> {
         extendBody: true,
         backgroundColor: kBackgroundColor,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0.0,
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              color: kPrimaryColor,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
+            backgroundColor: Colors.transparent,
+            elevation: 0.0,
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                color: kPrimaryColor,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
               ),
             ),
-          ),
-          leading: IconButton(
-            onPressed: _handleMenuButtonPressed,
-            icon: ValueListenableBuilder<AdvancedDrawerValue>(
-              valueListenable: _advancedDrawerController,
-              builder: (_, value, __) {
-                return AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
-                  child: Icon(
-                    value.visible ? Icons.clear : Icons.menu,
-                    key: ValueKey<bool>(value.visible),
-                  ),
-                );
-              },
+            leading: IconButton(
+              onPressed: _handleMenuButtonPressed,
+              icon: ValueListenableBuilder<AdvancedDrawerValue>(
+                valueListenable: _advancedDrawerController,
+                builder: (_, value, __) {
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: Icon(
+                      value.visible ? Icons.clear : Icons.menu,
+                      key: ValueKey<bool>(value.visible),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ),
+            actions: [
+              // An icon of qr code on the right side of the bar
+              // Turn to another page and show a barcode of the carrier after clicking it.
+              // I hope the screen can be brighter than before...? I haven't checked it.
+              // Otherwise, I "want" to rotate the barcode to vertical. Maybe it's not necessary.
+              IconButton(
+                icon: Icon(Icons.qr_code_2),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BarcodeScreen(),
+                          maintainState: false));
+                },
+              ),
+            ]),
         body: Body(),
       ),
       drawer: SafeArea(
