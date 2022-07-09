@@ -29,15 +29,8 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.8.2"
-  auth_buttons:
-    dependency: "direct main"
-    description:
-      name: auth_buttons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.0"
   barcode:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: barcode
       url: "https://pub.dartlang.org"
@@ -233,13 +226,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "9.2.0"
-  google_fonts:
-    dependency: transitive
-    description:
-      name: google_fonts
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.1"
   group_button:
     dependency: "direct main"
     description:
@@ -595,6 +581,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.9"
+  top_snackbar_flutter:
+    dependency: "direct main"
+    description:
+      name: top_snackbar_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
   typed_data:
     dependency: transitive
     description:
@@ -665,41 +658,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
-  wakelock:
-    dependency: "direct main"
-    description:
-      name: wakelock
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.6.1+2"
-  wakelock_macos:
-    dependency: transitive
-    description:
-      name: wakelock_macos
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.4.0"
-  wakelock_platform_interface:
-    dependency: transitive
-    description:
-      name: wakelock_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.0"
-  wakelock_web:
-    dependency: transitive
-    description:
-      name: wakelock_web
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.4.0"
-  wakelock_windows:
-    dependency: transitive
-    description:
-      name: wakelock_windows
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.0"
   win32:
     dependency: transitive
     description:
