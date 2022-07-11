@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 import '../../../constants.dart';
 import 'package:firstapp/constants.dart';
+=======
+>>>>>>> 8cc8287123672eeb8aed370c4d97fdc6a0de0140
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -12,7 +15,7 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
-   String _scanBarcode = 'Unknown';
+  String _scanBarcode = 'Unknown';
   @override
   void initState() {
     super.initState();
@@ -69,6 +72,7 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return MaterialApp(
         home: Scaffold(
             appBar: AppBar(title: const Text('Barcode scan',), backgroundColor: kPrimaryColor,),
@@ -92,5 +96,29 @@ class _QRViewExampleState extends State<QRViewExample> {
                             style: TextStyle(fontSize: 20))
                       ]));
             })));
+=======
+    return Scaffold(
+        appBar: AppBar(title: const Text('Barcode scan')),
+        body: Builder(builder: (BuildContext context) {
+          return Container(
+              alignment: Alignment.center,
+              child: Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ElevatedButton(
+                        onPressed: () => scanBarcodeNormal(),
+                        child: Text('Start barcode scan')),
+                    ElevatedButton(
+                        onPressed: () => scanQR(),
+                        child: Text('Start QR scan')),
+                    ElevatedButton(
+                        onPressed: () => startBarcodeScanStream(),
+                        child: Text('Start barcode scan stream')),
+                    Text('Scan result : $_scanBarcode\n',
+                        style: TextStyle(fontSize: 20))
+                  ]));
+        }));
+>>>>>>> 8cc8287123672eeb8aed370c4d97fdc6a0de0140
   }
 }

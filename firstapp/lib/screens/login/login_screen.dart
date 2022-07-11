@@ -1,4 +1,5 @@
 import 'package:firstapp/constants.dart';
+import 'package:firstapp/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:firstapp/screens/login/login_model.dart';
@@ -6,6 +7,8 @@ import 'package:http/http.dart' as http;
 import '../../../constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -103,7 +106,19 @@ class LoginScreen extends StatelessWidget {
       onLogin: _authUser,
       onSignup: _signupUser,
       onSubmitAnimationCompleted: () {
-        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MyApp(),
+          ),
+        );
+        showTopSnackBar(
+          context,
+          const CustomSnackBar.success(
+            message: "登入成功",
+            backgroundColor: kSecondaryColor,
+          ),
+        );
       },
       onRecoverPassword: _recoverPassword,
     );
