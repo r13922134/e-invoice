@@ -19,8 +19,8 @@ var time = DateTime.now();
 var date = DateTime(time.year - 1911, time.month);
 String current = date.year.toString() + date.month.toString();
 
-class _State extends State<Body> {
-  final CategoriesScroller categoriesScroller = CategoriesScroller();
+class _State extends State<Body> with SingleTickerProviderStateMixin {
+  final CategoriesScroller categoriesScroller = const CategoriesScroller();
   ScrollController controller = ScrollController();
   bool closeTopContainer = false;
   double topContainer = 0;
@@ -72,7 +72,7 @@ class _State extends State<Body> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 Text(
                                   responseList[i].invNum,
@@ -81,11 +81,25 @@ class _State extends State<Body> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  '  ' + responseList[i].date,
+                                  '   ' + responseList[i].date + '   ',
                                   style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold),
                                 ),
+                                if (responseList[i].barcode == "Scan")
+                                  Container(
+                                    padding: const EdgeInsets.all(3),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blueGrey,
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    child: const Text("紙本",
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        )),
+                                  ),
                               ]),
                           Text(
                             responseList[i].seller,
@@ -106,7 +120,7 @@ class _State extends State<Body> {
                       ),
                       Image.asset(
                         "assets/images/image_1.png",
-                        height: 70,
+                        height: 53,
                       )
                     ],
                   ),
@@ -194,7 +208,6 @@ class _State extends State<Body> {
 
   @override
   void initState() {
-    super.initState();
     controller.addListener(() {
       double value = controller.offset / 119;
 
@@ -203,6 +216,7 @@ class _State extends State<Body> {
         closeTopContainer = controller.offset > 50;
       });
     });
+    super.initState();
   }
 
   @override

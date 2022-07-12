@@ -3,8 +3,6 @@ import 'dart:convert';
 DetailModel detailModelFromJson(String str) =>
     DetailModel.fromJson(json.decode(str));
 
-String detailModelToJson(DetailModel data) => json.encode(data.toJson());
-
 class DetailModel {
   DetailModel({
     required this.v,
@@ -55,23 +53,6 @@ class DetailModel {
         invoiceTime: json["invoiceTime"],
         currency: json["currency"],
       );
-
-  Map<String, dynamic> toJson() => {
-        "v": v,
-        "code": code,
-        "msg": msg,
-        "invNum": invNum,
-        "invDate": invDate,
-        "sellerName": sellerName,
-        "amount": amount,
-        "invStatus": invStatus,
-        "invPeriod": invPeriod,
-        "details": List<dynamic>.from(details.map((x) => x.toJson())),
-        "sellerBan": sellerBan,
-        "sellerAddress": sellerAddress,
-        "invoiceTime": invoiceTime,
-        "currency": currency,
-      };
 }
 
 class Details {
@@ -96,12 +77,4 @@ class Details {
         unitPrice: json["unitPrice"],
         amount: json["amount"],
       );
-
-  Map<String, dynamic> toJson() => {
-        "rowNum": rowNum,
-        "description": description,
-        "quantity": quantity,
-        "unitPrice": unitPrice,
-        "amount": amount,
-      };
 }

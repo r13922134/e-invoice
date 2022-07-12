@@ -31,34 +31,31 @@ class _IdentityPageState extends State<BarcodeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: kPrimaryColor, 
-        actions: [
-          Icon(Icons.brightness_7),
-          SizedBox(width: 10.0),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                FlutterSwitch(
-                  width: 55.0,
-                  height: 25.0,
-                  valueFontSize: 12.0,
-                  toggleSize: 18.0,
-                  value: drinkingStatus,
-                  activeColor: kSecondaryColor,
-                  inactiveColor: Colors.black38,
-                  onToggle: (val) {
-                    setState(() {
-                      drinkingStatus = val;
-                    });
-                  },
-                ),
-                SizedBox(width: 10.0),
-              ]
-            ),
-          ]
+      appBar: AppBar(backgroundColor: kPrimaryColor, actions: [
+        const Icon(Icons.brightness_7),
+        const SizedBox(width: 10.0),
+        Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              FlutterSwitch(
+                width: 55.0,
+                height: 25.0,
+                valueFontSize: 12.0,
+                toggleSize: 18.0,
+                value: drinkingStatus,
+                activeColor: kSecondaryColor,
+                inactiveColor: Colors.black38,
+                onToggle: (val) {
+                  setState(() {
+                    drinkingStatus = val;
+                  });
+                },
+              ),
+              const SizedBox(width: 10.0),
+            ]),
+      ]
           //title: Text("第二頁"),
-      ),
+          ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

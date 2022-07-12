@@ -28,15 +28,17 @@ class _InvoiceDetail extends State<DetailsScreen> {
 
   Future<List<invoice_details>> getDetail() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
-    String? barcode = pref.getString('barcode')!;
-    String? password = pref.getString('password')!;
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 100;
-    int exp = timestamp + 200;
+    String? barcode = pref.getString('barcode') ?? "";
+    String? password = pref.getString('password') ?? "";
 
     List<invoice_details> responseList = [];
+
     responseList =
         await DetailHelper.instance.getDetail(widget.tag, widget.invNum);
+
     if (responseList.isEmpty) {
+      int timestamp = DateTime.now().millisecondsSinceEpoch + 100;
+      int exp = timestamp + 200;
       http.Response response;
       response = await http.post(
           Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),

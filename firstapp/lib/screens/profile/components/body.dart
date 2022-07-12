@@ -1,5 +1,3 @@
-import 'package:firstapp/screens/home/components/home_barcode.dart';
-import 'package:firstapp/screens/profile/components/profile_notification.dart';
 import 'package:flutter/material.dart';
 import 'profile_menu.dart';
 import 'profile_pic.dart';
@@ -14,6 +12,8 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Body extends StatefulWidget {
+  const Body({Key? key}) : super(key: key);
+
   @override
   ProfileBody createState() => ProfileBody();
 }
@@ -35,66 +35,6 @@ class ProfileBody extends State<Body> {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        children: [
-          ProfilePic(),
-          SizedBox(height: 20),
-          ProfileMenu(
-            text: "My Account",
-            icon: "assets/icons/User Icon.svg",
-            press: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AccountScreen(),
-                ),
-              ),
-            },
-          ),
-          ProfileMenu(
-            text: "Notifications",
-            icon: "assets/icons/Bell.svg",
-            press: () {},
-          ),
-          ProfileMenu(
-            text: "Settings",
-            icon: "assets/icons/Settings.svg",
-            press: () {},
-          ),
-          ProfileMenu(
-            text: "Help Center",
-            icon: "assets/icons/Question mark.svg",
-            press: () {},
-          ),
-          ProfileMenu(
-            text: "Log In",
-            icon: "assets/icons/Log out.svg",
-            press: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LoginScreen(),
-                ),
-              ),
-            },
-          ),
-          ProfileMenu(
-              text: "Log Out",
-              icon: "assets/icons/Log out.svg",
-              press: () => {
-                    CoolAlert.show(
-                      context: context,
-                      type: CoolAlertType.confirm,
-                      confirmBtnColor: kPrimaryColor,
-                      onConfirmBtnTap: () async {
-                        await HeaderHelper.instance.delete();
-                        await DetailHelper.instance.delete();
-                        Navigator.pop(context);
-                        
-=======
     return FutureBuilder<String>(
         future: getBarcode(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -107,7 +47,7 @@ class ProfileBody extends State<Body> {
                     const ProfilePic(),
                     const SizedBox(height: 20),
                     ProfileMenu(
-                      text: "My Account",
+                      text: "帳戶",
                       icon: "assets/icons/User Icon.svg",
                       press: () => {
                         Navigator.push(
@@ -116,7 +56,6 @@ class ProfileBody extends State<Body> {
                             builder: (context) => const AccountRevise(),
                           ),
                         ),
->>>>>>> 8cc8287123672eeb8aed370c4d97fdc6a0de0140
                       },
                     ),
                     ProfileMenu(
@@ -135,7 +74,7 @@ class ProfileBody extends State<Body> {
                       press: () {},
                     ),
                     ProfileMenu(
-                      text: "Log In",
+                      text: "登入",
                       icon: "assets/icons/Log in.svg",
                       press: () => {
                         Navigator.push(
@@ -157,7 +96,7 @@ class ProfileBody extends State<Body> {
                     const ProfilePic(),
                     const SizedBox(height: 20),
                     ProfileMenu(
-                      text: "My Account",
+                      text: "帳戶",
                       icon: "assets/icons/User Icon.svg",
                       press: () => {
                         Navigator.push(
@@ -184,7 +123,7 @@ class ProfileBody extends State<Body> {
                       press: () {},
                     ),
                     ProfileMenu(
-                        text: "Log Out",
+                        text: "登出",
                         icon: "assets/icons/Log out.svg",
                         press: () => {
                               CoolAlert.show(
@@ -222,7 +161,7 @@ class ProfileBody extends State<Body> {
                   const ProfilePic(),
                   const SizedBox(height: 20),
                   ProfileMenu(
-                    text: "My Account",
+                    text: "帳戶",
                     icon: "assets/icons/User Icon.svg",
                     press: () => {
                       Navigator.push(
