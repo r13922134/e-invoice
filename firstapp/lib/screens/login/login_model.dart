@@ -13,16 +13,18 @@ void loginModelFromJson(String str) async {
     tmpyear = element.invDate.year + 1911;
     invDate = DateTime(tmpyear, element.invDate.month, element.invDate.date);
     invdate = formatter.format(invDate);
-
-    await HeaderHelper.instance.add(Header(
-        tag: element.invDate.year.toString() + element.invDate.month.toString(),
-        date: invdate,
-        time: element.invoiceTime,
-        seller: element.sellerName,
-        address: element.sellerAddress,
-        invNum: element.invNum,
-        barcode: element.cardNo,
-        amount: element.amount));
+    if (await HeaderHelper.instance.checkHeader(element.invNum, invdate)) {
+      await HeaderHelper.instance.add(Header(
+          tag: element.invDate.year.toString() +
+              element.invDate.month.toString(),
+          date: invdate,
+          time: element.invoiceTime,
+          seller: element.sellerName,
+          address: element.sellerAddress,
+          invNum: element.invNum,
+          barcode: element.cardNo,
+          amount: element.amount));
+    }
   }
 }
 

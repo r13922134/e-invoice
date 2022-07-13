@@ -92,9 +92,7 @@ class HeaderHelper {
   Future<bool> getScanHeader(String invNum, String date) async {
     Database db = await instance.database;
     var header = await db.query('header',
-        orderBy: 'tag',
-        where: '"invNum" = ? AND date = ?',
-        whereArgs: [invNum, date]);
+        where: '"invNum" = ? AND date = ?', whereArgs: [invNum, date]);
     List<Header> headerList =
         header.isNotEmpty ? header.map((c) => Header.fromMap(c)).toList() : [];
     if (headerList.isNotEmpty) {
@@ -113,8 +111,15 @@ class HeaderHelper {
     await db.rawDelete('DELETE FROM header');
   }
 
-  Future<void> deleteMonth(String month) async {
+  Future<bool> checkHeader(String inv, String date) async {
     Database db = await instance.database;
-    await db.rawDelete('DELETE FROM header WHERE tag = ?', [month]);
+    var header = await db.query('header',
+        where: '"invNum" = ? AND date = ?', whereArgs: [inv, date]);
+    List<Header> headerList =
+        header.isNotEmpty ? header.map((c) => Header.fromMap(c)).toList() : [];
+    if (headerList.isNotEmpty) {
+      return false;
+    }
+    return true;
   }
 }

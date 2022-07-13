@@ -14,8 +14,8 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
-  String invnum = '';
-  String date = '';
+  String invnum = 'Unknown';
+  String date = 'Unknown';
 
   @override
   void initState() {
@@ -146,6 +146,7 @@ class _QRViewExampleState extends State<QRViewExample> {
           ),
         )
       ]),
+      const SizedBox(height: 100),
       Text(invnum),
       Text(date)
     ]));

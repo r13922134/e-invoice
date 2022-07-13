@@ -42,9 +42,7 @@ void updateData() async {
   var now = DateTime.now();
   List<Header>? responseList2 = await HeaderHelper.instance.getAll();
 
-  if (responseList2.isEmpty == false) {
-    String tmpTag = responseList2[responseList2.length - 1].tag;
-    await HeaderHelper.instance.deleteMonth(tmpTag);
+  if (responseList2.isNotEmpty) {
     String tmpDate = responseList2[responseList2.length - 1].date;
     final splitted = tmpDate.split('/');
     int tmpYear = int.parse(splitted[0]);

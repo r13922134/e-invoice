@@ -142,7 +142,6 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     List<Header>? responseList2 = await HeaderHelper.instance.getAll();
 
     String tmpTag = responseList2[responseList2.length - 1].tag;
-    await HeaderHelper.instance.deleteMonth(tmpTag);
     String tmpDate = responseList2[responseList2.length - 1].date;
     final splitted = tmpDate.split('/');
     int tmpYear = int.parse(splitted[0]);
