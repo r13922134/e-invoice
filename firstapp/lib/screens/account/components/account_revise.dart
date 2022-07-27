@@ -8,6 +8,7 @@ import 'package:numberpicker/numberpicker.dart';
 import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'dart:convert';
 import 'package:flutter_svg/svg.dart';
+import 'package:selectable_list/selectable_list.dart';
 
 class AccountRevise extends StatefulWidget {
   const AccountRevise({Key? key}) : super(key: key);
@@ -47,6 +48,13 @@ class Disease {
           .toList();
 }
 
+class Activity {
+  final String strength;
+  final String illustrate;
+
+  Activity(this.strength, this.illustrate);
+}
+
 class _ProfileState extends State<AccountRevise> {
   int heightValue = 120;
   int weightValue = 30;
@@ -61,6 +69,15 @@ class _ProfileState extends State<AccountRevise> {
     Disease(id: 3, name: "高血脂"),
     Disease(id: 4, name: "腎功能異常"),
   ];
+  String? activityValue;
+  final Activitys = [
+    //Activity("Little to no exercise", "大部份時間都在坐著唸書·做功課·談話，有部份時間會看電視或欣賞音樂，并有約一小時散步、購物等身體活動程度為正常速度·熱量消耗較少的活動"),
+    Activity("Light exercise", "大部份時間都坐著工作或談話，有部份時間會站著，例如乘車、接待客人、做家事等。另外會有約二小時的時間因工作或通勤的原故，需要步行"),
+    Activity("Moderate exercise", "日常活動強度與稍低者大致相同，但每日多從事1小時活動速度快。熱量消耗較多的活動，如快走或騎腳踏車等。或者大部份是處於站著工作，而且從事約1小時活動輕度較強的工作，如農漁業"),
+    Activity("Heavy exercise", "從事重物搬運、農漁業等站立姿勢且活動強度較強的工作。或每日有1小時的運動訓練、激烈的肌肉運動，如游泳、登山、打網球等活動程度較快或激烈且熱量消耗多的運動")
+  ];
+
+  
 
   final _items = _diseases
       .map((diseases) => MultiSelectItem<Disease>(diseases, diseases.name))
@@ -79,11 +96,25 @@ class _ProfileState extends State<AccountRevise> {
     pref.setInt('height', heightValue);
     pref.setInt('weight', weightValue);
     pref.setInt('age', ageValue);
+    if(activityValue == null){
+      pref.setString('activity', "Light exercise");
+    }
+    else if(activityValue == "Light exercise"){
+      pref.setString('activity', "Light exercise");
+    }
+    else if(activityValue == "Moderate exercise"){
+      pref.setString('activity', "Moderate exercise");
+    }
+    else{
+      pref.setString('activity', "Heavy exercise");
+    }
+    
   }
 
   @override
   void initState() {
     super.initState();
+
   }
 
   @override
@@ -217,6 +248,32 @@ class _ProfileState extends State<AccountRevise> {
               step: 1,
               itemHeight: 38,
               onChanged: (value) => setState(() => weightValue = value),
+            ),
+            const SizedBox(height: 10),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const <Widget>[
+                  Icon(Icons.accessibility),
+                  Text(
+                    "日常活動強度",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 80, 80, 80),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ]),
+            SelectableList<Activity, String?>(
+              items: Activitys,
+              itemBuilder: (context, Activity, selected, onTap) => ListTile(
+                title: Text(Activity.strength),
+                subtitle: Text('${Activity.illustrate.toString()}'),
+                selected: selected,
+                onTap: onTap),
+              valueSelector: (Activity) => Activity.strength,
+              selectedValue: activityValue,
+              onItemSelected: (Activity) => setState(() => activityValue = Activity.strength),
+              onItemDeselected: (Activity) => setState(() => activityValue = null),
             ),
             const SizedBox(height: 8),
             Container(

@@ -10,7 +10,7 @@ class AnalysisScreen extends StatefulWidget {
   _IdentityPageState createState() => _IdentityPageState();
 }
 
-class _IdentityPageState extends State<AnalysisScreen> {
+class _IdentityPageState extends State<AnalysisScreen> {  
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -86,7 +86,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                     color: kBackgroundColor),
                                 child: const Center(
                                   child: Text(
-                                    "20,3",
+                                    "20.3",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -163,3 +163,4 @@ class _IdentityPageState extends State<AnalysisScreen> {
                     ]))));
   }
 }
+  
