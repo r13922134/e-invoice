@@ -4,6 +4,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'package:firstapp/screens/scan/scan_model.dart';
 import 'package:firstapp/database/invoice_database.dart';
+import 'package:firstapp/screens/scan/add_invoice.dart';
 import '../../../constants.dart';
 
 class QRViewExample extends StatefulWidget {
@@ -116,7 +117,14 @@ class _QRViewExampleState extends State<QRViewExample> {
           ),
         ),
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AddInvoice(),
+              ),
+            );
+          },
           child: Container(
             width: 150,
             height: 150,
