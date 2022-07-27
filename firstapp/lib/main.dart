@@ -14,6 +14,7 @@ import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:firstapp/screens/account/components/account_revise.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/screens/home/components/home_barcode.dart';
+import 'package:firstapp/screens/analysis/calculate.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -104,6 +105,12 @@ class _MyAppState extends State<MyApp> {
   List<Disease> _selectedDisease = [];
   String genderValue = '';
   String listString = '';
+  String activityValue = '';
+	double bmiValue = 10.0; 
+  //int dailyCalorie = 0;
+  String bmirange = '';
+  int mixCalorie = 0;
+  
   Future<void> readData() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String? listString = pref.getString('select_diseases');
@@ -114,6 +121,26 @@ class _MyAppState extends State<MyApp> {
     heightValue = pref.getInt('height') ?? 120;
     weightValue = pref.getInt('weight') ?? 30;
     ageValue = pref.getInt('age') ?? 1;
+    activityValue = pref.getString('activity')?? '';
+    Calculate c = new Calculate(
+                      height: heightValue,
+                      weight: weightValue,
+                      gender: genderValue,
+                      activity: activityValue);
+    c.calculateBMI();
+    bmirange = c.getInterpretation();
+    if(ageValue>18){
+      mixCalorie = c.getdailyCalorie();
+    }
+    else if(ageValue>15){
+      mixCalorie = c.getdailyCalorie_teenager();
+    }
+    else if(ageValue>=13){
+      mixCalorie = c.getdailyCalorie_child();
+    }
+    else{
+      mixCalorie = 1200;
+    }
 
     setState(() {});
   }
@@ -262,6 +289,21 @@ class _MyAppState extends State<MyApp> {
                 leading: const Icon(Icons.accessibility),
                 title: Text("$weightValue"),
               ),
+              ListTile(
+                onTap: () {},
+                leading: const Icon(Icons.directions_walk_outlined),
+                title: Text("$activityValue"),
+              ),
+              ListTile(
+                onTap: () {},
+                leading: const Icon(Icons.flag_outlined),
+                title: Text("$mixCalorie kcal"),
+              ),
+              ListTile(
+                onTap: () {},
+                leading: const Icon(Icons.flag_outlined),
+                title: Text("$bmirange"),
+              ),
               const SizedBox(height: 18),
               Row(
                 children: <Widget>[
@@ -296,6 +338,7 @@ class _MyAppState extends State<MyApp> {
 
   void _handleMenuButtonPressed() async {
     await readData();
+    
 
     _advancedDrawerController.showDrawer();
   }
