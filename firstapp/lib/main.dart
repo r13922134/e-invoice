@@ -106,11 +106,11 @@ class _MyAppState extends State<MyApp> {
   String genderValue = '';
   String listString = '';
   String activityValue = '';
-	double bmiValue = 10.0; 
+  double bmiValue = 10.0;
   //int dailyCalorie = 0;
   String bmirange = '';
   int mixCalorie = 0;
-  
+
   Future<void> readData() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String? listString = pref.getString('select_diseases');
@@ -121,24 +121,22 @@ class _MyAppState extends State<MyApp> {
     heightValue = pref.getInt('height') ?? 120;
     weightValue = pref.getInt('weight') ?? 30;
     ageValue = pref.getInt('age') ?? 1;
-    activityValue = pref.getString('activity')?? '';
+    activityValue = pref.getString('activity') ?? '';
     Calculate c = new Calculate(
-                      height: heightValue,
-                      weight: weightValue,
-                      gender: genderValue,
-                      activity: activityValue);
+        height: heightValue,
+        weight: weightValue,
+        gender: genderValue,
+        activity: activityValue);
     c.calculateBMI();
     bmirange = c.getInterpretation();
-    if(ageValue>18){
+    pref.setString('bmirange', bmirange);
+    if (ageValue > 18) {
       mixCalorie = c.getdailyCalorie();
-    }
-    else if(ageValue>15){
+    } else if (ageValue > 15) {
       mixCalorie = c.getdailyCalorie_teenager();
-    }
-    else if(ageValue>=13){
+    } else if (ageValue >= 13) {
       mixCalorie = c.getdailyCalorie_child();
-    }
-    else{
+    } else {
       mixCalorie = 1200;
     }
 
@@ -277,22 +275,22 @@ class _MyAppState extends State<MyApp> {
               ListTile(
                 onTap: () {},
                 leading: const Icon(Icons.edit),
-                title: Text("$ageValue"),
+                title: Text("$ageValue   歲"),
               ),
               ListTile(
                 onTap: () {},
                 leading: const Icon(Icons.boy),
-                title: Text("$heightValue"),
+                title: Text("$heightValue   cm"),
               ),
               ListTile(
                 onTap: () {},
                 leading: const Icon(Icons.accessibility),
-                title: Text("$weightValue"),
+                title: Text("$weightValue   kg"),
               ),
               ListTile(
                 onTap: () {},
                 leading: const Icon(Icons.directions_walk_outlined),
-                title: Text("$activityValue"),
+                title: Text(activityValue),
               ),
               ListTile(
                 onTap: () {},
@@ -301,13 +299,14 @@ class _MyAppState extends State<MyApp> {
               ),
               ListTile(
                 onTap: () {},
-                leading: const Icon(Icons.flag_outlined),
-                title: Text("$bmirange"),
+                leading: Image.asset('assets/icons/bmi.svg',
+                    color: Colors.white, width: 30),
+                title: Text(bmirange),
               ),
               const SizedBox(height: 18),
               Row(
                 children: <Widget>[
-                  Text("    "),
+                  Text("     "),
                   const Icon(Icons.medical_information_outlined,
                       color: Colors.white),
                   Text("        "),
@@ -338,7 +337,6 @@ class _MyAppState extends State<MyApp> {
 
   void _handleMenuButtonPressed() async {
     await readData();
-    
 
     _advancedDrawerController.showDrawer();
   }
