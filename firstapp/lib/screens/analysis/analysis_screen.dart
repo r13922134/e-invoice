@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firstapp/screens/analysis/analysis_bar.dart';
 import 'package:firstapp/screens/analysis/water_intake_progressbar.dart';
 import 'package:firstapp/screens/analysis/water_intake_timeline.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AnalysisScreen extends StatefulWidget {
   const AnalysisScreen({Key? key}) : super(key: key);
@@ -10,7 +11,21 @@ class AnalysisScreen extends StatefulWidget {
   _IdentityPageState createState() => _IdentityPageState();
 }
 
-class _IdentityPageState extends State<AnalysisScreen> {  
+class _IdentityPageState extends State<AnalysisScreen> {
+  String bmirange = '';
+  Future<void> readData() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    bmirange = pref.getString('bmirange') ?? '';
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    readData();
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -48,8 +63,8 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white),
                                       ),
-                                      const Text(
-                                        "You have a normal weight",
+                                      Text(
+                                        "You have a $bmirange weight",
                                         style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w400,
@@ -163,4 +178,3 @@ class _IdentityPageState extends State<AnalysisScreen> {
                     ]))));
   }
 }
-  

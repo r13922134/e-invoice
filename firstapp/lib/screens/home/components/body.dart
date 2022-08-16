@@ -100,6 +100,20 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                                           fontWeight: FontWeight.w500,
                                         )),
                                   ),
+                                if (responseList[i].barcode == "manual")
+                                  Container(
+                                    padding: const EdgeInsets.all(3),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blueGrey,
+                                      borderRadius: BorderRadius.circular(7),
+                                    ),
+                                    child: const Text("手動",
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        )),
+                                  ),
                               ]),
                           Text(
                             responseList[i].seller,
