@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'dart:convert';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -21,50 +22,50 @@ class LoginScreen extends StatelessWidget {
     pref.setString('password', password);
   }
 
-  Future<String?> _authUser(LoginData data) {
+  Future<String?> _authUser(LoginData data) async {
     debugPrint('Name: ${data.name}, Password: ${data.password}');
-    return Future.delayed(loginTime).then((_) async {
-      setDevice(data.name, data.password);
 
-      int timestamp = DateTime.now().millisecondsSinceEpoch + 30;
-      int exp = timestamp + 200;
-      var now = DateTime.now();
-      var formatter = DateFormat('yyyy/MM/dd');
-      String responseString;
-      String sdate;
-      String edate;
-      DateTime last;
-      DateTime start;
-      http.Response response;
+    setDevice(data.name, data.password);
 
-      for (int j = 5; j >= 0; j--) {
-        start = DateTime(now.year, now.month - j, 01);
-        last = DateTime(start.year, start.month + 1, 0);
-        sdate = formatter.format(start);
-        edate = formatter.format(last);
-        response = await http.post(
-            Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
-            body: {
-              "version": "0.5",
-              "cardType": "3J0002",
-              "cardNo": data.name,
-              "expTimeStamp": exp.toString(),
-              "action": "carrierInvChk",
-              "timeStamp": timestamp.toString(),
-              "startDate": sdate,
-              "endDate": edate,
-              "onlyWinningInv": 'N',
-              "uuid": '1000',
-              "appID": 'EINV0202204156709',
-              "cardEncrypt": data.password,
-            });
-        responseString = response.body;
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 30;
+    int exp = timestamp + 180;
+    var now = DateTime.now();
+    var formatter = DateFormat('yyyy/MM/dd');
+    String responseString;
+    String sdate;
+    String edate;
+    DateTime last;
+    DateTime start;
+    http.Response response;
 
-        loginModelFromJson(responseString);
-      }
+    for (int j = 5; j >= 0; j--) {
+      start = DateTime(now.year, now.month - j, 01);
+      last = DateTime(start.year, start.month + 1, 0);
+      sdate = formatter.format(start);
+      edate = formatter.format(last);
 
-      return null;
-    });
+      response = await http.post(
+          Uri.https("api.einvoice.nat.gov.tw", "/PB2CAPIVAN/invServ/InvServ"),
+          body: jsonEncode({
+            "version": "0.5",
+            "cardType": "3J0002",
+            "cardNo": data.name,
+            "expTimeStamp": exp.toString(),
+            "action": "carrierInvChk",
+            "timeStamp": timestamp.toString(),
+            "startDate": sdate,
+            "endDate": edate,
+            "onlyWinningInv": 'N',
+            "uuid": '1000',
+            "appID": 'EINV0202204156709',
+            "cardEncrypt": data.password,
+          }));
+      responseString = response.body;
+      print(responseString);
+      loginModelFromJson(responseString);
+    }
+
+    return null;
   }
 
   Future<String?> _signupUser(SignupData data) {

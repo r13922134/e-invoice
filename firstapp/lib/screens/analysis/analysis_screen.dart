@@ -4,6 +4,16 @@ import 'package:firstapp/screens/analysis/analysis_bar.dart';
 import 'package:firstapp/screens/analysis/water_intake_progressbar.dart';
 import 'package:firstapp/screens/analysis/water_intake_timeline.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:firstapp/screens/analysis/card_info.dart';
+import 'package:firstapp/screens/analysis/card_detail.dart';
+import 'package:date_time_picker/date_time_picker.dart';
+
+DateTime now = DateTime.now();
+DateTime date = DateTime(now.year, now.month, now.day);
+List<String> splitted = date.toString().split('-');
+String tmpdate =
+    splitted[0] + '/' + splitted[1] + '/' + splitted[2][0] + splitted[2][1];
 
 class AnalysisScreen extends StatefulWidget {
   const AnalysisScreen({Key? key}) : super(key: key);
@@ -13,6 +23,8 @@ class AnalysisScreen extends StatefulWidget {
 
 class _IdentityPageState extends State<AnalysisScreen> {
   String bmirange = '';
+  String _date = tmpdate;
+
   Future<void> readData() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     bmirange = pref.getString('bmirange') ?? '';
@@ -36,6 +48,226 @@ class _IdentityPageState extends State<AnalysisScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 5),
+                      Container(
+                        width: 134,
+                        height: 35,
+                        child: DateTimePicker(
+                          type: DateTimePickerType.date,
+                          dateMask: 'yyyy/MM/dd',
+                          initialValue: date.toString(),
+                          style: const TextStyle(
+                              fontSize: 10, color: Colors.black),
+                          decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                  // width: 0.0 produces a thin "hairline" border
+                                  borderSide:
+                                      const BorderSide(color: kSecondaryColor),
+                                  borderRadius: BorderRadius.circular(15)),
+                              filled: true,
+                              fillColor: kSecondaryColor,
+                              suffixIcon: const Icon(Icons.arrow_drop_down,
+                                  color: Colors.black),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15))),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                          onChanged: (val) {
+                            splitted = val.toString().split('-');
+                            tmpdate = splitted[0] +
+                                '/' +
+                                splitted[1] +
+                                '/' +
+                                splitted[2];
+
+                            return setState(() => _date = tmpdate);
+                          },
+                          validator: (val) {
+                            setState(() => _date = val ?? '');
+                            return null;
+                          },
+                          onSaved: (val) => setState(() => _date = val ?? ''),
+                        ),
+                      ),
+                      FutureBuilder<List<CardInfo>>(
+                          future: getcurrentdate(_date),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.data.isEmpty) {
+                                return Center(
+                                    child: Column(children: [
+                                  Image.asset('assets/images/cancel.png',
+                                      width: 150),
+                                  Text("此日期無食物紀錄",
+                                      style: TextStyle(
+                                        color: kPrimaryColor,
+                                        fontFamily: 'Avenir',
+                                        fontSize: 19,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center)
+                                ]));
+                              } else {
+                                return Container(
+                                  height: 340,
+                                  padding: const EdgeInsets.only(left: 20),
+                                  child: Swiper(
+                                    itemCount: snapshot.data.length,
+                                    itemWidth:
+                                        MediaQuery.of(context).size.width -
+                                            2 * 64,
+                                    layout: SwiperLayout.STACK,
+                                    pagination: const SwiperPagination(
+                                      builder: DotSwiperPaginationBuilder(
+                                          activeSize: 13,
+                                          space: 8,
+                                          color: Colors.grey),
+                                    ),
+                                    itemBuilder: (context, index) {
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, a, b) =>
+                                                  DetailPage(
+                                                cardInfo: snapshot.data[index],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Stack(
+                                          alignment:
+                                              AlignmentDirectional.topCenter,
+                                          children: <Widget>[
+                                            Column(
+                                              children: <Widget>[
+                                                const SizedBox(height: 50),
+                                                Card(
+                                                  elevation: 8,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            32),
+                                                  ),
+                                                  color: Colors.white,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            32.0),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: <Widget>[
+                                                        const SizedBox(
+                                                            height: 33),
+                                                        Text(
+                                                          snapshot
+                                                              .data[index].name,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontFamily:
+                                                                'Avenir',
+                                                            fontSize: 19,
+                                                            color: kTextColor,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 5),
+                                                        Text(
+                                                          snapshot.data[index]
+                                                              .calorie,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontFamily:
+                                                                'Avenir',
+                                                            fontSize: 30,
+                                                            color: Color(
+                                                                0xff47455f),
+                                                            fontWeight:
+                                                                FontWeight.w900,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 20),
+                                                        Row(
+                                                          children: <Widget>[
+                                                            const Text(
+                                                              'Know more',
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontFamily:
+                                                                    'Avenir',
+                                                                fontSize: 18,
+                                                                color:
+                                                                    kTextColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .left,
+                                                            ),
+                                                            const Icon(
+                                                              Icons
+                                                                  .arrow_forward,
+                                                              color: kTextColor,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Hero(
+                                              tag:
+                                                  snapshot.data[index].position,
+                                              child: Image.asset(
+                                                  snapshot.data[index].images,
+                                                  width: 120),
+                                            ),
+                                            Positioned(
+                                              right: 24,
+                                              bottom: 70,
+                                              child: Text(
+                                                snapshot.data[index].position
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  fontFamily: 'Avenir',
+                                                  fontSize: 120,
+                                                  color: kTextColor
+                                                      .withOpacity(0.08),
+                                                  fontWeight: FontWeight.w900,
+                                                ),
+                                                textAlign: TextAlign.left,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                              }
+                            } else {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                          }),
                       const SizedBox(height: 20),
                       Container(
                         width: double.infinity,
@@ -65,7 +297,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                       ),
                                       Text(
                                         "You have a $bmirange weight",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w400,
                                             color: Colors.white),

@@ -89,6 +89,15 @@ class HeaderHelper {
     return headerList;
   }
 
+  Future<List<Header>> getHeader_date(String current) async {
+    Database db = await instance.database;
+    var header = await db.query('header',
+        orderBy: 'time', where: '"date" = ?', whereArgs: [current]);
+    List<Header> headerList =
+        header.isNotEmpty ? header.map((c) => Header.fromMap(c)).toList() : [];
+    return headerList;
+  }
+
   Future<bool> getScanHeader(String invNum, String date) async {
     Database db = await instance.database;
     var header = await db.query('header',

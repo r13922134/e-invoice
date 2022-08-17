@@ -162,7 +162,7 @@ class _MyAppState extends State<MyApp> {
       animateChildDecoration: true,
       rtlOpening: false,
       // openScale: 1.0,
-      disabledGestures: false,
+      disabledGestures: true,
       childDecoration: const BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(16)),
       ),

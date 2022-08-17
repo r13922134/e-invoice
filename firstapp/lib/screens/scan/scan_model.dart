@@ -3,7 +3,13 @@ import 'package:firstapp/database/invoice_database.dart';
 import 'package:firstapp/database/details_database.dart';
 import 'package:http/http.dart' as http;
 
-void scanModelFromJson(String str, String random) async {
+class returnValue {
+  returnValue({required this.seller, required this.amount});
+  String seller;
+  String amount;
+}
+
+Future<returnValue> scanModelFromJson(String str, String random) async {
   ScanModel tmp = ScanModel.fromJson(json.decode(str));
   String tmpdate = tmp.invDate.substring(0, 4) +
       '/' +
@@ -67,6 +73,7 @@ void scanModelFromJson(String str, String random) async {
       invNum: tmp.invNum,
       barcode: "Scan",
       amount: amount.toString()));
+  return returnValue(seller: tmp.sellerName, amount: amount.toString());
 }
 
 ScanDetailModel scanDetailModelFromJson(String str) =>

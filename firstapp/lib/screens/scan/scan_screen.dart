@@ -6,6 +6,8 @@ import 'package:firstapp/screens/scan/scan_model.dart';
 import 'package:firstapp/database/invoice_database.dart';
 import 'package:firstapp/screens/scan/add_invoice.dart';
 import '../../../constants.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 
 class QRViewExample extends StatefulWidget {
   const QRViewExample({Key? key}) : super(key: key);
@@ -15,8 +17,10 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
-  String invnum = 'Unknown';
-  String date = 'Unknown';
+  String invnum = '點選上方掃描或輸入';
+  String date = 'xxxx/xx/xx';
+  String seller = 'xxxx';
+  String amount = 'xx';
 
   @override
   void initState() {
@@ -26,7 +30,9 @@ class _QRViewExampleState extends State<QRViewExample> {
   Future<void> scanQR() async {
     String barcodeScanRes;
     int tmpdate = 0;
-    String tmpString = '';
+    String tmpString = 'xxxx/xx/xx';
+    String tmpseller = 'xxxx';
+    String tmpamount = 'xx';
 
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
@@ -45,7 +51,14 @@ class _QRViewExampleState extends State<QRViewExample> {
       if (await HeaderHelper.instance
           .getScanHeader(barcodeScanRes, tmpString)) {
         barcodeScanRes = "發票已存在";
-        tmpString = '';
+        tmpString = 'xxxx/xx/xx';
+        showTopSnackBar(
+          context,
+          const CustomSnackBar.info(
+            message: "發票已存在",
+            backgroundColor: kSecondaryColor,
+          ),
+        );
       } else {
         http.Response response = await http.post(
             Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invapp/InvApp"),
@@ -61,7 +74,17 @@ class _QRViewExampleState extends State<QRViewExample> {
             });
         String responseString = response.body;
 
-        scanModelFromJson(responseString, random);
+        await scanModelFromJson(responseString, random).then((value) {
+          tmpseller = value.seller;
+          tmpamount = value.amount;
+        });
+        showTopSnackBar(
+          context,
+          const CustomSnackBar.success(
+            message: "掃描成功",
+            backgroundColor: kSecondaryColor,
+          ),
+        );
       }
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
@@ -75,6 +98,8 @@ class _QRViewExampleState extends State<QRViewExample> {
     setState(() {
       invnum = barcodeScanRes;
       date = tmpString;
+      seller = tmpseller;
+      amount = tmpamount;
     });
   }
 
@@ -82,7 +107,7 @@ class _QRViewExampleState extends State<QRViewExample> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(children: <Widget>[
-      const SizedBox(height: 40),
+      const SizedBox(height: 70),
       Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <Widget>[
         GestureDetector(
           onTap: () {
@@ -155,8 +180,60 @@ class _QRViewExampleState extends State<QRViewExample> {
         )
       ]),
       const SizedBox(height: 100),
-      Text(invnum),
-      Text(date)
+      Container(
+          height: 145,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(color: Colors.black.withAlpha(100), blurRadius: 10.0),
+              ]),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            invnum,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '   ' + date + '   ',
+                            style: const TextStyle(
+                                fontSize: 13, fontWeight: FontWeight.bold),
+                          ),
+                        ]),
+                    Text(
+                      seller,
+                      style: const TextStyle(fontSize: 11, color: Colors.black),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "\$" + amount,
+                      style: const TextStyle(
+                          fontSize: 25,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+                Image.asset(
+                  "assets/images/image_1.png",
+                  height: 53,
+                )
+              ],
+            ),
+          )),
     ]));
   }
 }
