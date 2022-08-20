@@ -17,6 +17,6 @@ class _IdentityPageState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Body();
+    return const Body();
   }
 }

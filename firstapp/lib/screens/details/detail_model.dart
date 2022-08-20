@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-DetailModel detailModelFromJson(String str) =>
-    DetailModel.fromJson(json.decode(str));
+Future<DetailModel> detailModelFromJson(String str) async {
+  return DetailModel.fromJson(json.decode(str));
+}
 
 class DetailModel {
   DetailModel({

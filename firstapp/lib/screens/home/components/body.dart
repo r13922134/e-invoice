@@ -38,8 +38,8 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => DetailsScreen(
+                PageRouteBuilder(
+                  pageBuilder: (context, a, b) => DetailsScreen(
                     tag: responseList[i].tag,
                     invDate: responseList[i].date,
                     seller: responseList[i].seller,
@@ -132,10 +132,13 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                           )
                         ],
                       ),
-                      Image.asset(
-                        "assets/images/image_1.png",
-                        height: 53,
-                      )
+                      Hero(
+                        tag: responseList[i].invNum,
+                        child: Image.asset(
+                          "assets/images/image_1.png",
+                          height: 53,
+                        ),
+                      ),
                     ],
                   ),
                 ))),
@@ -149,58 +152,70 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
 
   Future<void> _handleRefresh() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
-    String barcode = pref.getString('barcode')!;
-    String password = pref.getString('password')!;
+    String barcode = pref.getString('barcode') ?? "";
+    String password = pref.getString('password') ?? "";
 
     var now = DateTime.now();
     List<Header>? responseList2 = await HeaderHelper.instance.getAll();
 
-    String tmpTag = responseList2[responseList2.length - 1].tag;
-    String tmpDate = responseList2[responseList2.length - 1].date;
-    final splitted = tmpDate.split('/');
-    int tmpYear = int.parse(splitted[0]);
-    int tmpMonth = int.parse(splitted[1]);
+    if (responseList2.isNotEmpty) {
+      String tmpDate = responseList2[responseList2.length - 1].date;
+      final splitted = tmpDate.split('/');
+      int tmpYear = int.parse(splitted[0]);
+      int tmpMonth = int.parse(splitted[1]);
 
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 30;
-    int exp = timestamp + 200;
-    var formatter = DateFormat('yyyy/MM/dd');
-    String responseString;
-    String sdate;
-    String edate;
-    DateTime last;
-    DateTime start;
-    http.Response response;
+      int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
+      int exp = timestamp + 100000;
+      int len = barcode.length;
+      String uuid = barcode.substring(1, len);
 
-    while (true) {
-      start = DateTime(tmpYear, tmpMonth, 01);
-      last = DateTime(tmpYear, tmpMonth + 1, 0);
-      sdate = formatter.format(start);
-      edate = formatter.format(last);
-      response = await http.post(
-          Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
-          body: {
-            "version": "0.5",
-            "cardType": "3J0002",
-            "cardNo": barcode,
-            "expTimeStamp": exp.toString(),
-            "action": "carrierInvChk",
-            "timeStamp": timestamp.toString(),
-            "startDate": sdate,
-            "endDate": edate,
-            "onlyWinningInv": 'N',
-            "uuid": '1000',
-            "appID": 'EINV0202204156709',
-            "cardEncrypt": password,
-          });
-      responseString = response.body;
-      loginModelFromJson(responseString);
-      if (start.year == now.year && start.month == now.month) {
-        break;
+      var formatter = DateFormat('yyyy/MM/dd');
+      String responseString;
+      String sdate;
+      String edate;
+      DateTime last;
+      DateTime start;
+
+      while (true) {
+        start = DateTime(tmpYear, tmpMonth, 01);
+        last = DateTime(tmpYear, tmpMonth + 1, 0);
+        sdate = formatter.format(start);
+        edate = formatter.format(last);
+        var client = http.Client();
+        try {
+          var response = await client.post(
+              Uri.https(
+                  "api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
+              body: {
+                "version": "0.5",
+                "cardType": "3J0002",
+                "cardNo": barcode,
+                "expTimeStamp": exp.toString().substring(0, 10),
+                "action": "carrierInvChk",
+                "timeStamp": timestamp.toString().substring(0, 10),
+                "startDate": sdate,
+                "endDate": edate,
+                "onlyWinningInv": 'N',
+                "uuid": uuid,
+                "appID": 'EINV0202204156709',
+                "cardEncrypt": password,
+              });
+
+          responseString = response.body;
+          if (responseString != '') {
+            loginModelFromJson(responseString);
+          }
+          if (start.year == now.year && start.month == now.month) {
+            break;
+          }
+          tmpMonth += 1;
+        } catch (e) {
+          print("error");
+        } finally {
+          client.close();
+        }
       }
-      tmpMonth += 1;
     }
-
-    return;
   }
 
   void leftclick() {

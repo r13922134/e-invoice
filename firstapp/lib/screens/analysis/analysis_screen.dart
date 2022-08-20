@@ -4,10 +4,11 @@ import 'package:firstapp/screens/analysis/analysis_bar.dart';
 import 'package:firstapp/screens/analysis/water_intake_progressbar.dart';
 import 'package:firstapp/screens/analysis/water_intake_timeline.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:card_swiper/card_swiper.dart';
 import 'package:firstapp/screens/analysis/card_info.dart';
 import 'package:firstapp/screens/analysis/card_detail.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 DateTime now = DateTime.now();
 DateTime date = DateTime(now.year, now.month, now.day);
@@ -35,12 +36,12 @@ class _IdentityPageState extends State<AnalysisScreen> {
   @override
   void initState() {
     super.initState();
-    readData();
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+
     return Scaffold(
         body: SingleChildScrollView(
             child: Padding(
@@ -49,13 +50,13 @@ class _IdentityPageState extends State<AnalysisScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 5),
-                      Container(
+                      SizedBox(
                         width: 134,
                         height: 35,
                         child: DateTimePicker(
                           type: DateTimePickerType.date,
                           dateMask: 'yyyy/MM/dd',
-                          initialValue: date.toString(),
+                          initialValue: _date.toString(),
                           style: const TextStyle(
                               fontSize: 10, color: Colors.black),
                           decoration: InputDecoration(
@@ -95,122 +96,121 @@ class _IdentityPageState extends State<AnalysisScreen> {
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.done) {
-                              if (snapshot.data.isEmpty) {
-                                return Center(
-                                    child: Column(children: [
-                                  Image.asset('assets/images/cancel.png',
-                                      width: 150),
-                                  Text("此日期無食物紀錄",
-                                      style: TextStyle(
-                                        color: kPrimaryColor,
-                                        fontFamily: 'Avenir',
-                                        fontSize: 19,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      textAlign: TextAlign.center)
-                                ]));
-                              } else {
+                              List<CardInfo> tcards = snapshot.data;
+                              if (snapshot.data?.isEmpty ?? true) {
                                 return Container(
-                                  height: 340,
-                                  padding: const EdgeInsets.only(left: 20),
-                                  child: Swiper(
-                                    itemCount: snapshot.data.length,
-                                    itemWidth:
-                                        MediaQuery.of(context).size.width -
-                                            2 * 64,
-                                    layout: SwiperLayout.STACK,
-                                    pagination: const SwiperPagination(
-                                      builder: DotSwiperPaginationBuilder(
-                                          activeSize: 13,
-                                          space: 8,
-                                          color: Colors.grey),
-                                    ),
-                                    itemBuilder: (context, index) {
-                                      return InkWell(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, a, b) =>
-                                                  DetailPage(
-                                                cardInfo: snapshot.data[index],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: Stack(
-                                          alignment:
-                                              AlignmentDirectional.topCenter,
-                                          children: <Widget>[
-                                            Column(
-                                              children: <Widget>[
-                                                const SizedBox(height: 50),
-                                                Card(
-                                                  elevation: 8,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            32),
-                                                  ),
-                                                  color: Colors.white,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            32.0),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceEvenly,
-                                                      children: <Widget>[
-                                                        const SizedBox(
-                                                            height: 33),
-                                                        Text(
-                                                          snapshot
-                                                              .data[index].name,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontFamily:
-                                                                'Avenir',
-                                                            fontSize: 19,
-                                                            color: kTextColor,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                          textAlign:
-                                                              TextAlign.left,
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 5),
-                                                        Text(
-                                                          snapshot.data[index]
-                                                              .calorie,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontFamily:
-                                                                'Avenir',
-                                                            fontSize: 30,
-                                                            color: Color(
-                                                                0xff47455f),
-                                                            fontWeight:
-                                                                FontWeight.w900,
-                                                          ),
-                                                          textAlign:
-                                                              TextAlign.left,
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 20),
-                                                        Row(
-                                                          children: <Widget>[
-                                                            const Text(
-                                                              'Know more',
+                                    height: 300,
+                                    child: Center(
+                                        child: Column(children: [
+                                      const SizedBox(height: 50),
+                                      Image.asset('assets/images/cancel.png',
+                                          width: 150),
+                                      const Text("此日期無食物紀錄",
+                                          style: TextStyle(
+                                            color: kPrimaryColor,
+                                            fontFamily: 'Avenir',
+                                            fontSize: 19,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          textAlign: TextAlign.center)
+                                    ])));
+                              } else {
+                                int len = tcards.length - 1;
+                                int herotag;
+                                List<int> tmptag = [1, 2, 3, 4, 5];
+                                int i = 0;
+                                return Swiper(
+                                  index: len,
+                                  onTap: (index) {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, a, b) =>
+                                            DetailPage(
+                                          cardInfo: tcards[len - index],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  itemCount: tcards.length,
+                                  itemWidth: MediaQuery.of(context).size.width -
+                                      2 * 34,
+                                  itemHeight: 280.0,
+                                  layout: SwiperLayout.TINDER,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    if (len < 4) {
+                                      if (i == 5) {
+                                        i = 0;
+                                      }
+                                      herotag = tmptag[i++];
+                                    } else {
+                                      herotag = tcards[index].position;
+                                    }
+                                    return InkWell(
+                                      child: Stack(
+                                        alignment:
+                                            AlignmentDirectional.topCenter,
+                                        children: <Widget>[
+                                          Column(
+                                            children: <Widget>[
+                                              const SizedBox(height: 50),
+                                              Card(
+                                                elevation: 8,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(32),
+                                                ),
+                                                color: Colors.white,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      32.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: <Widget>[
+                                                      const SizedBox(
+                                                          height: 33),
+                                                      tcards[len - index]
+                                                                  .name
+                                                                  .length <
+                                                              14
+                                                          ? Text(
+                                                              tcards[len -
+                                                                      index]
+                                                                  .name,
                                                               style:
                                                                   const TextStyle(
                                                                 fontFamily:
                                                                     'Avenir',
-                                                                fontSize: 18,
+                                                                fontSize: 19,
+                                                                color:
+                                                                    kTextColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .left,
+                                                            )
+                                                          : Text(
+                                                              tcards[len -
+                                                                          index]
+                                                                      .name
+                                                                      .substring(
+                                                                          0,
+                                                                          12) +
+                                                                  "..",
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontFamily:
+                                                                    'Avenir',
+                                                                fontSize: 19,
                                                                 color:
                                                                     kTextColor,
                                                                 fontWeight:
@@ -221,51 +221,91 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                   TextAlign
                                                                       .left,
                                                             ),
-                                                            const Icon(
-                                                              Icons
-                                                                  .arrow_forward,
-                                                              color: kTextColor,
-                                                            ),
-                                                          ],
+                                                      const SizedBox(
+                                                          height: 15),
+                                                      Text(
+                                                        tcards[len - index]
+                                                            .calorie,
+                                                        style: const TextStyle(
+                                                          fontFamily: 'Avenir',
+                                                          fontSize: 30,
+                                                          color:
+                                                              Color(0xff47455f),
+                                                          fontWeight:
+                                                              FontWeight.w900,
                                                         ),
-                                                      ],
-                                                    ),
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 10),
+                                                      Row(
+                                                        children: const <
+                                                            Widget>[
+                                                          Text(
+                                                            'Know more',
+                                                            style: TextStyle(
+                                                              fontFamily:
+                                                                  'Avenir',
+                                                              fontSize: 18,
+                                                              color: kTextColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                          ),
+                                                          Icon(
+                                                            Icons.arrow_forward,
+                                                            color: kTextColor,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                            Hero(
-                                              tag:
-                                                  snapshot.data[index].position,
-                                              child: Image.asset(
-                                                  snapshot.data[index].images,
-                                                  width: 120),
-                                            ),
-                                            Positioned(
-                                              right: 24,
-                                              bottom: 70,
-                                              child: Text(
-                                                snapshot.data[index].position
-                                                    .toString(),
-                                                style: TextStyle(
-                                                  fontFamily: 'Avenir',
-                                                  fontSize: 120,
-                                                  color: kTextColor
-                                                      .withOpacity(0.08),
-                                                  fontWeight: FontWeight.w900,
-                                                ),
-                                                textAlign: TextAlign.left,
                                               ),
+                                            ],
+                                          ),
+                                          Hero(
+                                            tag: herotag,
+                                            child: Image.asset(
+                                                tcards[len - index].images,
+                                                width: 120),
+                                          ),
+                                          Positioned(
+                                            right: 24,
+                                            bottom: 1,
+                                            child: Text(
+                                              tcards[len - index]
+                                                  .position
+                                                  .toString(),
+                                              style: TextStyle(
+                                                fontFamily: 'Avenir',
+                                                fontSize: 120,
+                                                color: kTextColor
+                                                    .withOpacity(0.08),
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                              textAlign: TextAlign.left,
                                             ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 );
                               }
                             } else {
-                              return Center(child: CircularProgressIndicator());
+                              return Container(
+                                  height: 300,
+                                  child: Center(
+                                      child: LoadingAnimationWidget
+                                          .staggeredDotsWave(
+                                    color: kPrimaryColor,
+                                    size: 80,
+                                  )));
                             }
                           }),
                       const SizedBox(height: 20),
@@ -377,7 +417,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                       children: [
                                         const Text(
                                           "Water Intake",
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.bold),
                                         ),

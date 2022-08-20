@@ -1,8 +1,5 @@
-import 'package:firstapp/screens/profile/components/profile_menu.dart';
-import 'package:firstapp/screens/profile/components/profile_pic.dart';
 import 'package:flutter/material.dart';
 import '../../../constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:group_button/group_button.dart';
@@ -44,13 +41,13 @@ class _IdentityPageState extends State<NotificationScreen> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              SizedBox(height: 20.0),
-              Text("喝水提醒"),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 20.0),
+              const Text("喝水提醒"),
+              const SizedBox(height: 10.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -76,10 +73,10 @@ class _IdentityPageState extends State<NotificationScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 30.0),
+              const SizedBox(height: 30.0),
               Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
+                  children: const <Widget>[
                     GroupButton(
                       isRadio: false,
                       buttons: [

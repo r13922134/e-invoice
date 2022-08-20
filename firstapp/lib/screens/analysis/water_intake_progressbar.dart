@@ -22,7 +22,7 @@ class WateIntakeProgressBar extends StatelessWidget {
           child: Container(
             width: 20,
             height: size.height * 0.18,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30),
                     bottomRight: Radius.circular(30)),

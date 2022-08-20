@@ -151,9 +151,9 @@ class _ProfileState extends State<AccountRevise> {
                       contentPadding: const EdgeInsets.all(10),
                       radius: 15,
                       height: 55,
-                      tabs: [
-                        const Tab(icon: Icon(Icons.male)),
-                        const Tab(icon: Icon(Icons.female))
+                      tabs: const [
+                        Tab(icon: Icon(Icons.male)),
+                        Tab(icon: Icon(Icons.female))
                       ],
                       onTap: (index) {
                         genderValue = index;
@@ -263,7 +263,7 @@ class _ProfileState extends State<AccountRevise> {
               items: Activitys,
               itemBuilder: (context, Activity, selected, onTap) => ListTile(
                   title: Text(Activity.strength),
-                  subtitle: Text('${Activity.illustrate.toString()}'),
+                  subtitle: Text(Activity.illustrate.toString()),
                   selected: selected,
                   onTap: onTap),
               valueSelector: (Activity) => Activity.strength,

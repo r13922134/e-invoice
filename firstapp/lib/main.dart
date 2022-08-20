@@ -35,7 +35,7 @@ void main() {
   ));
 }
 
-void updateData() async {
+Future<void> updateData() async {
   final SharedPreferences pref = await SharedPreferences.getInstance();
   String barcode = pref.getString('barcode') ?? "";
   String password = pref.getString('password') ?? "";
@@ -49,43 +49,54 @@ void updateData() async {
     int tmpYear = int.parse(splitted[0]);
     int tmpMonth = int.parse(splitted[1]);
 
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 30;
-    int exp = timestamp + 200;
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 10;
+    int exp = timestamp + 100;
     var formatter = DateFormat('yyyy/MM/dd');
     String responseString;
     String sdate;
     String edate;
     DateTime last;
     DateTime start;
-    http.Response response;
-
+    int len = barcode.length;
+    String uuid = barcode.substring(1, len);
     while (true) {
       start = DateTime(tmpYear, tmpMonth, 01);
       last = DateTime(tmpYear, tmpMonth + 1, 0);
       sdate = formatter.format(start);
       edate = formatter.format(last);
-      response = await http.post(
-          Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
-          body: {
-            "version": "0.5",
-            "cardType": "3J0002",
-            "cardNo": barcode,
-            "expTimeStamp": exp.toString(),
-            "action": "carrierInvChk",
-            "timeStamp": timestamp.toString(),
-            "startDate": sdate,
-            "endDate": edate,
-            "onlyWinningInv": 'N',
-            "uuid": '1000',
-            "appID": 'EINV0202204156709',
-            "cardEncrypt": password,
-          });
-      responseString = response.body;
-      loginModelFromJson(responseString);
-      if (start.year == now.year && start.month == now.month) {
-        break;
+      var client = http.Client();
+      try {
+        var response = await client.post(
+            Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
+            body: {
+              "version": "0.5",
+              "cardType": "3J0002",
+              "cardNo": barcode,
+              "expTimeStamp": exp.toString(),
+              "action": "carrierInvChk",
+              "timeStamp": timestamp.toString(),
+              "startDate": sdate,
+              "endDate": edate,
+              "onlyWinningInv": 'N',
+              "uuid": uuid,
+              "appID": 'EINV0202204156709',
+              "cardEncrypt": password,
+            });
+
+        responseString = response.body;
+        if (responseString != '') {
+          loginModelFromJson(responseString);
+        }
+
+        if (start.year == now.year && start.month == now.month) {
+          break;
+        }
+        tmpMonth += 1;
+      } catch (e) {
+        print("error");
+      } finally {
+        client.close();
       }
-      tmpMonth += 1;
     }
   }
 }
@@ -97,7 +108,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  GlobalKey<CurvedNavigationBarState> _NavKey = GlobalKey();
+  final GlobalKey<CurvedNavigationBarState> _NavKey = GlobalKey();
   final _advancedDrawerController = AdvancedDrawerController();
   int heightValue = 120;
   int weightValue = 30;
@@ -122,7 +133,7 @@ class _MyAppState extends State<MyApp> {
     weightValue = pref.getInt('weight') ?? 30;
     ageValue = pref.getInt('age') ?? 1;
     activityValue = pref.getString('activity') ?? '';
-    Calculate c = new Calculate(
+    Calculate c = Calculate(
         height: heightValue,
         weight: weightValue,
         gender: genderValue,
@@ -306,13 +317,13 @@ class _MyAppState extends State<MyApp> {
               const SizedBox(height: 18),
               Row(
                 children: <Widget>[
-                  Text("     "),
+                  const Text("     "),
                   const Icon(Icons.medical_information_outlined,
                       color: Colors.white),
-                  Text("        "),
+                  const Text("        "),
                   for (Disease value in _selectedDisease)
                     Text(value.name.toString() + ' ',
-                        style: TextStyle(color: Colors.white))
+                        style: const TextStyle(color: Colors.white))
                 ],
               ),
               const Spacer(),

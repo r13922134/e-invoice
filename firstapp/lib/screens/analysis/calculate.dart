@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'dart:math';
 class Calculate{
   final int height,weight;
   final String gender,activity;
@@ -15,44 +13,71 @@ class Calculate{
 	}
 	
 	String getInterpretation(){
-    		if(bmiValue>=24) return bmirange = "Overweight";
-    		else if(bmiValue>18.5) return bmirange = "Normal";
-    		else return bmirange = "Underweight";
+    		if(bmiValue>=24) {
+    		  return bmirange = "Overweight";
+    		} else if(bmiValue>18.5) {
+    		  return bmirange = "Normal";
+    		} else {
+    		  return bmirange = "Underweight";
+    		}
   	}
 
 	int getdailyCalorie(){
-    		if(bmirange=="Underweight" && activity=="Light exercise") Calorie = weight*35;
-   		  else if(bmirange=="Underweight" && activity=="Moderate exercise") Calorie = weight*40;
-		    else if(bmirange=="Underweight" && activity=="Heavy exercise") Calorie = weight*45;
-		    else if(bmirange=="Normal" && activity=="Light exercise") Calorie = weight*30;
-    		else if(bmirange=="Normal" && activity=="Moderate exercise") Calorie = weight*35;
-    		else if(bmirange=="Normal" && activity=="Heavy exercise") Calorie = weight*40;
-		    else if(bmirange=="Overweight" && activity=="Light exercise") Calorie = weight*25;
-    		else if(bmirange=="Overweight" && activity=="Moderate exercise") Calorie = weight*30;
-    		else Calorie = weight*35;
+    		if(bmirange=="Underweight" && activity=="Light exercise") {
+    		  Calorie = weight*35;
+    		} else if(bmirange=="Underweight" && activity=="Moderate exercise") {
+   		    Calorie = weight*40;
+   		  } else if(bmirange=="Underweight" && activity=="Heavy exercise") {
+		      Calorie = weight*45;
+		    } else if(bmirange=="Normal" && activity=="Light exercise") {
+		      Calorie = weight*30;
+		    } else if(bmirange=="Normal" && activity=="Moderate exercise") {
+    		  Calorie = weight*35;
+    		} else if(bmirange=="Normal" && activity=="Heavy exercise") {
+    		  Calorie = weight*40;
+    		} else if(bmirange=="Overweight" && activity=="Light exercise") {
+		      Calorie = weight*25;
+		    } else if(bmirange=="Overweight" && activity=="Moderate exercise") {
+    		  Calorie = weight*30;
+    		} else {
+    		  Calorie = weight*35;
+    		}
         return Calorie;
     		
   	}
 
     int getdailyCalorie_teenager(){
     		//if(genderValue=="男" && activity=="Little to no exercise") return dailyCalorie = 2150;
-   		  if(gender=="男" && activity=="Light exercise") Calorie = 2500;
-		    else if(gender=="男" && activity=="Moderate exercise") Calorie = 2900;
-		    else if(gender=="男" && activity=="Heavy exercise") Calorie = 3350;
-    		//else if(genderValue=="女" && activity=="Little to no exercise") return dailyCalorie = 1650;
-    		else if(gender=="女" && activity=="Light exercise") Calorie = 1900;
-        else if(gender=="女" && activity=="Moderate exercise") Calorie = 2350;
-		    else if(gender=="女" && activity=="Heavy exercise") Calorie = 2550;
-    		else Calorie = 1500;//Fake number
+   		  if(gender=="男" && activity=="Light exercise") {
+   		    Calorie = 2500;
+   		  } else if(gender=="男" && activity=="Moderate exercise") {
+		      Calorie = 2900;
+		    } else if(gender=="男" && activity=="Heavy exercise") {
+		      Calorie = 3350;
+		    } else if(gender=="女" && activity=="Light exercise") {
+    		  Calorie = 1900;
+    		} else if(gender=="女" && activity=="Moderate exercise") {
+          Calorie = 2350;
+        } else if(gender=="女" && activity=="Heavy exercise") {
+		      Calorie = 2550;
+		    } else {
+		      Calorie = 1500;
+		    }//Fake number
         return Calorie;	
   	}
 
     int getdailyCalorie_child(){
-    		if(gender=="男" && activity=="Light exercise") Calorie = 2400;
-   		  else if(gender=="男" && activity=="Moderate exercise") Calorie = 2800;
-		    else if(gender=="女" && activity=="Light exercise") Calorie = 2050;
-    		else if(gender=="女" && activity=="Moderate exercise") Calorie = 2350;
-    		else Calorie = 1800;//Fake number
+    		if(gender=="男" && activity=="Light exercise") {
+    		  Calorie = 2400;
+    		} else if(gender=="男" && activity=="Moderate exercise") {
+   		    Calorie = 2800;
+   		  } else if(gender=="女" && activity=="Light exercise") {
+		      Calorie = 2050;
+		    } else if(gender=="女" && activity=="Moderate exercise") {
+    		  Calorie = 2350;
+    		} else {
+    		  Calorie = 1800;
+    		}//Fake number
         return Calorie;
   	}
 }

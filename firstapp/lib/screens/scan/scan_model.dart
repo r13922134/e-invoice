@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:firstapp/database/invoice_database.dart';
 import 'package:firstapp/database/details_database.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class returnValue {
   returnValue({required this.seller, required this.amount});
@@ -10,6 +11,11 @@ class returnValue {
 }
 
 Future<returnValue> scanModelFromJson(String str, String random) async {
+  final SharedPreferences pref = await SharedPreferences.getInstance();
+  String? barcode = pref.getString('barcode') ?? "";
+
+  int len = barcode.length;
+  String uuid = barcode.substring(1, len);
   ScanModel tmp = ScanModel.fromJson(json.decode(str));
   String tmpdate = tmp.invDate.substring(0, 4) +
       '/' +
@@ -28,56 +34,67 @@ Future<returnValue> scanModelFromJson(String str, String random) async {
   }
 
   int amount = 0;
+  var client = http.Client();
+  try {
+    var response = await client.post(
+        Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invapp/InvApp"),
+        body: {
+          "version": "0.5",
+          "type": "Barcode",
+          "invNum": tmp.invNum,
+          "action": "qryInvDetail",
+          "generation": "V2",
+          "invTerm": tmptag,
+          "invDate": tmpdate,
+          "encrypt": "11",
+          "sellerID": "11",
+          "UUID": uuid,
+          "randomNumber": random,
+          "appID": "EINV0202204156709",
+        });
+    String responseString2 = response.body;
+    if (responseString2 != '') {
+      await scanDetailModelFromJson(responseString2).then((value) {
+        if (tag[3] == "0") {
+          tag = tag.substring(0, 3) + tag.substring(4, 5);
+        }
+        List<String> splitted;
+        for (Details element in value.details) {
+          splitted = element.quantity.split('.');
 
-  http.Response response2 = await http.post(
-      Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invapp/InvApp"),
-      body: {
-        "version": "0.5",
-        "type": "Barcode",
-        "invNum": tmp.invNum,
-        "action": "qryInvDetail",
-        "generation": "V2",
-        "invTerm": tmptag,
-        "invDate": tmpdate,
-        "encrypt": "11",
-        "sellerID": "11",
-        "UUID": "1000",
-        "randomNumber": random,
-        "appID": "EINV0202204156709",
+          DetailHelper.instance.add(invoice_details(
+              tag: tag,
+              invNum: tmp.invNum,
+              name: element.description,
+              date: tmpdate,
+              quantity: splitted[0],
+              amount: element.amount));
+          amount += int.parse(element.amount);
+        }
       });
-  String responseString2 = response2.body;
 
-  List<Details> tmpdetail = scanDetailModelFromJson(responseString2).details;
-  if (tag[3] == "0") {
-    tag = tag.substring(0, 3) + tag.substring(4, 5);
+      await HeaderHelper.instance.add(Header(
+          tag: tag,
+          date: tmpdate,
+          time: tmp.invoiceTime,
+          seller: tmp.sellerName,
+          address: tmp.sellerAddress,
+          invNum: tmp.invNum,
+          barcode: "Scan",
+          amount: amount.toString()));
+    }
+  } catch (e) {
+    print("error");
+  } finally {
+    client.close();
   }
-  List<String> splitted;
-  for (Details element in tmpdetail) {
-    splitted = element.quantity.split('.');
 
-    await DetailHelper.instance.add(invoice_details(
-        tag: tag,
-        invNum: tmp.invNum,
-        name: element.description,
-        date: tmpdate,
-        quantity: splitted[0],
-        amount: element.amount));
-    amount += int.parse(element.amount);
-  }
-  await HeaderHelper.instance.add(Header(
-      tag: tag,
-      date: tmpdate,
-      time: tmp.invoiceTime,
-      seller: tmp.sellerName,
-      address: tmp.sellerAddress,
-      invNum: tmp.invNum,
-      barcode: "Scan",
-      amount: amount.toString()));
   return returnValue(seller: tmp.sellerName, amount: amount.toString());
 }
 
-ScanDetailModel scanDetailModelFromJson(String str) =>
-    ScanDetailModel.fromJson(json.decode(str));
+Future<ScanDetailModel> scanDetailModelFromJson(String str) async {
+  return ScanDetailModel.fromJson(json.decode(str));
+}
 
 class ScanDetailModel {
   ScanDetailModel({

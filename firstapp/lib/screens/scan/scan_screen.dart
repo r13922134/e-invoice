@@ -8,6 +8,7 @@ import 'package:firstapp/screens/scan/add_invoice.dart';
 import '../../../constants.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QRViewExample extends StatefulWidget {
   const QRViewExample({Key? key}) : super(key: key);
@@ -33,7 +34,10 @@ class _QRViewExampleState extends State<QRViewExample> {
     String tmpString = 'xxxx/xx/xx';
     String tmpseller = 'xxxx';
     String tmpamount = 'xx';
-
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String? barcode = pref.getString('barcode') ?? "";
+    int len = barcode.length;
+    String uuid = barcode.substring(1, len);
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
@@ -60,31 +64,40 @@ class _QRViewExampleState extends State<QRViewExample> {
           ),
         );
       } else {
-        http.Response response = await http.post(
-            Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invapp/InvApp"),
-            body: {
-              "version": "0.5",
-              "type": "Barcode",
-              "invNum": barcodeScanRes,
-              "action": "qryInvHeader",
-              "generation": "V2",
-              "invDate": tmpString,
-              "UUID": "1000",
-              "appID": "EINV0202204156709",
-            });
-        String responseString = response.body;
+        var client = http.Client();
+        try {
+          var response = await client.post(
+              Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invapp/InvApp"),
+              body: {
+                "version": "0.5",
+                "type": "Barcode",
+                "invNum": barcodeScanRes,
+                "action": "qryInvHeader",
+                "generation": "V2",
+                "invDate": tmpString,
+                "UUID": uuid,
+                "appID": "EINV0202204156709",
+              });
 
-        await scanModelFromJson(responseString, random).then((value) {
-          tmpseller = value.seller;
-          tmpamount = value.amount;
-        });
-        showTopSnackBar(
-          context,
-          const CustomSnackBar.success(
-            message: "掃描成功",
-            backgroundColor: kSecondaryColor,
-          ),
-        );
+          String responseString = response.body;
+          if (responseString != '') {
+            await scanModelFromJson(responseString, random).then((value) {
+              tmpseller = value.seller;
+              tmpamount = value.amount;
+            });
+            showTopSnackBar(
+              context,
+              const CustomSnackBar.success(
+                message: "掃描成功",
+                backgroundColor: kSecondaryColor,
+              ),
+            );
+          }
+        } catch (e) {
+          print("error");
+        } finally {
+          client.close();
+        }
       }
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
