@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firstapp/screens/analysis/card_info.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -11,6 +12,7 @@ class invoice_details {
   String date;
   String quantity;
   String amount;
+  int? type;
 
   invoice_details({
     required this.tag,
@@ -19,6 +21,7 @@ class invoice_details {
     required this.date,
     required this.quantity,
     required this.amount,
+    this.type,
   });
   factory invoice_details.fromMap(Map<String, dynamic> json) => invoice_details(
         tag: json['tag'],
@@ -27,6 +30,7 @@ class invoice_details {
         date: json['date'],
         quantity: json['quantity'],
         amount: json['amount'],
+        type: json['type'],
       );
   Map<String, dynamic> toMap() {
     return {
@@ -36,6 +40,7 @@ class invoice_details {
       'date': date,
       'quantity': quantity,
       'amount': amount,
+      'type': type,
     };
   }
 }
@@ -60,7 +65,7 @@ class DetailHelper {
 
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE DETAIL(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,tag TEXT,invNum TEXT,name TEXT,date TEXT,quantity TEXT,amount TEXT)
+      CREATE TABLE DETAIL(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,tag TEXT,invNum TEXT,name TEXT,date TEXT,quantity TEXT,amount TEXT,type INTEGER)
 ''');
   }
 
@@ -74,6 +79,24 @@ class DetailHelper {
     return detailList;
   }
 
+  Future<void> updateType(CardInfo cards, int type) async {
+    Database db = await instance.database;
+
+    await db.rawUpdate(
+        'UPDATE detail SET tag = ? , invNum = ? , name = ? ,date = ? ,quantity =? ,amount =? ,type = ? WHERE invNum = ? AND name = ?',
+        [
+          cards.tag,
+          cards.invnum,
+          cards.name,
+          cards.date,
+          cards.quantity,
+          cards.amount,
+          type,
+          cards.invnum,
+          cards.name
+        ]);
+  }
+
   Future<int> add(invoice_details detail) async {
     Database db = await instance.database;
     return await db.insert('detail', detail.toMap());
@@ -83,5 +106,4 @@ class DetailHelper {
     Database db = await instance.database;
     await db.rawDelete('DELETE FROM detail');
   }
-
 }

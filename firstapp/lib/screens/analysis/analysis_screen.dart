@@ -271,7 +271,8 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                           Hero(
                                             tag: herotag,
                                             child: Image.asset(
-                                                tcards[len - index].images,
+                                                tcards[len - index].images ??
+                                                    'assets/images/eggs.png',
                                                 width: 120),
                                           ),
                                           Positioned(

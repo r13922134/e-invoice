@@ -15,6 +15,7 @@ import 'package:firstapp/screens/account/components/account_revise.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/screens/home/components/home_barcode.dart';
 import 'package:firstapp/screens/analysis/calculate.dart';
+import 'package:scroll_app_bar/scroll_app_bar.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,8 +83,8 @@ Future<void> updateData() async {
               "appID": 'EINV0202204156709',
               "cardEncrypt": password,
             });
-
         responseString = response.body;
+
         if (responseString != '') {
           loginModelFromJson(responseString);
         }
@@ -110,6 +111,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final GlobalKey<CurvedNavigationBarState> _NavKey = GlobalKey();
   final _advancedDrawerController = AdvancedDrawerController();
+  final controller = ScrollController();
   int heightValue = 120;
   int weightValue = 30;
   int ageValue = 1;
@@ -181,7 +183,8 @@ class _MyAppState extends State<MyApp> {
       child: Scaffold(
           extendBody: true,
           backgroundColor: kBackgroundColor,
-          appBar: AppBar(
+          appBar: ScrollAppBar(
+            controller: controller,
             backgroundColor: Colors.transparent,
             elevation: 0.0,
             flexibleSpace: Container(

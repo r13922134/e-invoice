@@ -71,7 +71,9 @@ class DetailPage extends StatelessWidget {
               right: -30,
               child: Hero(
                   tag: cardInfo.position,
-                  child: Image.asset(cardInfo.images, width: 270)),
+                  child: Image.asset(
+                      cardInfo.images ?? 'assets/images/eggs.png',
+                      width: 270)),
             ),
             Positioned(
               top: 60,

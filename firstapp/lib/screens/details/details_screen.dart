@@ -82,6 +82,7 @@ class DetailsScreen extends StatelessWidget {
         client.close();
       }
     }
+
     return responseList;
   }
 
