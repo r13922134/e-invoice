@@ -4,8 +4,8 @@ import 'package:firstapp/database/details_database.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firstapp/screens/details/detail_model.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'dart:convert';
 
 class DetailsScreen extends StatelessWidget {
   final String tag, invDate, invNum, seller, address, time, amount;
@@ -31,53 +31,56 @@ class DetailsScreen extends StatelessWidget {
 
     if (responseList.isEmpty) {
       int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
-      int exp = timestamp + 5000;
+      int exp = timestamp + 70000;
       int len = barcode.length;
       String uuid = barcode.substring(1, len);
+      var rbody = {
+        "version": "0.5",
+        "cardType": "3J0002",
+        "cardNo": barcode,
+        "expTimeStamp": exp.toString().substring(0, 10),
+        "action": "carrierInvDetail",
+        "timeStamp": timestamp.toString().substring(0, 10),
+        "invNum": invNum,
+        "invDate": invDate,
+        "uuid": uuid,
+        "appID": 'EINV0202204156709',
+        "cardEncrypt": password,
+      };
+      print(rbody);
       var client = http.Client();
       try {
         var response = await client.post(
-            Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
+            Uri.parse(
+                "https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ"),
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: {
-              "version": "0.5",
-              "cardType": "3J0002",
-              "cardNo": barcode,
-              "expTimeStamp": exp.toString().substring(0, 10),
-              "action": "carrierInvDetail",
-              "timeStamp": timestamp.toString().substring(0, 10),
-              "invNum": invNum,
-              "invDate": invDate,
-              "uuid": uuid,
-              "appID": 'EINV0202204156709',
-              "cardEncrypt": password,
-            });
+            body: rbody);
 
-        String responseString = response.body;
-        if (responseString != '') {
-          await detailModelFromJson(responseString).then((value) {
-            for (Details element in value.details) {
-              DetailHelper.instance.add(invoice_details(
-                  tag: tag.toString(),
-                  invNum: invNum.toString(),
-                  name: element.description,
-                  date: invDate.toString(),
-                  quantity: element.quantity,
-                  amount: element.amount));
-              responseList.add(invoice_details(
-                  tag: tag.toString(),
-                  invNum: invNum.toString(),
-                  name: element.description,
-                  date: invDate.toString(),
-                  quantity: element.quantity,
-                  amount: element.amount));
-            }
-          });
+        if (response.statusCode == 200) {
+          String responseString = response.body;
+          var r = jsonDecode(responseString);
+          List d = r['details'];
+          for (var de in d) {
+            await DetailHelper.instance.add(invoice_details(
+                tag: tag.toString(),
+                invNum: invNum.toString(),
+                name: de['description'],
+                date: invDate.toString(),
+                quantity: de['quantity'],
+                amount: de['amount']));
+            responseList.add(invoice_details(
+                tag: tag.toString(),
+                invNum: invNum.toString(),
+                name: de['description'],
+                date: invDate.toString(),
+                quantity: de['quantity'],
+                amount: de['amount']));
+          }
         }
       } catch (e) {
-        print("error");
+        debugPrint("$e");
       } finally {
         client.close();
       }

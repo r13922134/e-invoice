@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
-import 'package:firstapp/screens/scan/scan_model.dart';
 import 'package:firstapp/database/invoice_database.dart';
 import 'package:firstapp/screens/scan/add_invoice.dart';
 import '../../../constants.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:firstapp/database/details_database.dart';
 
 class QRViewExample extends StatefulWidget {
   const QRViewExample({Key? key}) : super(key: key);
@@ -79,12 +80,90 @@ class _QRViewExampleState extends State<QRViewExample> {
                 "appID": "EINV0202204156709",
               });
 
-          String responseString = response.body;
-          if (responseString != '') {
-            await scanModelFromJson(responseString, random).then((value) {
-              tmpseller = value.seller;
-              tmpamount = value.amount;
-            });
+          if (response.statusCode == 200) {
+            String responseString = response.body;
+            var r = jsonDecode(responseString);
+
+            final SharedPreferences pref =
+                await SharedPreferences.getInstance();
+            String? barcode = pref.getString('barcode') ?? "";
+            int len = barcode.length;
+            String uuid = barcode.substring(1, len);
+
+            String tmpdate = r['invDate'].substring(0, 4) +
+                '/' +
+                r['invDate'].toString().substring(4, 6) +
+                '/' +
+                r['invDate'].toString().substring(6, 8);
+
+            int tmpyear = int.parse(tmpdate.substring(0, 4)) - 1911;
+            int tmpmonth = int.parse(tmpdate.substring(5, 7));
+            String tag = tmpyear.toString() + tmpdate.substring(5, 7);
+            String tmptag;
+            if (tmpmonth % 2 != 0) {
+              tmptag = (int.parse(tag) + 1).toString();
+            } else {
+              tmptag = tag;
+            }
+
+            int amount = 0;
+            try {
+              var response2 = await client.post(
+                  Uri.https(
+                      "api.einvoice.nat.gov.tw", "PB2CAPIVAN/invapp/InvApp"),
+                  body: {
+                    "version": "0.5",
+                    "type": "Barcode",
+                    "invNum": r['invNum'].toString(),
+                    "action": "qryInvDetail",
+                    "generation": "V2",
+                    "invTerm": tmptag,
+                    "invDate": tmpdate,
+                    "encrypt": "11",
+                    "sellerID": "11",
+                    "UUID": uuid,
+                    "randomNumber": random,
+                    "appID": "EINV0202204156709",
+                  });
+              if (response2.statusCode == 200) {
+                String responseString2 = response2.body;
+                var r2 = jsonDecode(responseString2);
+                List d2 = r2['details'];
+
+                List<String> splitted;
+                if (tag[3] == "0") {
+                  tag = tag.substring(0, 3) + tag.substring(4, 5);
+                }
+                for (var dde in d2) {
+                  splitted = dde['quantity'].split('.');
+                  await DetailHelper.instance.add(invoice_details(
+                      tag: tag,
+                      invNum: r['invNum'],
+                      name: dde['description'],
+                      date: tmpdate,
+                      quantity: splitted[0],
+                      amount: dde['amount']));
+
+                  amount += int.parse(dde['amount']);
+                }
+
+                await HeaderHelper.instance.add(Header(
+                    tag: tag,
+                    date: tmpdate,
+                    time: r['invoiceTime'],
+                    seller: r['sellerName'],
+                    address: r['sellerAddress'],
+                    invNum: r['invNum'],
+                    barcode: "Scan",
+                    amount: amount.toString()));
+
+                tmpseller = r['sellerName'];
+                tmpamount = amount.toString();
+              }
+            } catch (e) {
+              print("error");
+            }
+
             showTopSnackBar(
               context,
               const CustomSnackBar.success(
@@ -95,9 +174,9 @@ class _QRViewExampleState extends State<QRViewExample> {
           }
         } catch (e) {
           print("error");
-        } finally {
-          client.close();
         }
+
+        client.close();
       }
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';

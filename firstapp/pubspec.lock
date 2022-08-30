@@ -43,6 +43,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
+  beautiful_soup_dart:
+    dependency: "direct main"
+    description:
+      name: beautiful_soup_dart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -113,6 +120,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.2"
+  csslib:
+    dependency: transitive
+    description:
+      name: csslib
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.17.2"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -229,7 +243,7 @@ packages:
       name: flutter_svg
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.4"
   flutter_switch:
     dependency: "direct main"
     description:
@@ -261,6 +275,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.0.1"
+  html:
+    dependency: transitive
+    description:
+      name: html
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.15.0"
   http:
     dependency: "direct main"
     description:
@@ -414,14 +435,14 @@ packages:
       name: path_drawing
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
   path_parsing:
     dependency: transitive
     description:
       name: path_parsing
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
   path_provider:
     dependency: "direct main"
     description:
@@ -527,20 +548,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.5"
-  scroll_app_bar:
-    dependency: "direct main"
-    description:
-      name: scroll_app_bar
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
-  scroll_bars_common:
-    dependency: transitive
-    description:
-      name: scroll_bars_common
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.0"
   selectable_list:
     dependency: "direct main"
     description:

@@ -9,13 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:firstapp/database/invoice_database.dart';
 import 'package:intl/intl.dart';
-import 'package:firstapp/screens/login/login_model.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:firstapp/screens/account/components/account_revise.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/screens/home/components/home_barcode.dart';
 import 'package:firstapp/screens/analysis/calculate.dart';
-import 'package:scroll_app_bar/scroll_app_bar.dart';
+import 'dart:convert';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,16 +49,18 @@ Future<void> updateData() async {
     int tmpYear = int.parse(splitted[0]);
     int tmpMonth = int.parse(splitted[1]);
 
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 10;
-    int exp = timestamp + 100;
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
+    int exp = timestamp + 70000;
+    int len = barcode.length;
+    String uuid = barcode.substring(1, len);
+
     var formatter = DateFormat('yyyy/MM/dd');
     String responseString;
     String sdate;
     String edate;
     DateTime last;
     DateTime start;
-    int len = barcode.length;
-    String uuid = barcode.substring(1, len);
+
     while (true) {
       start = DateTime(tmpYear, tmpMonth, 01);
       last = DateTime(tmpYear, tmpMonth + 1, 0);
@@ -73,9 +74,9 @@ Future<void> updateData() async {
               "version": "0.5",
               "cardType": "3J0002",
               "cardNo": barcode,
-              "expTimeStamp": exp.toString(),
+              "expTimeStamp": exp.toString().substring(0, 10),
               "action": "carrierInvChk",
-              "timeStamp": timestamp.toString(),
+              "timeStamp": timestamp.toString().substring(0, 10),
               "startDate": sdate,
               "endDate": edate,
               "onlyWinningInv": 'N',
@@ -83,12 +84,35 @@ Future<void> updateData() async {
               "appID": 'EINV0202204156709',
               "cardEncrypt": password,
             });
-        responseString = response.body;
 
-        if (responseString != '') {
-          loginModelFromJson(responseString);
+        if (response.statusCode == 200) {
+          responseString = response.body;
+          int tmpyear;
+          DateTime invDate;
+          String invdate;
+          var t;
+          var formatter = DateFormat('yyyy/MM/dd');
+          var r = jsonDecode(responseString);
+          List d = r['details'];
+          for (var de in d) {
+            t = de['invDate'];
+            tmpyear = t['year'] + 1911;
+            invDate = DateTime(tmpyear, t['month'], t['date']);
+            invdate = formatter.format(invDate);
+            if (await HeaderHelper.instance
+                .checkHeader(de['invNum'], invdate)) {
+              await HeaderHelper.instance.add(Header(
+                  tag: t['year'].toString() + t['month'].toString(),
+                  date: invdate,
+                  time: de['invoiceTime'],
+                  seller: de['sellerName'],
+                  address: de['sellerAddress'],
+                  invNum: de['invNum'],
+                  barcode: de['cardNo'],
+                  amount: de['amount']));
+            }
+          }
         }
-
         if (start.year == now.year && start.month == now.month) {
           break;
         }
@@ -183,8 +207,7 @@ class _MyAppState extends State<MyApp> {
       child: Scaffold(
           extendBody: true,
           backgroundColor: kBackgroundColor,
-          appBar: ScrollAppBar(
-            controller: controller,
+          appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0.0,
             flexibleSpace: Container(

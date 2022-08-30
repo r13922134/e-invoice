@@ -3,10 +3,10 @@ import '../../../constants.dart';
 import 'package:firstapp/screens/details/details_screen.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:firstapp/database/invoice_database.dart';
-import 'package:firstapp/screens/login/login_model.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -26,10 +26,69 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
   double topContainer = 0;
 
   List<Widget> itemsData = [];
-
+  List<String> winninglist = [];
   Future<List<Widget>> getPostsData(String current) async {
-    List<Widget> listItems = [];
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String barcode = pref.getString('barcode') ?? "";
+    String password = pref.getString('password') ?? "";
+    winninglist = [];
+    var client = http.Client();
+    int len = barcode.length;
+    String uuid = barcode.substring(1, len);
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
+    int exp = timestamp + 70000;
+    String m;
+    String y;
+    if (current.length == 4) {
+      y = current.substring(0, 3);
+      m = current[3];
+    } else {
+      y = current.substring(0, 3);
+      m = current.substring(3, 5);
+    }
+    DateTime start = DateTime(int.parse(y) + 1911, int.parse(m), 01);
+    DateTime last = DateTime(start.year, start.month + 1, 0);
+    var formatter = DateFormat('yyyy/MM/dd');
+    String sdate = formatter.format(start);
+    String edate = formatter.format(last);
+    var rbody = {
+      "version": "0.5",
+      "cardType": "3J0002",
+      "cardNo": barcode,
+      "expTimeStamp": exp.toString().substring(0, 10),
+      "action": "carrierInvChk",
+      "timeStamp": timestamp.toString().substring(0, 10),
+      "startDate": sdate,
+      "endDate": edate,
+      "onlyWinningInv": 'Y',
+      "uuid": uuid,
+      "appID": 'EINV0202204156709',
+      "cardEncrypt": password,
+    };
 
+    try {
+      var response = await client.post(
+          Uri.parse(
+              'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ'),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: rbody);
+
+      if (response.statusCode == 200) {
+        String reString = response.body;
+        var r = jsonDecode(reString);
+        List d = r['details'];
+        for (var w in d) {
+          winninglist.add(w['invNum']);
+        }
+      }
+    } catch (e) {
+      debugPrint("$e");
+    } finally {
+      client.close();
+    }
+    List<Widget> listItems = [];
     List<Header>? responseList = await HeaderHelper.instance.getHeader(current);
 
     for (int i = responseList.length - 1; i > -1; i--) {
@@ -132,13 +191,22 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                           )
                         ],
                       ),
-                      Hero(
-                        tag: responseList[i].invNum,
-                        child: Image.asset(
-                          "assets/images/image_1.png",
-                          height: 53,
+                      if (winninglist.contains(responseList[i].invNum))
+                        Hero(
+                          tag: responseList[i].invNum,
+                          child: Image.asset(
+                            "assets/images/money.png",
+                            height: 53,
+                          ),
                         ),
-                      ),
+                      if (!winninglist.contains(responseList[i].invNum))
+                        Hero(
+                          tag: responseList[i].invNum,
+                          child: Image.asset(
+                            "assets/images/image_1.png",
+                            height: 53,
+                          ),
+                        ),
                     ],
                   ),
                 ))),
@@ -165,7 +233,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
       int tmpMonth = int.parse(splitted[1]);
 
       int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
-      int exp = timestamp + 100000;
+      int exp = timestamp + 70000;
       int len = barcode.length;
       String uuid = barcode.substring(1, len);
 
@@ -201,9 +269,33 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                 "cardEncrypt": password,
               });
 
-          responseString = response.body;
-          if (responseString != '') {
-            loginModelFromJson(responseString);
+          if (response.statusCode == 200) {
+            responseString = response.body;
+            int tmpyear;
+            DateTime invDate;
+            String invdate;
+            var t;
+            var formatter = DateFormat('yyyy/MM/dd');
+            var r = jsonDecode(responseString);
+            List d = r['details'];
+            for (var de in d) {
+              t = de['invDate'];
+              tmpyear = t['year'] + 1911;
+              invDate = DateTime(tmpyear, t['month'], t['date']);
+              invdate = formatter.format(invDate);
+              if (await HeaderHelper.instance
+                  .checkHeader(de['invNum'], invdate)) {
+                await HeaderHelper.instance.add(Header(
+                    tag: t['year'].toString() + t['month'].toString(),
+                    date: invdate,
+                    time: de['invoiceTime'],
+                    seller: de['sellerName'],
+                    address: de['sellerAddress'],
+                    invNum: de['invNum'],
+                    barcode: de['cardNo'],
+                    amount: de['amount']));
+              }
+            }
           }
           if (start.year == now.year && start.month == now.month) {
             break;
@@ -220,16 +312,18 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
 
   void leftclick() {
     date = DateTime(date.year, date.month - 1);
-    current = date.year.toString() + date.month.toString();
     setState(() {
+      current = date.year.toString() + date.month.toString();
+
       getPostsData(current);
     });
   }
 
   void rightclick() {
     date = DateTime(date.year, date.month + 1);
-    current = date.year.toString() + date.month.toString();
     setState(() {
+      current = date.year.toString() + date.month.toString();
+
       getPostsData(current);
     });
   }

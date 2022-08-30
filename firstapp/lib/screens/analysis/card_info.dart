@@ -2,8 +2,8 @@ import 'package:firstapp/database/details_database.dart';
 import 'package:firstapp/database/invoice_database.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firstapp/screens/details/detail_model.dart';
 import 'dart:convert';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
 
 Map<String, String> pic = {
   "主食/食材": 'assets/images/eggs.png',
@@ -109,8 +109,8 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
         await DetailHelper.instance.getDetail(element.tag, element.invNum);
 
     if (response.isEmpty) {
-      int timestamp = DateTime.now().millisecondsSinceEpoch + 100000;
-      int exp = timestamp + 10000000;
+      int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
+      int exp = timestamp + 70000;
       int len = barcode.length;
       String uuid = barcode.substring(1, len);
 
@@ -133,36 +133,34 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
               "cardEncrypt": password,
             });
 
-        String responseString = _response.body;
-        if (responseString != '') {
-          await detailModelFromJson(responseString).then((value) {
-            for (Details elements in value.details) {
-              DetailHelper.instance.add(invoice_details(
+        if (_response.statusCode == 200) {
+          String responseString = _response.body;
+          var r = jsonDecode(responseString);
+          List d = r['details'];
+          for (var de in d) {
+            await DetailHelper.instance.add(invoice_details(
+                tag: element.toString(),
+                invNum: element.toString(),
+                name: de['description'],
+                date: element.toString(),
+                quantity: de['quantity'],
+                amount: de['amount']));
+            cards.add(CardInfo(count++,
+                name: de['description'],
+                calorie: '100',
+                type: 0,
+                invnum: element.invNum,
                 tag: element.tag,
-                invNum: element.invNum,
-                name: elements.description,
                 date: element.date,
-                quantity: elements.quantity,
-                amount: elements.amount,
-              ));
-              cards.add(CardInfo(count++,
-                  name: elements.description,
-                  calorie: '100',
-                  type: 0,
-                  invnum: element.invNum,
-                  tag: element.tag,
-                  date: element.date,
-                  quantity: elements.quantity,
-                  amount: elements.amount));
-            }
-          });
+                quantity: de['quantity'],
+                amount: de['amount']));
+          }
         }
       } catch (e) {
         print("error");
       }
     } else {
       for (invoice_details value in response) {
-        print(value.type);
         cards.add(CardInfo(count++,
             name: value.name,
             calorie: "100",
@@ -178,8 +176,10 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
 
   List<Ename> tmparray = [];
   String tmpbody;
+  String path;
   List<CardInfo> returncards = [];
   for (CardInfo c in cards) {
+    path = 'https://www.google.com/search?q=' + c.name + '熱量';
     tmparray = [];
     if (c.type == 0) {
       tmparray.add(Ename(name: c.name));
@@ -191,16 +191,23 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
             headers: {"Content-Type": "application/json"},
             body: tmpbody);
 
-        String responseString2 = _response2.body;
-        print(responseString2);
-        if (responseString2 != '') {
-          await AIModelFromJson(responseString2).then((value) {
+        if (_response2.statusCode == 200) {
+          String responseString2 = _response2.body;
+          await AIModelFromJson(responseString2).then((value) async {
             c.type = value.results[0][0];
             if (c.type == 1 ||
                 c.type == 2 ||
                 c.type == 3 ||
                 c.type == 4 ||
                 c.type == 6) {
+              try {
+                var re = await http.get(Uri.parse(path));
+                if (re.statusCode == 200) {
+                  print("re.body");
+                }
+              } catch (e) {
+                print("error");
+              }
               c.images = pic[dict[c.type] ?? ''] ?? '';
               returncards.add(c);
               DetailHelper.instance.updateType(c, c.type);
@@ -217,6 +224,23 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
         c.type == 3 ||
         c.type == 4 ||
         c.type == 6) {
+      try {
+        var re = await http.get(Uri.parse(path));
+        if (re.statusCode == 200) {
+          BeautifulSoup soup = BeautifulSoup(re.body);
+          List<Bs4Element> r1 = soup.findAll("span", class_: "FCUp0c rQMQod");
+          List<Bs4Element> r2 =
+              soup.findAll("td", class_: "sjsZvd s5aIid OE1use");
+          for (Bs4Element bs4 in r1) {
+            print(bs4.getText());
+          }
+          for (Bs4Element bs4 in r2) {
+            print(bs4.getText());
+          }
+        }
+      } catch (e) {
+        print("error");
+      }
       c.images = pic[dict[c.type] ?? ''] ?? '';
       returncards.add(c);
     }
