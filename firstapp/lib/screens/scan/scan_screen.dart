@@ -10,6 +10,7 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:firstapp/database/details_database.dart';
+import 'dart:math';
 
 class QRViewExample extends StatefulWidget {
   const QRViewExample({Key? key}) : super(key: key);
@@ -37,8 +38,8 @@ class _QRViewExampleState extends State<QRViewExample> {
     String tmpamount = 'xx';
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String? barcode = pref.getString('barcode') ?? "";
-    int len = barcode.length;
-    String uuid = barcode.substring(1, len);
+    var rng = Random();
+    int uuid = rng.nextInt(1000);
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
@@ -76,7 +77,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                 "action": "qryInvHeader",
                 "generation": "V2",
                 "invDate": tmpString,
-                "UUID": uuid,
+                "UUID": uuid.toString(),
                 "appID": "EINV0202204156709",
               });
 
@@ -87,8 +88,7 @@ class _QRViewExampleState extends State<QRViewExample> {
             final SharedPreferences pref =
                 await SharedPreferences.getInstance();
             String? barcode = pref.getString('barcode') ?? "";
-            int len = barcode.length;
-            String uuid = barcode.substring(1, len);
+            uuid = rng.nextInt(1000);
 
             String tmpdate = r['invDate'].substring(0, 4) +
                 '/' +
@@ -121,7 +121,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                     "invDate": tmpdate,
                     "encrypt": "11",
                     "sellerID": "11",
-                    "UUID": uuid,
+                    "UUID": uuid.toString(),
                     "randomNumber": random,
                     "appID": "EINV0202204156709",
                   });
@@ -155,7 +155,8 @@ class _QRViewExampleState extends State<QRViewExample> {
                     address: r['sellerAddress'],
                     invNum: r['invNum'],
                     barcode: "Scan",
-                    amount: amount.toString()));
+                    amount: amount.toString(),
+                    w: 'f'));
 
                 tmpseller = r['sellerName'];
                 tmpamount = amount.toString();

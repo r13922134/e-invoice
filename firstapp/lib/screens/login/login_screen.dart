@@ -1,5 +1,4 @@
 import 'package:firstapp/constants.dart';
-import 'package:firstapp/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:http/http.dart' as http;
@@ -10,6 +9,7 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'dart:convert';
 import 'package:firstapp/database/invoice_database.dart';
+import 'dart:math';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -31,11 +31,11 @@ class LoginScreen extends StatelessWidget {
     String edate;
     DateTime last;
     DateTime start;
-    int len = data.name.length;
-    String uuid = data.name.substring(1, len);
-
+    var rng = Random();
+    int uuid;
     for (int j = 5; j >= 0; j--) {
       var client = http.Client();
+      uuid = rng.nextInt(1000);
 
       start = DateTime(now.year, now.month - j, 01);
       last = DateTime(start.year, start.month + 1, 0);
@@ -51,7 +51,7 @@ class LoginScreen extends StatelessWidget {
         "startDate": sdate,
         "endDate": edate,
         "onlyWinningInv": 'N',
-        "uuid": uuid,
+        "uuid": uuid.toString(),
         "appID": 'EINV0202204156709',
         "cardEncrypt": data.password,
       };
@@ -89,7 +89,8 @@ class LoginScreen extends StatelessWidget {
                   address: de['sellerAddress'],
                   invNum: de['invNum'],
                   barcode: de['cardNo'],
-                  amount: de['amount']));
+                  amount: de['amount'],
+                  w: 'f'));
             }
           }
         }
@@ -142,12 +143,7 @@ class LoginScreen extends StatelessWidget {
       onLogin: _authUser,
       onSignup: _signupUser,
       onSubmitAnimationCompleted: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const MyApp(),
-          ),
-        );
+        Navigator.pop(context);
         showTopSnackBar(
           context,
           const CustomSnackBar.success(

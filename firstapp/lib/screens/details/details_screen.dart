@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'dart:convert';
+import 'dart:math';
 
 class DetailsScreen extends StatelessWidget {
   final String tag, invDate, invNum, seller, address, time, amount;
@@ -32,8 +33,8 @@ class DetailsScreen extends StatelessWidget {
     if (responseList.isEmpty) {
       int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
       int exp = timestamp + 70000;
-      int len = barcode.length;
-      String uuid = barcode.substring(1, len);
+      var rng = Random();
+      int uuid = rng.nextInt(1000);
       var rbody = {
         "version": "0.5",
         "cardType": "3J0002",
@@ -43,20 +44,20 @@ class DetailsScreen extends StatelessWidget {
         "timeStamp": timestamp.toString().substring(0, 10),
         "invNum": invNum,
         "invDate": invDate,
-        "uuid": uuid,
+        "uuid": uuid.toString(),
         "appID": 'EINV0202204156709',
         "cardEncrypt": password,
       };
-      print(rbody);
       var client = http.Client();
       try {
         var response = await client.post(
-            Uri.parse(
-                "https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ"),
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: rbody);
+          Uri.parse(
+              "https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ"),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: rbody,
+        );
 
         if (response.statusCode == 200) {
           String responseString = response.body;
@@ -78,6 +79,8 @@ class DetailsScreen extends StatelessWidget {
                 quantity: de['quantity'],
                 amount: de['amount']));
           }
+        } else {
+          print(response.statusCode);
         }
       } catch (e) {
         debugPrint("$e");

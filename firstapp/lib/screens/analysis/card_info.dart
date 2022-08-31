@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'dart:math';
 
 Map<String, String> pic = {
   "主食/食材": 'assets/images/eggs.png',
@@ -111,8 +112,8 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
     if (response.isEmpty) {
       int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
       int exp = timestamp + 70000;
-      int len = barcode.length;
-      String uuid = barcode.substring(1, len);
+      var rng = Random();
+      int uuid = rng.nextInt(1000);
 
       try {
         var _response = await client.post(
@@ -126,7 +127,7 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
               "timeStamp": timestamp.toString().substring(0, 10),
               "invNum": element.invNum,
               "invDate": element.date,
-              "uuid": uuid,
+              "uuid": uuid.toString(),
               "sellerName": element.seller,
               "amount": element.amount,
               "appID": 'EINV0202204156709',

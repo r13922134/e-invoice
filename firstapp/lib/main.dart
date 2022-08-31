@@ -15,10 +15,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:firstapp/screens/home/components/home_barcode.dart';
 import 'package:firstapp/screens/analysis/calculate.dart';
 import 'dart:convert';
+import 'dart:math';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  updateData();
+  await updateData();
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -36,24 +37,27 @@ void main() {
 }
 
 Future<void> updateData() async {
-  final SharedPreferences pref = await SharedPreferences.getInstance();
-  String barcode = pref.getString('barcode') ?? "";
-  String password = pref.getString('password') ?? "";
-
-  var now = DateTime.now();
   List<Header>? responseList2 = await HeaderHelper.instance.getAll();
 
   if (responseList2.isNotEmpty) {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String barcode = pref.getString('barcode') ?? "";
+    String password = pref.getString('password') ?? "";
+    var client = http.Client();
+    var rng = Random();
+    var now = DateTime.now();
+    int uuid = rng.nextInt(1000);
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
+    int exp = timestamp + 70000;
+    int m = now.month;
+
     String tmpDate = responseList2[responseList2.length - 1].date;
     final splitted = tmpDate.split('/');
     int tmpYear = int.parse(splitted[0]);
     int tmpMonth = int.parse(splitted[1]);
 
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
-    int exp = timestamp + 70000;
-    int len = barcode.length;
-    String uuid = barcode.substring(1, len);
-
+    timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
+    exp = timestamp + 70000;
     var formatter = DateFormat('yyyy/MM/dd');
     String responseString;
     String sdate;
@@ -62,6 +66,8 @@ Future<void> updateData() async {
     DateTime start;
 
     while (true) {
+      uuid = rng.nextInt(1000);
+
       start = DateTime(tmpYear, tmpMonth, 01);
       last = DateTime(tmpYear, tmpMonth + 1, 0);
       sdate = formatter.format(start);
@@ -80,7 +86,7 @@ Future<void> updateData() async {
               "startDate": sdate,
               "endDate": edate,
               "onlyWinningInv": 'N',
-              "uuid": uuid,
+              "uuid": uuid.toString(),
               "appID": 'EINV0202204156709',
               "cardEncrypt": password,
             });
@@ -109,7 +115,8 @@ Future<void> updateData() async {
                   address: de['sellerAddress'],
                   invNum: de['invNum'],
                   barcode: de['cardNo'],
-                  amount: de['amount']));
+                  amount: de['amount'],
+                  w: 'f'));
             }
           }
         }
@@ -119,10 +126,72 @@ Future<void> updateData() async {
         tmpMonth += 1;
       } catch (e) {
         print("error");
-      } finally {
-        client.close();
       }
     }
+    for (int i = 0; i < 6; i++) {
+      DateTime start = DateTime(now.year, m - i, 01);
+      DateTime last = DateTime(start.year, start.month + 1, 0);
+      var formatter = DateFormat('yyyy/MM/dd');
+      String sdate = formatter.format(start);
+      String edate = formatter.format(last);
+      var rbody = {
+        "version": "0.5",
+        "cardType": "3J0002",
+        "cardNo": barcode,
+        "expTimeStamp": exp.toString().substring(0, 10),
+        "action": "carrierInvChk",
+        "timeStamp": timestamp.toString().substring(0, 10),
+        "startDate": sdate,
+        "endDate": edate,
+        "onlyWinningInv": 'Y',
+        "uuid": uuid.toString(),
+        "appID": 'EINV0202204156709',
+        "cardEncrypt": password,
+      };
+
+      try {
+        var response = await client.post(
+            Uri.parse(
+                'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ'),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: rbody);
+
+        if (response.statusCode == 200) {
+          String reString = response.body;
+          var r = jsonDecode(reString);
+          if (r['code'] == "200") {
+            List d = r['details'];
+            int tmpyear;
+            DateTime invDate;
+            String invdate;
+            var formatter = DateFormat('yyyy/MM/dd');
+            var t;
+            for (var de in d) {
+              t = de['invDate'];
+              tmpyear = t['year'] + 1911;
+              invDate = DateTime(tmpyear, t['month'], t['date']);
+              invdate = formatter.format(invDate);
+              await HeaderHelper.instance.deleteold(de['invNum']);
+              await HeaderHelper.instance.add(Header(
+                  tag: t['year'].toString() + t['month'].toString(),
+                  date: invdate,
+                  time: de['invoiceTime'],
+                  seller: de['sellerName'],
+                  address: de['sellerAddress'],
+                  invNum: de['invNum'],
+                  barcode: de['cardNo'],
+                  amount: de['amount'],
+                  w: "w"));
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint("$e");
+      }
+    }
+    client.close();
   }
 }
 

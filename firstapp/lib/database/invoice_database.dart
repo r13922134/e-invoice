@@ -13,7 +13,7 @@ class Header {
   String invNum;
   String barcode;
   String amount;
-
+  String w;
   Header({
     required this.tag,
     required this.date,
@@ -23,6 +23,7 @@ class Header {
     required this.invNum,
     required this.barcode,
     required this.amount,
+    required this.w,
   });
   factory Header.fromMap(Map<String, dynamic> json) => Header(
         tag: json['tag'],
@@ -33,6 +34,7 @@ class Header {
         invNum: json['invNum'],
         barcode: json['barcode'],
         amount: json['amount'],
+        w: json['w'],
       );
   Map<String, dynamic> toMap() {
     return {
@@ -44,6 +46,7 @@ class Header {
       'invNum': invNum,
       'barcode': barcode,
       'amount': amount,
+      'w': w,
     };
   }
 }
@@ -68,7 +71,7 @@ class HeaderHelper {
 
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE HEADER(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,tag TEXT,date TEXT,time TEXT,seller TEXT,address TEXT,invNum TEXT,barcode TEXT,amount TEXT)
+      CREATE TABLE HEADER(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,tag TEXT,date TEXT,time TEXT,seller TEXT,address TEXT,invNum TEXT,barcode TEXT,amount TEXT,w TEXT)
 ''');
   }
 
@@ -118,6 +121,11 @@ class HeaderHelper {
   Future<void> delete() async {
     Database db = await instance.database;
     await db.rawDelete('DELETE FROM header');
+  }
+
+  Future<void> deleteold(String invNum) async {
+    Database db = await instance.database;
+    await db.rawDelete('DELETE FROM header WHERE invNum = ?', [invNum]);
   }
 
   Future<bool> checkHeader(String inv, String date) async {

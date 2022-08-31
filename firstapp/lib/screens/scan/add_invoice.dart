@@ -208,7 +208,8 @@ class _AddInvoice extends State<AddInvoice> {
                                     address: details.address ?? "",
                                     invNum: details.invNum ?? "",
                                     barcode: "manual",
-                                    amount: amount.toString()));
+                                    amount: amount.toString(),
+                                    w: 'f'));
                                 showTopSnackBar(
                                   context,
                                   const CustomSnackBar.success(
