@@ -51,55 +51,52 @@ Future<void> updateData() async {
     int exp = timestamp + 70000;
     int m = now.month;
 
-    String tmpDate = responseList2[responseList2.length - 1].date;
-    final splitted = tmpDate.split('/');
-    int tmpYear = int.parse(splitted[0]);
-    int tmpMonth = int.parse(splitted[1]);
-
-    timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
-    exp = timestamp + 70000;
     var formatter = DateFormat('yyyy/MM/dd');
-    String responseString;
     String sdate;
     String edate;
     DateTime last;
     DateTime start;
 
-    while (true) {
+    for (int j = 5; j >= 0; j--) {
       uuid = rng.nextInt(1000);
 
-      start = DateTime(tmpYear, tmpMonth, 01);
-      last = DateTime(tmpYear, tmpMonth + 1, 0);
+      start = DateTime(now.year, now.month - j, 01);
+      last = DateTime(start.year, start.month + 1, 0);
       sdate = formatter.format(start);
       edate = formatter.format(last);
-      var client = http.Client();
+      var rbody = {
+        "version": "0.5",
+        "cardType": "3J0002",
+        "cardNo": barcode,
+        "expTimeStamp": exp.toString().substring(0, 10),
+        "action": "carrierInvChk",
+        "timeStamp": timestamp.toString().substring(0, 10),
+        "startDate": sdate,
+        "endDate": edate,
+        "onlyWinningInv": 'N',
+        "uuid": uuid.toString(),
+        "appID": 'EINV0202204156709',
+        "cardEncrypt": password,
+      };
+
       try {
         var response = await client.post(
-            Uri.https("api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
-            body: {
-              "version": "0.5",
-              "cardType": "3J0002",
-              "cardNo": barcode,
-              "expTimeStamp": exp.toString().substring(0, 10),
-              "action": "carrierInvChk",
-              "timeStamp": timestamp.toString().substring(0, 10),
-              "startDate": sdate,
-              "endDate": edate,
-              "onlyWinningInv": 'N',
-              "uuid": uuid.toString(),
-              "appID": 'EINV0202204156709',
-              "cardEncrypt": password,
-            });
+            Uri.parse(
+                'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ'),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: rbody);
 
         if (response.statusCode == 200) {
-          responseString = response.body;
+          String responseString = response.body;
+          var r = jsonDecode(responseString);
+          List d = r['details'];
           int tmpyear;
           DateTime invDate;
           String invdate;
-          var t;
           var formatter = DateFormat('yyyy/MM/dd');
-          var r = jsonDecode(responseString);
-          List d = r['details'];
+          var t;
           for (var de in d) {
             t = de['invDate'];
             tmpyear = t['year'] + 1911;
@@ -120,15 +117,16 @@ Future<void> updateData() async {
             }
           }
         }
-        if (start.year == now.year && start.month == now.month) {
-          break;
-        }
-        tmpMonth += 1;
       } catch (e) {
-        print("error");
+        debugPrint("$e");
+      } finally {
+        client.close();
       }
     }
+
     for (int i = 0; i < 6; i++) {
+      uuid = rng.nextInt(1000);
+
       DateTime start = DateTime(now.year, m - i, 01);
       DateTime last = DateTime(start.year, start.month + 1, 0);
       var formatter = DateFormat('yyyy/MM/dd');
