@@ -188,7 +188,8 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
       tmpbody = json.encoder.convert(p);
       try {
         var _response2 = await client.post(
-            Uri.parse("https://project-cloudrie.herokuapp.com/product_class"),
+            Uri.parse(
+                "https://cloudrie-product-classifier.herokuapp.com/product_class"),
             headers: {"Content-Type": "application/json"},
             body: tmpbody);
 
