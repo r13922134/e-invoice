@@ -98,7 +98,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                 ConnectionState.done) {
                               List<CardInfo> tcards = snapshot.data;
                               if (snapshot.data?.isEmpty ?? true) {
-                                return Container(
+                                return SizedBox(
                                     height: 300,
                                     child: Center(
                                         child: Column(children: [
@@ -122,15 +122,31 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                 return Swiper(
                                   index: len,
                                   onTap: (index) {
-                                    Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, a, b) =>
-                                            DetailPage(
-                                          cardInfo: tcards[len - index],
+                                    if (len < 5) {
+                                      int tmpindex = index;
+                                      if (index == 5) {
+                                        tmpindex = 0;
+                                      }
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, a, b) =>
+                                              DetailPage(
+                                            cardInfo: tcards[len - tmpindex],
+                                          ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, a, b) =>
+                                              DetailPage(
+                                            cardInfo: tcards[len - index],
+                                          ),
+                                        ),
+                                      );
+                                    }
                                   },
                                   itemCount: tcards.length,
                                   itemWidth: MediaQuery.of(context).size.width -
@@ -224,8 +240,9 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                       const SizedBox(
                                                           height: 15),
                                                       Text(
-                                                        tcards[len - index]
-                                                            .calorie,
+                                                        "x" +
+                                                            tcards[len - index]
+                                                                .quantity,
                                                         style: const TextStyle(
                                                           fontFamily: 'Avenir',
                                                           fontSize: 30,
@@ -243,7 +260,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                         children: const <
                                                             Widget>[
                                                           Text(
-                                                            'Know more',
+                                                            '設定熱量',
                                                             style: TextStyle(
                                                               fontFamily:
                                                                   'Avenir',

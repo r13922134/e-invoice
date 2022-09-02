@@ -64,7 +64,7 @@ class CardInfo {
       required this.tag});
   int position;
   String name;
-  String calorie;
+  List<String> calorie;
   String? images;
   String invnum;
   int type;
@@ -148,7 +148,7 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
                 amount: de['amount']));
             cards.add(CardInfo(count++,
                 name: de['description'],
-                calorie: '100',
+                calorie: [],
                 type: 0,
                 invnum: element.invNum,
                 tag: element.tag,
@@ -164,7 +164,7 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
       for (invoice_details value in response) {
         cards.add(CardInfo(count++,
             name: value.name,
-            calorie: "100",
+            calorie: [],
             type: value.type ?? 0,
             invnum: value.invNum,
             tag: value.tag,
@@ -177,10 +177,13 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
 
   List<Ename> tmparray = [];
   String tmpbody;
-  String path;
+  String path1;
+  final regex =
+      RegExp(r'(\d+(?:\.\d+)?)\s*(kcal|Kcal|cal|大卡|卡|Kilocalorie|kilocalorie)');
+  final num = RegExp(r'(\d+(?:\.\d+)?)');
   List<CardInfo> returncards = [];
   for (CardInfo c in cards) {
-    path = 'https://www.google.com/search?q=' + c.name + '熱量';
+    path1 = 'https://www.google.com/search?q=' + c.name + '熱量';
     tmparray = [];
     if (c.type == 0) {
       tmparray.add(Ename(name: c.name));
@@ -203,7 +206,8 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
                 c.type == 4 ||
                 c.type == 6) {
               try {
-                var re = await http.get(Uri.parse(path));
+                var re = await http.get(Uri.parse(path1));
+
                 if (re.statusCode == 200) {
                   print("re.body");
                 }
@@ -212,9 +216,9 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
               }
               c.images = pic[dict[c.type] ?? ''] ?? '';
               returncards.add(c);
-              DetailHelper.instance.updateType(c, c.type);
+              await DetailHelper.instance.updateType(c, c.type);
             } else {
-              DetailHelper.instance.updateType(c, c.type);
+              await DetailHelper.instance.updateType(c, c.type);
             }
           });
         }
@@ -227,18 +231,35 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
         c.type == 4 ||
         c.type == 6) {
       try {
-        var re = await http.get(Uri.parse(path));
+        List<String> sample = [];
+        var re = await http.get(Uri.parse(path1));
         if (re.statusCode == 200) {
-          BeautifulSoup soup = BeautifulSoup(re.body);
-          List<Bs4Element> r1 = soup.findAll("span", class_: "FCUp0c rQMQod");
+          BeautifulSoup soup1 = BeautifulSoup(re.body);
+          List<Bs4Element> r1 = soup1.findAll("span", class_: "FCUp0c rQMQod");
           List<Bs4Element> r2 =
-              soup.findAll("td", class_: "sjsZvd s5aIid OE1use");
+              soup1.findAll("td", class_: "sjsZvd s5aIid OE1use");
+
           for (Bs4Element bs4 in r1) {
-            print(bs4.getText());
+            if (regex.hasMatch(bs4.getText())) {
+              sample.add(bs4.getText());
+            } else if (num.hasMatch(bs4.getText())) {
+              sample.add(bs4.getText());
+            }
           }
-          for (Bs4Element bs4 in r2) {
-            print(bs4.getText());
+          if (sample.isEmpty) {
+            for (Bs4Element bs4 in r2) {
+              String str = bs4.parent?.getText() ?? "%";
+              if (regex.hasMatch(str) & str.contains(c.name)) {
+                var match = regex.firstMatch(str);
+                str = match?.group(0) ?? '';
+                sample.add(str);
+              } else if (num.hasMatch(str) & str.contains(c.name)) {
+                sample.add(str);
+              }
+            }
           }
+
+          c.calorie = sample;
         }
       } catch (e) {
         print("error");

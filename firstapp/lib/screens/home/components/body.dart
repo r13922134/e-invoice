@@ -278,7 +278,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
 
       setState(() {
         topContainer = value;
-        closeTopContainer = controller.offset > 50;
+        closeTopContainer = controller.offset > 200;
       });
     });
     super.initState();

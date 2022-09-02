@@ -34,16 +34,17 @@ class DetailPage extends StatelessWidget {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        const Text(
-                          'Solar System',
-                          style: TextStyle(
-                            fontFamily: 'Avenir',
-                            fontSize: 31,
-                            color: kTextColor,
-                            fontWeight: FontWeight.w300,
+                        for (String s in cardInfo.calorie)
+                          Text(
+                            s,
+                            style: const TextStyle(
+                              fontFamily: 'Avenir',
+                              fontSize: 31,
+                              color: kTextColor,
+                              fontWeight: FontWeight.w300,
+                            ),
+                            textAlign: TextAlign.left,
                           ),
-                          textAlign: TextAlign.left,
-                        ),
                         const Divider(color: Colors.black38),
                         const SizedBox(height: 32),
                         const Divider(color: Colors.black38),
