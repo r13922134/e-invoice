@@ -47,7 +47,7 @@ class ProfileBody extends State<Body> {
                     const ProfilePic(),
                     const SizedBox(height: 20),
                     ProfileMenu(
-                      text: "帳戶",
+                      text: "基本資料",
                       icon: "assets/icons/User Icon.svg",
                       press: () => {
                         Navigator.push(
@@ -96,7 +96,7 @@ class ProfileBody extends State<Body> {
                     const ProfilePic(),
                     const SizedBox(height: 20),
                     ProfileMenu(
-                      text: "帳戶",
+                      text: "基本資料",
                       icon: "assets/icons/User Icon.svg",
                       press: () => {
                         Navigator.push(
@@ -161,7 +161,7 @@ class ProfileBody extends State<Body> {
                   const ProfilePic(),
                   const SizedBox(height: 20),
                   ProfileMenu(
-                    text: "帳戶",
+                    text: "基本資料",
                     icon: "assets/icons/User Icon.svg",
                     press: () => {
                       Navigator.push(

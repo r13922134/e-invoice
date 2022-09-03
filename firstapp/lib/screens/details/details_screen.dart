@@ -9,7 +9,7 @@ import 'dart:convert';
 import 'dart:math';
 
 class DetailsScreen extends StatelessWidget {
-  final String tag, invDate, invNum, seller, address, time, amount;
+  final String tag, invDate, invNum, seller, address, time, amount, w;
   const DetailsScreen({
     Key? key,
     required this.tag,
@@ -19,6 +19,7 @@ class DetailsScreen extends StatelessWidget {
     required this.invNum,
     required this.time,
     required this.amount,
+    required this.w,
   }) : super(key: key);
 
   Future<List<invoice_details>> getDetail() async {
@@ -96,13 +97,16 @@ class DetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: kPrimaryColor,
+        backgroundColor:
+            w == 'f' ? kPrimaryColor : const Color.fromARGB(255, 252, 243, 167),
         appBar: AppBar(
-          backgroundColor: kPrimaryColor,
+          backgroundColor: w == 'f'
+              ? kPrimaryColor
+              : const Color.fromARGB(255, 252, 243, 167),
           elevation: 0,
           leading: IconButton(
               icon: SvgPicture.asset("assets/icons/back_arrow.svg",
-                  color: Colors.white),
+                  color: w == 'f' ? Colors.white : kTextColor),
               onPressed: () => Navigator.pop(context)),
         ),
         body: SingleChildScrollView(
@@ -176,56 +180,85 @@ class DetailsScreen extends StatelessWidget {
                                 .textTheme
                                 .headline4
                                 ?.copyWith(
-                                    color: Colors.white,
+                                    color: w == 'f'
+                                        ? Colors.white
+                                        : const Color.fromARGB(
+                                            255, 71, 148, 74),
                                     fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 35),
                           Row(
                             children: [
-                              const Icon(Icons.store, color: Colors.white),
+                              Icon(Icons.store,
+                                  color: w == 'f' ? Colors.white : kTextColor),
                               Text('  ' + seller,
-                                  style: const TextStyle(color: Colors.white)),
+                                  style: TextStyle(
+                                      color: w == 'f'
+                                          ? Colors.white
+                                          : kTextColor)),
                             ],
                           ),
                           const SizedBox(height: 5),
                           Row(
                             children: [
-                              const Icon(Icons.location_on,
-                                  color: Colors.white),
+                              Icon(Icons.location_on,
+                                  color: w == 'f' ? Colors.white : kTextColor),
                               Text('  ' + address,
-                                  style: const TextStyle(color: Colors.white)),
+                                  style: TextStyle(
+                                      color: w == 'f'
+                                          ? Colors.white
+                                          : kTextColor)),
                             ],
                           ),
                           const SizedBox(height: 5),
                           Row(
                             children: [
-                              const Icon(Icons.date_range, color: Colors.white),
+                              Icon(Icons.date_range,
+                                  color: w == 'f' ? Colors.white : kTextColor),
                               Text('  ' + invDate,
-                                  style: const TextStyle(color: Colors.white)),
+                                  style: TextStyle(
+                                      color: w == 'f'
+                                          ? Colors.white
+                                          : kTextColor)),
                             ],
                           ),
                           const SizedBox(height: 5),
                           Row(
                             children: [
-                              const Icon(Icons.access_time,
-                                  color: Colors.white),
+                              Icon(Icons.access_time,
+                                  color: w == 'f' ? Colors.white : kTextColor),
                               Text('  ' + time,
-                                  style: const TextStyle(color: Colors.white)),
+                                  style: TextStyle(
+                                      color: w == 'f'
+                                          ? Colors.white
+                                          : kTextColor)),
                             ],
                           ),
                         ],
                       ),
                     ),
-                    Positioned(
-                        top: 0,
-                        right: 25,
-                        child: Hero(
-                          tag: invNum,
-                          child: Image.asset(
-                            "assets/images/image_1.png",
-                            height: 93,
-                          ),
-                        )),
+                    if (w == 'f')
+                      Positioned(
+                          top: 0,
+                          right: 25,
+                          child: Hero(
+                            tag: invNum,
+                            child: Image.asset(
+                              "assets/images/image_1.png",
+                              height: 93,
+                            ),
+                          )),
+                    if (w == 'w')
+                      Positioned(
+                          top: 0,
+                          right: 25,
+                          child: Hero(
+                            tag: invNum,
+                            child: Image.asset(
+                              "assets/images/money.png",
+                              height: 93,
+                            ),
+                          )),
                   ],
                 ),
               ),

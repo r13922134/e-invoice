@@ -47,6 +47,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                     invNum: responseList[i].invNum,
                     time: responseList[i].time,
                     amount: responseList[i].amount,
+                    w: responseList[i].w,
                   ),
                 ),
               );
@@ -57,7 +58,9 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(20.0)),
-                    color: Colors.white,
+                    color: responseList[i].w == 'f'
+                        ? Colors.white
+                        : const Color.fromARGB(255, 252, 243, 167),
                     boxShadow: [
                       BoxShadow(
                           color: Colors.black.withAlpha(100), blurRadius: 10.0),
@@ -76,7 +79,11 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                               children: <Widget>[
                                 Text(
                                   responseList[i].invNum,
-                                  style: const TextStyle(
+                                  style: TextStyle(
+                                      color: responseList[i].w == 'f'
+                                          ? kTextColor
+                                          : const Color.fromARGB(
+                                              255, 71, 148, 74),
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold),
                                 ),

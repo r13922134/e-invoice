@@ -161,91 +161,102 @@ class _ProfileState extends State<AccountRevise> {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 40),
             Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>[
-                  Icon(Icons.edit),
-                  Text(
-                    "年齡",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 80, 80, 80),
-                      fontSize: 15,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const <Widget>[
+                        Icon(Icons.edit),
+                        Text(
+                          "年齡",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 80, 80, 80),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ]),
+                  NumberPicker(
+                    textStyle: const TextStyle(color: kPrimaryColor),
+                    selectedTextStyle: const TextStyle(
+                      color: Color.fromARGB(255, 36, 145, 126),
+                      fontSize: 35,
                       fontWeight: FontWeight.w700,
                     ),
+                    value: ageValue,
+                    minValue: 1,
+                    maxValue: 100,
+                    step: 1,
+                    itemHeight: 38,
+                    onChanged: (value) => setState(() => ageValue = value),
                   ),
                 ]),
-            NumberPicker(
-              textStyle: const TextStyle(color: kPrimaryColor),
-              selectedTextStyle: const TextStyle(
-                color: Color.fromARGB(255, 36, 145, 126),
-                fontSize: 35,
-                fontWeight: FontWeight.w700,
-              ),
-              value: ageValue,
-              minValue: 1,
-              maxValue: 100,
-              step: 1,
-              itemHeight: 38,
-              onChanged: (value) => setState(() => ageValue = value),
-            ),
-            const SizedBox(height: 10),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>[
-                  Icon(Icons.boy),
-                  Text(
-                    "身高(cm)",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 80, 80, 80),
-                      fontSize: 15,
+                Column(children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const <Widget>[
+                        Icon(Icons.boy),
+                        Text(
+                          "身高(cm)",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 80, 80, 80),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ]),
+                  NumberPicker(
+                    textStyle: const TextStyle(color: kPrimaryColor),
+                    selectedTextStyle: const TextStyle(
+                      color: Color.fromARGB(255, 36, 145, 126),
+                      fontSize: 35,
                       fontWeight: FontWeight.w700,
                     ),
+                    value: heightValue,
+                    minValue: 120,
+                    maxValue: 220,
+                    step: 1,
+                    itemHeight: 38,
+                    onChanged: (value) => setState(() => heightValue = value),
                   ),
                 ]),
-            NumberPicker(
-              textStyle: const TextStyle(color: kPrimaryColor),
-              selectedTextStyle: const TextStyle(
-                color: Color.fromARGB(255, 36, 145, 126),
-                fontSize: 35,
-                fontWeight: FontWeight.w700,
-              ),
-              value: heightValue,
-              minValue: 120,
-              maxValue: 220,
-              step: 1,
-              itemHeight: 38,
-              onChanged: (value) => setState(() => heightValue = value),
-            ),
-            const SizedBox(height: 10),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>[
-                  Icon(Icons.accessibility),
-                  Text(
-                    "體重(kg)",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 80, 80, 80),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+                Column(
+                  children: [
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const <Widget>[
+                          Icon(Icons.accessibility),
+                          Text(
+                            "體重(kg)",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 80, 80, 80),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ]),
+                    NumberPicker(
+                      textStyle: const TextStyle(color: kPrimaryColor),
+                      selectedTextStyle: const TextStyle(
+                        color: Color.fromARGB(255, 36, 145, 126),
+                        fontSize: 35,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      value: weightValue,
+                      minValue: 30,
+                      maxValue: 150,
+                      step: 1,
+                      itemHeight: 38,
+                      onChanged: (value) => setState(() => weightValue = value),
                     ),
-                  ),
-                ]),
-            NumberPicker(
-              textStyle: const TextStyle(color: kPrimaryColor),
-              selectedTextStyle: const TextStyle(
-                color: Color.fromARGB(255, 36, 145, 126),
-                fontSize: 35,
-                fontWeight: FontWeight.w700,
-              ),
-              value: weightValue,
-              minValue: 30,
-              maxValue: 150,
-              step: 1,
-              itemHeight: 38,
-              onChanged: (value) => setState(() => weightValue = value),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 50),
             Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const <Widget>[
