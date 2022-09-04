@@ -181,7 +181,7 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
   final regex =
       RegExp(r'(\d+(?:\.\d+)?)\s*(kcal|Kcal|cal|大卡|卡|Kilocalorie|kilocalorie)');
   final num = RegExp(r'(\d+(?:\.\d+)?)');
-  int index_count = 0;
+  int index_count = 1;
   List<CardInfo> returncards = [];
   for (CardInfo c in cards) {
     path1 = 'https://www.google.com/search?q=' + c.name + '熱量';
