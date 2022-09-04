@@ -181,6 +181,7 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
   final regex =
       RegExp(r'(\d+(?:\.\d+)?)\s*(kcal|Kcal|cal|大卡|卡|Kilocalorie|kilocalorie)');
   final num = RegExp(r'(\d+(?:\.\d+)?)');
+  int index_count = 0;
   List<CardInfo> returncards = [];
   for (CardInfo c in cards) {
     path1 = 'https://www.google.com/search?q=' + c.name + '熱量';
@@ -206,15 +207,42 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
                 c.type == 4 ||
                 c.type == 6) {
               try {
+                List<String> sample = [];
                 var re = await http.get(Uri.parse(path1));
-
                 if (re.statusCode == 200) {
-                  print("re.body");
+                  BeautifulSoup soup1 = BeautifulSoup(re.body);
+                  List<Bs4Element> r1 =
+                      soup1.findAll("span", class_: "FCUp0c rQMQod");
+                  List<Bs4Element> r2 =
+                      soup1.findAll("td", class_: "sjsZvd s5aIid OE1use");
+
+                  for (Bs4Element bs4 in r1) {
+                    if (regex.hasMatch(bs4.getText())) {
+                      sample.add(bs4.getText());
+                    } else if (num.hasMatch(bs4.getText())) {
+                      sample.add(bs4.getText());
+                    }
+                  }
+                  if (sample.isEmpty) {
+                    for (Bs4Element bs4 in r2) {
+                      String str = bs4.parent?.getText() ?? "%";
+                      if (regex.hasMatch(str) & str.contains(c.name)) {
+                        var match = regex.firstMatch(str);
+                        str = match?.group(0) ?? '';
+                        sample.add(str);
+                      } else if (num.hasMatch(str) & str.contains(c.name)) {
+                        sample.add(str);
+                      }
+                    }
+                  }
+
+                  c.calorie = sample;
                 }
               } catch (e) {
                 print("error");
               }
               c.images = pic[dict[c.type] ?? ''] ?? '';
+              c.position = index_count++;
               returncards.add(c);
               await DetailHelper.instance.updateType(c, c.type);
             } else {
@@ -265,6 +293,8 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
         print("error");
       }
       c.images = pic[dict[c.type] ?? ''] ?? '';
+      c.position = index_count++;
+
       returncards.add(c);
     }
   }
