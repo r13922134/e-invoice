@@ -170,63 +170,87 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String barcode = pref.getString('barcode') ?? "";
     String password = pref.getString('password') ?? "";
-
+    var client = http.Client();
+    var rng = Random();
     var now = DateTime.now();
-    List<Header>? responseList2 = await HeaderHelper.instance.getAll();
+    int uuid = rng.nextInt(1000);
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 30000;
+    int exp = timestamp + 50000;
+    int m = now.month;
 
-    if (responseList2.isNotEmpty) {
-      String tmpDate = responseList2[responseList2.length - 1].date;
-      final splitted = tmpDate.split('/');
-      int tmpYear = int.parse(splitted[0]);
-      int tmpMonth = int.parse(splitted[1]);
+    var formatter = DateFormat('yyyy/MM/dd');
+    String sdate;
+    String edate;
+    DateTime last;
+    DateTime start;
 
-      int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
-      int exp = timestamp + 70000;
-      var rng = Random();
-      int uuid;
-      var formatter = DateFormat('yyyy/MM/dd');
-      String responseString;
-      String sdate;
-      String edate;
-      DateTime last;
-      DateTime start;
+    for (int j = 5; j >= 0; j--) {
+      uuid = rng.nextInt(1000);
 
-      while (true) {
-        uuid = rng.nextInt(1000);
+      start = DateTime(now.year, now.month - j, 01);
+      last = DateTime(start.year, start.month + 1, 0);
+      sdate = formatter.format(start);
+      edate = formatter.format(last);
+      var rbody1 = {
+        "version": "0.5",
+        "cardType": "3J0002",
+        "cardNo": barcode,
+        "expTimeStamp": exp.toString().substring(0, 10),
+        "action": "carrierInvChk",
+        "timeStamp": timestamp.toString().substring(0, 10),
+        "startDate": sdate,
+        "endDate": edate,
+        "onlyWinningInv": 'N',
+        "uuid": uuid.toString(),
+        "appID": 'EINV0202204156709',
+        "cardEncrypt": password,
+      };
+      var rbody2 = {
+        "version": "0.5",
+        "cardType": "3J0002",
+        "cardNo": barcode,
+        "expTimeStamp": exp.toString().substring(0, 10),
+        "action": "carrierInvChk",
+        "timeStamp": timestamp.toString().substring(0, 10),
+        "startDate": sdate,
+        "endDate": edate,
+        "onlyWinningInv": 'Y',
+        "uuid": uuid.toString(),
+        "appID": 'EINV0202204156709',
+        "cardEncrypt": password,
+      };
 
-        start = DateTime(tmpYear, tmpMonth, 01);
-        last = DateTime(tmpYear, tmpMonth + 1, 0);
-        sdate = formatter.format(start);
-        edate = formatter.format(last);
-        var client = http.Client();
-        try {
-          var response = await client.post(
-              Uri.https(
-                  "api.einvoice.nat.gov.tw", "PB2CAPIVAN/invServ/InvServ"),
-              body: {
-                "version": "0.5",
-                "cardType": "3J0002",
-                "cardNo": barcode,
-                "expTimeStamp": exp.toString().substring(0, 10),
-                "action": "carrierInvChk",
-                "timeStamp": timestamp.toString().substring(0, 10),
-                "startDate": sdate,
-                "endDate": edate,
-                "onlyWinningInv": 'N',
-                "uuid": uuid.toString(),
-                "appID": 'EINV0202204156709',
-                "cardEncrypt": password,
-              });
+      try {
+        var response = await client.post(
+            Uri.parse(
+                'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ'),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: rbody1);
+        var response2 = await client.post(
+            Uri.parse(
+                'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ'),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: rbody2);
+        if (response.statusCode == 200 && response2.statusCode == 200) {
+          String responseString = response.body;
+          String reString = response2.body;
 
-          if (response.statusCode == 200) {
-            responseString = response.body;
-            int tmpyear;
-            DateTime invDate;
-            String invdate;
-            var t;
-            var formatter = DateFormat('yyyy/MM/dd');
-            var r = jsonDecode(responseString);
-            List d = r['details'];
+          var r = jsonDecode(responseString);
+          var re = jsonDecode(reString);
+
+          List d = r['details'];
+          List d2 = re['details'];
+
+          int tmpyear;
+          DateTime invDate;
+          String invdate;
+          var formatter = DateFormat('yyyy/MM/dd');
+          var t;
+          if (d.isNotEmpty) {
             for (var de in d) {
               t = de['invDate'];
               tmpyear = t['year'] + 1911;
@@ -247,17 +271,33 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
               }
             }
           }
-          if (start.year == now.year && start.month == now.month) {
-            break;
+          if (d2.isNotEmpty) {
+            for (var de in d2) {
+              t = de['invDate'];
+              tmpyear = t['year'] + 1911;
+              invDate = DateTime(tmpyear, t['month'], t['date']);
+              invdate = formatter.format(invDate);
+
+              await HeaderHelper.instance.deleteold(de['invNum']);
+              await HeaderHelper.instance.add(Header(
+                  tag: t['year'].toString() + t['month'].toString(),
+                  date: invdate,
+                  time: de['invoiceTime'],
+                  seller: de['sellerName'],
+                  address: de['sellerAddress'],
+                  invNum: de['invNum'],
+                  barcode: de['cardNo'],
+                  amount: de['amount'],
+                  w: "w"));
+            }
           }
-          tmpMonth += 1;
-        } catch (e) {
-          print("error");
-        } finally {
-          client.close();
         }
+      } catch (e) {
+        debugPrint("$e");
       }
     }
+
+    client.close();
   }
 
   void leftclick() {
@@ -296,73 +336,11 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     final Size size = MediaQuery.of(context).size;
     final double categoryHeight = size.height * 0.25;
 
-    return SafeArea(
-      child: Scaffold(
-        body: FutureBuilder<List<Widget>>(
-          future: getPostsData(current),
-          builder: (BuildContext context, AsyncSnapshot? snapshot) {
-            if (snapshot?.data?.isEmpty ?? true) {
-              return SizedBox(
-                height: size.height,
-                child: Column(
-                  children: <Widget>[
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    AnimatedOpacity(
-                      duration: const Duration(milliseconds: 500),
-                      opacity: closeTopContainer ? 0 : 1,
-                      child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 500),
-                          width: size.width,
-                          alignment: Alignment.topCenter,
-                          height: closeTopContainer ? 0 : categoryHeight,
-                          child: categoriesScroller),
-                    ),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          TextButton(
-                            child: const Icon(Icons.arrow_circle_left),
-                            onPressed: leftclick,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.blueGrey,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Text(
-                                '  ' +
-                                    date.year.toString() +
-                                    '年' +
-                                    ' ' +
-                                    date.month.toString() +
-                                    '月' +
-                                    '  ',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                )),
-                          ),
-                          TextButton(
-                            child: const Icon(Icons.arrow_circle_right),
-                            onPressed: rightclick,
-                          )
-                        ]),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: LiquidPullToRefresh(
-                          height: 90,
-                          color: kSecondaryColor,
-                          onRefresh: _handleRefresh,
-                          child: const Text("\n\n查無發票")),
-                    ),
-                  ],
-                ),
-              );
-            }
+    return Scaffold(
+      body: FutureBuilder<List<Widget>>(
+        future: getPostsData(current),
+        builder: (BuildContext context, AsyncSnapshot? snapshot) {
+          if (snapshot?.data?.isEmpty ?? true) {
             return SizedBox(
               height: size.height,
               child: Column(
@@ -371,10 +349,10 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                     height: 10,
                   ),
                   AnimatedOpacity(
-                    duration: const Duration(milliseconds: 350),
+                    duration: const Duration(milliseconds: 500),
                     opacity: closeTopContainer ? 0 : 1,
                     child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 350),
+                        duration: const Duration(milliseconds: 500),
                         width: size.width,
                         alignment: Alignment.topCenter,
                         height: closeTopContainer ? 0 : categoryHeight,
@@ -412,44 +390,104 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                           onPressed: rightclick,
                         )
                       ]),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 10),
                   Expanded(
-                      child: LiquidPullToRefresh(
-                          height: 90,
-                          color: kSecondaryColor,
-                          onRefresh: _handleRefresh,
-                          child: ListView.builder(
-                              controller: controller,
-                              itemCount: snapshot?.data.length,
-                              physics: const BouncingScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                double scale = 1.0;
-                                if (topContainer > 0.5) {
-                                  scale = index + 0.5 - topContainer;
-                                  if (scale < 0) {
-                                    scale = 0;
-                                  } else if (scale > 1) {
-                                    scale = 1;
-                                  }
-                                }
-                                return Opacity(
-                                  opacity: scale,
-                                  child: Transform(
-                                    transform: Matrix4.identity()
-                                      ..scale(scale, scale),
-                                    alignment: Alignment.bottomCenter,
-                                    child: Align(
-                                        heightFactor: 0.7,
-                                        alignment: Alignment.topCenter,
-                                        child: snapshot?.data[index]),
-                                  ),
-                                );
-                              }))),
+                    child: LiquidPullToRefresh(
+                        height: 90,
+                        color: kSecondaryColor,
+                        onRefresh: _handleRefresh,
+                        child: const Text("\n\n查無發票")),
+                  ),
                 ],
               ),
             );
-          },
-        ),
+          }
+          return SizedBox(
+            height: size.height,
+            child: Column(
+              children: <Widget>[
+                const SizedBox(
+                  height: 10,
+                ),
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 350),
+                  opacity: closeTopContainer ? 0 : 1,
+                  child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 350),
+                      width: size.width,
+                      alignment: Alignment.topCenter,
+                      height: closeTopContainer ? 0 : categoryHeight,
+                      child: categoriesScroller),
+                ),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      TextButton(
+                        child: const Icon(Icons.arrow_circle_left),
+                        onPressed: leftclick,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Text(
+                            '  ' +
+                                date.year.toString() +
+                                '年' +
+                                ' ' +
+                                date.month.toString() +
+                                '月' +
+                                '  ',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            )),
+                      ),
+                      TextButton(
+                        child: const Icon(Icons.arrow_circle_right),
+                        onPressed: rightclick,
+                      )
+                    ]),
+                const SizedBox(height: 18),
+                Expanded(
+                    child: LiquidPullToRefresh(
+                        height: 90,
+                        color: kSecondaryColor,
+                        onRefresh: _handleRefresh,
+                        child: ListView.builder(
+                            controller: controller,
+                            itemCount: snapshot?.data.length,
+                            physics: const BouncingScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              double scale = 1.0;
+                              if (topContainer > 0.5) {
+                                scale = index + 0.5 - topContainer;
+                                if (scale < 0) {
+                                  scale = 0;
+                                } else if (scale > 1) {
+                                  scale = 1;
+                                }
+                              }
+                              return Opacity(
+                                opacity: scale,
+                                child: Transform(
+                                  transform: Matrix4.identity()
+                                    ..scale(scale, scale),
+                                  alignment: Alignment.bottomCenter,
+                                  child: Align(
+                                      heightFactor: 0.7,
+                                      alignment: Alignment.topCenter,
+                                      child: snapshot?.data[index]),
+                                ),
+                              );
+                            }))),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
