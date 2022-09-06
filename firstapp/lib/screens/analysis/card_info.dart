@@ -140,10 +140,10 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
           List d = r['details'];
           for (var de in d) {
             await DetailHelper.instance.add(invoice_details(
-                tag: element.toString(),
-                invNum: element.toString(),
+                tag: element.tag,
+                invNum: element.invNum,
                 name: de['description'],
-                date: element.toString(),
+                date: element.date,
                 quantity: de['quantity'],
                 amount: de['amount']));
             cards.add(CardInfo(count++,
@@ -299,7 +299,10 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
     }
   }
   client.close();
-
+  int j = 0;
+  while (returncards.length < 5) {
+    returncards.add(returncards[j++]);
+  }
   return returncards;
 }
 

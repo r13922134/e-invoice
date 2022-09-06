@@ -116,37 +116,20 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                     ])));
                               } else {
                                 int len = tcards.length - 1;
-                                int herotag;
-                                List<int> tmptag = [1, 2, 3, 4, 5];
-                                int i = 0;
+
                                 return Swiper(
                                   index: len,
                                   onTap: (index) {
-                                    if (len < 5) {
-                                      int tmpindex = index;
-                                      if (index == 5) {
-                                        tmpindex = 0;
-                                      }
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, a, b) =>
-                                              DetailPage(
-                                            cardInfo: tcards[len - tmpindex],
-                                          ),
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, a, b) =>
+                                            DetailPage(
+                                          cardInfo: tcards[len - index],
+                                          index: index,
                                         ),
-                                      );
-                                    } else {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, a, b) =>
-                                              DetailPage(
-                                            cardInfo: tcards[len - index],
-                                          ),
-                                        ),
-                                      );
-                                    }
+                                      ),
+                                    );
                                   },
                                   itemCount: tcards.length,
                                   itemWidth: MediaQuery.of(context).size.width -
@@ -155,14 +138,6 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                   layout: SwiperLayout.TINDER,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    if (len < 4) {
-                                      if (i == 5) {
-                                        i = 0;
-                                      }
-                                      herotag = tmptag[i++];
-                                    } else {
-                                      herotag = tcards[index].position;
-                                    }
                                     return InkWell(
                                       child: Stack(
                                         alignment:
@@ -286,10 +261,10 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                             ],
                                           ),
                                           Hero(
-                                            tag: herotag,
+                                            tag: index,
                                             child: Image.asset(
                                                 tcards[len - index].images ??
-                                                    'assets/images/eggs.png',
+                                                    '',
                                                 width: 120),
                                           ),
                                           Positioned(
@@ -316,7 +291,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                 );
                               }
                             } else {
-                              return Container(
+                              return SizedBox(
                                   height: 300,
                                   child: Center(
                                       child: LoadingAnimationWidget

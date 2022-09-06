@@ -4,8 +4,9 @@ import 'package:firstapp/constants.dart';
 
 class DetailPage extends StatelessWidget {
   final CardInfo cardInfo;
-
-  const DetailPage({Key? key, required this.cardInfo}) : super(key: key);
+  final index;
+  const DetailPage({Key? key, required this.cardInfo, required this.index})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -71,10 +72,8 @@ class DetailPage extends StatelessWidget {
               top: 10,
               right: -30,
               child: Hero(
-                  tag: cardInfo.position,
-                  child: Image.asset(
-                      cardInfo.images ?? 'assets/images/eggs.png',
-                      width: 270)),
+                  tag: index,
+                  child: Image.asset(cardInfo.images ?? '', width: 270)),
             ),
             Positioned(
               top: 60,

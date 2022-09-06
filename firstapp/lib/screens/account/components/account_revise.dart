@@ -190,7 +190,7 @@ class _ProfileState extends State<AccountRevise> {
                     minValue: 1,
                     maxValue: 100,
                     step: 1,
-                    itemHeight: 38,
+                    itemHeight: 50,
                     onChanged: (value) => setState(() => ageValue = value),
                   ),
                 ]),
@@ -219,7 +219,7 @@ class _ProfileState extends State<AccountRevise> {
                     minValue: 120,
                     maxValue: 220,
                     step: 1,
-                    itemHeight: 38,
+                    itemHeight: 50,
                     onChanged: (value) => setState(() => heightValue = value),
                   ),
                 ]),
@@ -249,14 +249,14 @@ class _ProfileState extends State<AccountRevise> {
                       minValue: 30,
                       maxValue: 150,
                       step: 1,
-                      itemHeight: 38,
+                      itemHeight: 50,
                       onChanged: (value) => setState(() => weightValue = value),
                     ),
                   ],
                 ),
               ],
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 30),
             Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const <Widget>[
@@ -377,7 +377,10 @@ class _ProfileState extends State<AccountRevise> {
       backgroundColor: kPrimaryColor,
       elevation: 0,
       leading: IconButton(
-        icon: SvgPicture.asset("assets/icons/back_arrow.svg"),
+        icon: const Icon(
+          Icons.arrow_back_sharp,
+          color: Colors.white,
+        ),
         onPressed: () {
           Navigator.pop(context);
         },
