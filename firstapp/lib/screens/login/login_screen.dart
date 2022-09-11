@@ -9,6 +9,8 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'dart:convert';
 import 'package:firstapp/database/invoice_database.dart';
+import 'package:firstapp/database/winninglist_database.dart';
+
 import 'dart:math';
 
 class LoginScreen extends StatelessWidget {
@@ -27,18 +29,27 @@ class LoginScreen extends StatelessWidget {
     var now = DateTime.now();
     var formatter = DateFormat('yyyy/MM/dd');
     String responseString;
+    String winlist;
     String sdate;
     String edate;
     DateTime last;
     DateTime start;
     var rng = Random();
     int uuid;
+    String term;
+
+    var client = http.Client();
+
     for (int j = 5; j >= 0; j--) {
-      var client = http.Client();
       uuid = rng.nextInt(1000);
 
       start = DateTime(now.year, now.month - j, 01);
       last = DateTime(start.year, start.month + 1, 0);
+      if (start.month < 10) {
+        term = (start.year - 1911).toString() + '0' + start.month.toString();
+      } else {
+        term = (start.year - 1911).toString() + start.month.toString();
+      }
       sdate = formatter.format(start);
       edate = formatter.format(last);
       var rbody = {
@@ -55,7 +66,13 @@ class LoginScreen extends StatelessWidget {
         "appID": 'EINV0202204156709',
         "cardEncrypt": data.password,
       };
-
+      var rbody2 = {
+        "version": "0.2",
+        "action": "QryWinningList",
+        "invTerm": term,
+        "UUID": uuid.toString(),
+        "appID": "EINV0202204156709",
+      };
       try {
         var response = await client.post(
             Uri.parse(
@@ -64,10 +81,19 @@ class LoginScreen extends StatelessWidget {
               "Content-Type": "application/x-www-form-urlencoded",
             },
             body: rbody);
-
-        if (response.statusCode == 200) {
+        var response2 = await client.post(
+            Uri.parse(
+                'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invapp/InvApp'),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: rbody2);
+        if (response.statusCode == 200 && response2.statusCode == 200) {
           responseString = response.body;
+          winlist = response2.body;
+          var w = jsonDecode(winlist);
           var r = jsonDecode(responseString);
+
           List d = r['details'];
           int tmpyear;
           DateTime invDate;
@@ -93,13 +119,25 @@ class LoginScreen extends StatelessWidget {
                   w: 'f'));
             }
           }
+
+          if (w['code'] == '200') {
+            String tmpterm =
+                (start.year - 1911).toString() + start.month.toString();
+            await WlistHelper.instance.add(WinningList(
+              tag: tmpterm,
+              superPrizeNo: w['superPrizeNo'],
+              firstPrizeNo1: w['firstPrizeNo1'],
+              firstPrizeNo2: w['firstPrizeNo2'],
+              firstPrizeNo3: w['firstPrizeNo3'],
+              spcPrizeNo: w['spcPrizeNo'],
+            ));
+          }
         }
       } catch (e) {
         debugPrint("$e");
-      } finally {
-        client.close();
       }
     }
+    client.close();
 
     return null;
   }

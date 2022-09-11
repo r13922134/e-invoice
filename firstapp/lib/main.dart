@@ -16,6 +16,7 @@ import 'package:firstapp/screens/home/components/home_barcode.dart';
 import 'package:firstapp/screens/analysis/calculate.dart';
 import 'dart:convert';
 import 'dart:math';
+import 'package:firstapp/database/winninglist_database.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,14 +50,13 @@ Future<void> updateData() async {
     int uuid = rng.nextInt(1000);
     int timestamp = DateTime.now().millisecondsSinceEpoch + 30000;
     int exp = timestamp + 50000;
-    int m = now.month;
 
     var formatter = DateFormat('yyyy/MM/dd');
     String sdate;
     String edate;
     DateTime last;
     DateTime start;
-
+    String term;
     for (int j = 5; j >= 0; j--) {
       uuid = rng.nextInt(1000);
 
@@ -64,6 +64,11 @@ Future<void> updateData() async {
       last = DateTime(start.year, start.month + 1, 0);
       sdate = formatter.format(start);
       edate = formatter.format(last);
+      if (start.month < 10) {
+        term = (start.year - 1911).toString() + '0' + start.month.toString();
+      } else {
+        term = (start.year - 1911).toString() + start.month.toString();
+      }
       var rbody1 = {
         "version": "0.5",
         "cardType": "3J0002",
@@ -92,7 +97,13 @@ Future<void> updateData() async {
         "appID": 'EINV0202204156709',
         "cardEncrypt": password,
       };
-
+      var rbody3 = {
+        "version": "0.2",
+        "action": "QryWinningList",
+        "invTerm": term,
+        "UUID": uuid.toString(),
+        "appID": "EINV0202204156709",
+      };
       try {
         var response = await client.post(
             Uri.parse(
@@ -108,10 +119,20 @@ Future<void> updateData() async {
               "Content-Type": "application/x-www-form-urlencoded",
             },
             body: rbody2);
-        if (response.statusCode == 200 && response2.statusCode == 200) {
+        var response3 = await client.post(
+            Uri.parse(
+                'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invapp/InvApp'),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: rbody3);
+        if (response.statusCode == 200 &&
+            response2.statusCode == 200 &&
+            response3.statusCode == 200) {
           String responseString = response.body;
           String reString = response2.body;
-
+          String winlist = response3.body;
+          var w = jsonDecode(winlist);
           var r = jsonDecode(responseString);
           var re = jsonDecode(reString);
 
@@ -161,8 +182,21 @@ Future<void> updateData() async {
                   invNum: de['invNum'],
                   barcode: de['cardNo'],
                   amount: de['amount'],
-                  w: "w"));
+                  w: "500"));
             }
+          }
+          String tmpterm =
+              (start.year - 1911).toString() + start.month.toString();
+          if (await WlistHelper.instance.checkWlist(tmpterm) &&
+              w['code'] == '200') {
+            await WlistHelper.instance.add(WinningList(
+              tag: tmpterm,
+              superPrizeNo: w['superPrizeNo'],
+              firstPrizeNo1: w['firstPrizeNo1'],
+              firstPrizeNo2: w['firstPrizeNo2'],
+              firstPrizeNo3: w['firstPrizeNo3'],
+              spcPrizeNo: w['spcPrizeNo'],
+            ));
           }
         }
       } catch (e) {
@@ -257,7 +291,7 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: kBackgroundColor,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            elevation: 0.0,
+            elevation: 0,
             flexibleSpace: Container(
               decoration: const BoxDecoration(
                 color: kPrimaryColor,

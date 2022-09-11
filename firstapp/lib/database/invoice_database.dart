@@ -139,4 +139,76 @@ class HeaderHelper {
     }
     return true;
   }
+
+  Future<Topbar> count(String current) async {
+    Database db = await instance.database;
+    int count = Sqflite.firstIntValue(await db.rawQuery(
+            'SELECT COUNT(*) FROM header WHERE tag = ?', [current])) ??
+        0;
+
+    var amount = await db.query('header',
+        columns: ['amount'], where: '"tag" = ? ', whereArgs: [current]);
+    List<Header> amountList =
+        amount.isNotEmpty ? amount.map((c) => Header.fromMap(c)).toList() : [];
+    var wamount = await db.query('header',
+        columns: ['w'],
+        where:
+            '"tag" = ? AND ("w" = ? OR "w" = ? OR "w" = ? OR "w" = ? OR "w" = ? OR "w" = ? OR "w" = ? OR "w" = ? OR "w" = ?)',
+        whereArgs: [
+          current,
+          '500',
+          '10000000',
+          '2000000',
+          '200000',
+          '40000',
+          '10000',
+          '4000',
+          '1000',
+          '200'
+        ]);
+    List<Header> wamountList = wamount.isNotEmpty
+        ? wamount.map((c) => Header.fromMap(c)).toList()
+        : [];
+    int total = 0;
+    int winamount = 0;
+    for (Header h in amountList) {
+      total += int.parse(h.amount);
+    }
+    for (Header h in wamountList) {
+      winamount += int.parse(h.w);
+    }
+    return Topbar(count: count, total: total, winamount: winamount);
+  }
+
+  Future<void> update(Header h, String m) async {
+    Database db = await instance.database;
+
+    await db.rawUpdate(
+        'UPDATE header SET tag = ? , date = ? ,time = ? ,seller =? ,address =? ,invNum = ? ,barcode = ? ,amount = ? ,w = ? WHERE invNum = ? AND tag = ?',
+        [
+          h.tag,
+          h.date,
+          h.time,
+          h.seller,
+          h.address,
+          h.invNum,
+          h.barcode,
+          h.amount,
+          m,
+          h.invNum,
+          h.tag
+        ]);
+  }
+}
+
+class Topbar {
+  int count;
+
+  int total;
+  int winamount;
+  Topbar({
+    required this.count,
+    required this.total,
+    required this.winamount,
+  });
 }

@@ -1,3 +1,4 @@
+import 'package:firstapp/database/details_database.dart';
 import 'package:flutter/material.dart';
 import '../../../constants.dart';
 import 'package:firstapp/screens/details/details_screen.dart';
@@ -8,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/cupertino.dart';
+import 'package:firstapp/database/winninglist_database.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -30,8 +33,183 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
 
   Future<List<Widget>> getPostsData(String current) async {
     List<Widget> listItems = [];
-    List<Header>? responseList = await HeaderHelper.instance.getHeader(current);
+    List<Header>? relist = await HeaderHelper.instance.getHeader(current);
+    List<WinningList> wlist;
+    DateTime ldate;
+    if (int.parse(current) % 2 == 0) {
+      wlist = await WlistHelper.instance.get(current);
+      ldate = DateTime(int.parse(current.substring(0, 3)) + 1911,
+          int.parse(current.substring(3)) + 1, 25);
+    } else {
+      wlist =
+          await WlistHelper.instance.get((int.parse(current) + 1).toString());
+      ldate = DateTime(int.parse(current.substring(0, 3)) + 1911,
+          int.parse(current.substring(3)) + 2, 25);
+    }
+    var diff = ldate.difference(time).inDays + 1;
 
+    if (wlist.isNotEmpty) {
+      for (Header h in relist) {
+        if (h.invNum.substring(2) == wlist[0].superPrizeNo) {
+          await HeaderHelper.instance.update(h, '10000000');
+        } else if (h.invNum.substring(2) == wlist[0].spcPrizeNo) {
+          await HeaderHelper.instance.update(h, '2000000');
+        } else if (h.invNum.substring(2) == wlist[0].firstPrizeNo1 ||
+            h.invNum.substring(2) == wlist[0].firstPrizeNo1 ||
+            h.invNum.substring(2) == wlist[0].firstPrizeNo1) {
+          await HeaderHelper.instance.update(h, '200000');
+        } else if (h.invNum.substring(3, 10) ==
+                wlist[0].firstPrizeNo1.substring(1, 8) ||
+            h.invNum.substring(3, 10) ==
+                wlist[0].firstPrizeNo1.substring(1, 8) ||
+            h.invNum.substring(3, 10) ==
+                wlist[0].firstPrizeNo1.substring(1, 8)) {
+          await HeaderHelper.instance.update(h, '40000');
+        } else if (h.invNum.substring(4, 10) ==
+                wlist[0].firstPrizeNo1.substring(2, 8) ||
+            h.invNum.substring(4, 10) ==
+                wlist[0].firstPrizeNo1.substring(2, 8) ||
+            h.invNum.substring(4, 10) ==
+                wlist[0].firstPrizeNo1.substring(2, 8)) {
+          await HeaderHelper.instance.update(h, '10000');
+        } else if (h.invNum.substring(5, 10) ==
+                wlist[0].firstPrizeNo1.substring(3, 8) ||
+            h.invNum.substring(5, 10) ==
+                wlist[0].firstPrizeNo1.substring(3, 8) ||
+            h.invNum.substring(5, 10) ==
+                wlist[0].firstPrizeNo1.substring(3, 8)) {
+          await HeaderHelper.instance.update(h, '4000');
+        } else if (h.invNum.substring(6, 10) ==
+                wlist[0].firstPrizeNo1.substring(4, 8) ||
+            h.invNum.substring(6, 10) ==
+                wlist[0].firstPrizeNo1.substring(4, 8) ||
+            h.invNum.substring(6, 10) ==
+                wlist[0].firstPrizeNo1.substring(4, 8)) {
+          await HeaderHelper.instance.update(h, '1000');
+        } else if (h.invNum.substring(7, 10) ==
+                wlist[0].firstPrizeNo1.substring(5, 8) ||
+            h.invNum.substring(7, 10) ==
+                wlist[0].firstPrizeNo1.substring(5, 8) ||
+            h.invNum.substring(7, 10) ==
+                wlist[0].firstPrizeNo1.substring(5, 8)) {
+          await HeaderHelper.instance.update(h, '200');
+        }
+      }
+    }
+    List<Header>? responseList = await HeaderHelper.instance.getHeader(current);
+    Topbar topList = await HeaderHelper.instance.count(current);
+    listItems.add(
+      Container(
+        height: 95,
+        margin: const EdgeInsets.symmetric(horizontal: 26, vertical: 10),
+        decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+            color: kPrimaryColor,
+            boxShadow: [
+              BoxShadow(color: Colors.black.withAlpha(100), blurRadius: 10.0),
+            ]),
+        child: Padding(
+          padding:
+              const EdgeInsets.only(top: 12, bottom: 20, left: 25, right: 40),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (wlist.isEmpty)
+                      Row(children: const [
+                        Icon(CupertinoIcons.money_dollar_circle_fill,
+                            color: Color.fromARGB(255, 243, 230, 111),
+                            size: 20),
+                        Text(
+                          " 開獎倒數",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ]),
+                    if (wlist.isNotEmpty)
+                      Row(children: const [
+                        Icon(CupertinoIcons.money_dollar_circle_fill,
+                            color: Color.fromARGB(255, 243, 230, 111),
+                            size: 20),
+                        Text(
+                          " 中獎金額",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ]),
+                    Row(
+                      children: const [
+                        Icon(CupertinoIcons.money_dollar,
+                            color: Color.fromARGB(255, 250, 240, 154),
+                            size: 20),
+                        Text(
+                          "總消費金額",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (wlist.isNotEmpty)
+                      Row(children: [
+                        Text(
+                          "\$" + topList.winamount.toString() + ' / ',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 23,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '共' + topList.count.toString() + '張  ',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ]),
+                    if (wlist.isEmpty)
+                      Row(children: [
+                        Text(
+                          diff.toString() + '天 / ',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 19.5,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '共' + topList.count.toString() + '張  ',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ]),
+                    Text(
+                      "\$" + topList.total.toString(),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 21,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                )
+              ]),
+        ),
+      ),
+    );
     for (int i = responseList.length - 1; i > -1; i--) {
       listItems.add(
         GestureDetector(
@@ -53,7 +231,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
               );
             },
             child: Container(
-                height: 145,
+                height: 135,
                 margin:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
@@ -109,7 +287,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                                   ),
                                 if (responseList[i].barcode == "manual")
                                   Container(
-                                    padding: const EdgeInsets.all(3),
+                                    padding: const EdgeInsets.all(2),
                                     decoration: BoxDecoration(
                                       color: Colors.blueGrey,
                                       borderRadius: BorderRadius.circular(7),
@@ -139,22 +317,153 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                           )
                         ],
                       ),
-                      if (responseList[i].w == "w")
-                        Hero(
-                          tag: responseList[i].invNum,
-                          child: Image.asset(
-                            "assets/images/money.png",
-                            height: 53,
-                          ),
-                        ),
                       if (responseList[i].w == 'f')
                         Hero(
                           tag: responseList[i].invNum,
                           child: Image.asset(
                             "assets/images/image_1.png",
-                            height: 53,
+                            height: 46,
                           ),
                         ),
+                      if (responseList[i].w != "f")
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Hero(
+                              tag: responseList[i].invNum,
+                              child: Image.asset(
+                                "assets/images/money.png",
+                                height: 46,
+                              ),
+                            ),
+                            if (responseList[i].w == "500")
+                              Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 36, 129, 39),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: const Text("載具伍佰獎",
+                                    style: TextStyle(
+                                      fontSize: 7.67,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                              ),
+                            if (responseList[i].w == "10000000")
+                              Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 36, 129, 39),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: const Text("千萬特別獎",
+                                    style: TextStyle(
+                                      fontSize: 7.67,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                              ),
+                            if (responseList[i].w == "2000000")
+                              Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 36, 129, 39),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: const Text("兩百萬特獎",
+                                    style: TextStyle(
+                                      fontSize: 7.67,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                              ),
+                            if (responseList[i].w == "200000")
+                              Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 36, 129, 39),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: const Text("20萬頭獎",
+                                    style: TextStyle(
+                                      fontSize: 7.67,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                              ),
+                            if (responseList[i].w == "40000")
+                              Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 36, 129, 39),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: const Text("二獎4萬",
+                                    style: TextStyle(
+                                      fontSize: 7.67,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                              ),
+                            if (responseList[i].w == "10000")
+                              Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 36, 129, 39),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: const Text("三獎1萬",
+                                    style: TextStyle(
+                                      fontSize: 7.67,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                              ),
+                            if (responseList[i].w == "4000")
+                              Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 36, 129, 39),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: const Text("四獎4千",
+                                    style: TextStyle(
+                                      fontSize: 7.67,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                              ),
+                            if (responseList[i].w == "1000")
+                              Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 36, 129, 39),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: const Text("五獎1千",
+                                    style: TextStyle(
+                                      fontSize: 7.67,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                              ),
+                            if (responseList[i].w == "200")
+                              Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 36, 129, 39),
+                                  borderRadius: BorderRadius.circular(7),
+                                ),
+                                child: const Text("六獎200",
+                                    style: TextStyle(
+                                      fontSize: 7.67,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                              ),
+                          ],
+                        )
                     ],
                   ),
                 ))),
@@ -186,11 +495,16 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
 
     for (int j = 5; j >= 0; j--) {
       uuid = rng.nextInt(1000);
-
+      String term;
       start = DateTime(now.year, now.month - j, 01);
       last = DateTime(start.year, start.month + 1, 0);
       sdate = formatter.format(start);
       edate = formatter.format(last);
+      if (start.month < 10) {
+        term = (start.year - 1911).toString() + '0' + start.month.toString();
+      } else {
+        term = (start.year - 1911).toString() + start.month.toString();
+      }
       var rbody1 = {
         "version": "0.5",
         "cardType": "3J0002",
@@ -219,7 +533,13 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
         "appID": 'EINV0202204156709',
         "cardEncrypt": password,
       };
-
+      var rbody3 = {
+        "version": "0.2",
+        "action": "QryWinningList",
+        "invTerm": term,
+        "UUID": uuid.toString(),
+        "appID": "EINV0202204156709",
+      };
       try {
         var response = await client.post(
             Uri.parse(
@@ -235,10 +555,20 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
               "Content-Type": "application/x-www-form-urlencoded",
             },
             body: rbody2);
-        if (response.statusCode == 200 && response2.statusCode == 200) {
+        var response3 = await client.post(
+            Uri.parse(
+                'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invapp/InvApp'),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: rbody3);
+        if (response.statusCode == 200 &&
+            response2.statusCode == 200 &&
+            response3.statusCode == 200) {
           String responseString = response.body;
           String reString = response2.body;
-
+          String winlist = response3.body;
+          var w = jsonDecode(winlist);
           var r = jsonDecode(responseString);
           var re = jsonDecode(reString);
 
@@ -288,8 +618,22 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                   invNum: de['invNum'],
                   barcode: de['cardNo'],
                   amount: de['amount'],
-                  w: "w"));
+                  w: "500"));
             }
+          }
+
+          String tmpterm =
+              (start.year - 1911).toString() + start.month.toString();
+          if (await WlistHelper.instance.checkWlist(tmpterm) &&
+              w['code'] == '200') {
+            await WlistHelper.instance.add(WinningList(
+              tag: tmpterm,
+              superPrizeNo: w['superPrizeNo'],
+              firstPrizeNo1: w['firstPrizeNo1'],
+              firstPrizeNo2: w['firstPrizeNo2'],
+              firstPrizeNo3: w['firstPrizeNo3'],
+              spcPrizeNo: w['spcPrizeNo'],
+            ));
           }
         }
       } catch (e) {
@@ -325,7 +669,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
 
       setState(() {
         topContainer = value;
-        closeTopContainer = controller.offset > 200;
+        closeTopContainer = controller.offset > 220;
       });
     });
     super.initState();
@@ -545,7 +889,7 @@ class CategoriesScroller extends StatelessWidget {
                 margin: const EdgeInsets.only(right: 20),
                 height: categoryHeight,
                 decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: kSecondaryColor,
                     borderRadius: BorderRadius.all(Radius.circular(20.0))),
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
@@ -575,7 +919,7 @@ class CategoriesScroller extends StatelessWidget {
                 margin: const EdgeInsets.only(right: 20),
                 height: categoryHeight,
                 decoration: const BoxDecoration(
-                    color: kSecondaryColor,
+                    color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20.0))),
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
