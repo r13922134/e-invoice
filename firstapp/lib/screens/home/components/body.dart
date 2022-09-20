@@ -11,6 +11,9 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/database/winninglist_database.dart';
+import 'package:url_launcher/url_launcher.dart';
+//import 'package:firstapp/screens/home/components/news.dart';
+//import 'package:beautiful_soup_dart/beautiful_soup.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -836,10 +839,15 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     );
   }
 }
-
+final Uri _url = Uri.parse("https://www.ch.com.tw/index.aspx?sv=ch_fitness&chapter=ABD031002");
+final Uri _url2 = Uri.parse("https://www.womenshealthmag.com/tw/food-nutrition/diet/g37253866/6-healthy-diet/");
+final Uri _url3 = Uri.parse("https://pupupepe.com/zhtw/article/detail/2748");
+final Uri _url4 = Uri.parse("https://www.edh.tw/article/13013");
+final Uri _url5 = Uri.parse("https://www.chp.gov.hk/tc/static/102339.html");
+final Uri _url6 = Uri.parse("https://www.commonhealth.com.tw/article/75826");
 class CategoriesScroller extends StatelessWidget {
   const CategoriesScroller();
-
+  
   @override
   Widget build(BuildContext context) {
     final double categoryHeight =
@@ -865,20 +873,38 @@ class CategoriesScroller extends StatelessWidget {
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const <Widget>[
+                    children: <Widget>[
                       Text(
-                        "Most\nFavorites",
+                        "每日飲水量",
                         style: TextStyle(
-                            fontSize: 25,
+                            fontSize: 20,
                             color: Colors.white,
                             fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
                         height: 10,
                       ),
-                      Text(
-                        "20 Items",
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ElevatedButton(
+                        onPressed: _launchUrl1,
+                        child:  
+                          const Text("喝水是一門學問",
+                          style: TextStyle(fontSize: 17, color: Colors.white),),
+                        style:  ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                          side: MaterialStateProperty.all(BorderSide(color:kPrimaryColor,width: 1)),
+                          elevation: MaterialStateProperty.all(0),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: _launchUrl4,
+                        child:  
+                          const Text("一天要喝多少水才夠?",
+                          style: TextStyle(fontSize: 17, color: Colors.white),),
+                        style:  ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(kPrimaryColor),
+                          side: MaterialStateProperty.all(BorderSide(color:kPrimaryColor,width: 1)),
+                          elevation: MaterialStateProperty.all(0),
+                        ),
                       ),
                     ],
                   ),
@@ -895,20 +921,38 @@ class CategoriesScroller extends StatelessWidget {
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const <Widget>[
+                    children: <Widget>[
                       Text(
-                        "Newest",
+                        "維持體態",
                         style: TextStyle(
-                            fontSize: 25,
+                            fontSize: 20,
                             color: Colors.white,
                             fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
                         height: 10,
                       ),
-                      Text(
-                        "20 Items",
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ElevatedButton(
+                        onPressed: _launchUrl2,
+                        child:  
+                          const Text("6個不復胖飲食習慣!",
+                          style: TextStyle(fontSize: 17, color: Colors.white),),
+                        style:  ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(kSecondaryColor),
+                          side: MaterialStateProperty.all(BorderSide(color:kSecondaryColor,width: 1)),
+                          elevation: MaterialStateProperty.all(0),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: _launchUrl3,
+                        child:  
+                          const Text("30+無痛體態維持",
+                          style: TextStyle(fontSize: 17, color: Colors.white),),
+                        style:  ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(kSecondaryColor),
+                          side: MaterialStateProperty.all(BorderSide(color:kSecondaryColor,width: 1)),
+                          elevation: MaterialStateProperty.all(0),
+                        ),
                       ),
                     ],
                   ),
@@ -925,20 +969,39 @@ class CategoriesScroller extends StatelessWidget {
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const <Widget>[
+                    children: <Widget>[
                       Text(
-                        "Super\nSaving",
+                        "糖尿病飲食",
                         style: TextStyle(
-                            fontSize: 25,
-                            color: Colors.white,
+                            fontSize: 20,
+                            color: Colors.black,
                             fontWeight: FontWeight.bold),
                       ),
+                      //Image.asset('assets/images/cancel.png',width: 30,),
                       SizedBox(
                         height: 10,
                       ),
-                      Text(
-                        "20 Items",
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ElevatedButton(
+                        onPressed: _launchUrl2,
+                        child:  
+                          const Text("糖尿病飲食建議",
+                          style: TextStyle(fontSize: 17, color: Color.fromARGB(255, 141, 129, 129)),),
+                        style:  ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.white),
+                          side: MaterialStateProperty.all(BorderSide(color:Colors.white,width: 1)),
+                          elevation: MaterialStateProperty.all(0),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: _launchUrl3,
+                        child:  
+                          const Text("16種抗糖尿病明星食物",
+                          style: TextStyle(fontSize: 17, color: Color.fromARGB(255, 141, 129, 129)),),
+                        style:  ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.white),
+                          side: MaterialStateProperty.all(BorderSide(color:Colors.white,width: 1)),
+                          elevation: MaterialStateProperty.all(0),
+                        ),
                       ),
                     ],
                   ),
@@ -951,3 +1014,43 @@ class CategoriesScroller extends StatelessWidget {
     );
   }
 }
+
+Future<void> _launchUrl1() async {
+  if (!await launchUrl(_url)) {
+    throw 'Could not launch $_url';
+  }
+}
+
+Future<void> _launchUrl2() async {
+  if (!await launchUrl(_url2)) {
+    throw 'Could not launch $_url2';
+  }
+}
+
+Future<void> _launchUrl3() async {
+  if (!await launchUrl(_url3)) {
+    throw 'Could not launch $_url3';
+  }
+}
+
+Future<void> _launchUrl4() async {
+  if (!await launchUrl(_url4)) {
+    throw 'Could not launch $_url4';
+  }
+}
+
+Future<void> _launchUrl5() async {
+  if (!await launchUrl(_url5)) {
+    throw 'Could not launch $_url5';
+  }
+}
+
+Future<void> _launchUrl6() async {
+  if (!await launchUrl(_url6)) {
+    throw 'Could not launch $_url6';
+  }
+}
+
+
+
+

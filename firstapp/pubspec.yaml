@@ -58,6 +58,7 @@ dependencies:
   card_swiper: ^2.0.4
   loading_animation_widget: ^1.2.0+2
   beautiful_soup_dart: ^0.3.0
+  flutter_linkify: ^5.0.2
   percent_indicator: ^4.0.1
 
   # The following adds the Cupertino Icons font to your application.

@@ -22,6 +22,7 @@ class Calculate{
     		}
   	}
 
+  //Calorie calculate for Adult
 	int getdailyCalorie(){
     		if(bmirange=="Underweight" && activity=="Light exercise") {
     		  Calorie = weight*35;
@@ -46,6 +47,7 @@ class Calculate{
     		
   	}
 
+    //Calorie calculate for person who is 16 or 17 years old
     int getdailyCalorie_teenager(){
     		//if(genderValue=="男" && activity=="Little to no exercise") return dailyCalorie = 2150;
    		  if(gender=="男" && activity=="Light exercise") {
@@ -66,6 +68,7 @@ class Calculate{
         return Calorie;	
   	}
 
+    //Calorie calculate for person who is 13 to 15 years old
     int getdailyCalorie_child(){
     		if(gender=="男" && activity=="Light exercise") {
     		  Calorie = 2400;
