@@ -15,17 +15,16 @@ class BarcodeScreen extends StatefulWidget {
 
 class _IdentityPageState extends State<BarcodeScreen> {
   String barcode = "";
-  bool _isKeptOn = false;
-  double _brightness = 1.0;
+  //bool _isKeptOn = false;
+  //double _brightness = 1.0;
   bool toggle = false;
-  bool drinkingStatus = false;
+  bool brightnessStatus = true;
 
   @override
   void initState() {
     super.initState();
     getBarcode();
     initPlatformState();
-    //Wakelock.enable(); //Make the screen light.
   }
 
   @override
@@ -34,6 +33,7 @@ class _IdentityPageState extends State<BarcodeScreen> {
       appBar: AppBar(backgroundColor: kPrimaryColor, actions: [
         const Icon(Icons.brightness_7),
         const SizedBox(width: 10.0),
+        
         Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
@@ -42,19 +42,26 @@ class _IdentityPageState extends State<BarcodeScreen> {
                 height: 25.0,
                 valueFontSize: 12.0,
                 toggleSize: 18.0,
-                value: drinkingStatus,
+                value: brightnessStatus,
                 activeColor: kSecondaryColor,
                 inactiveColor: Colors.black38,
                 onToggle: (val) {
                   setState(() {
-                    drinkingStatus = val;
+                    brightnessStatus = val;
+                    if(val==true){
+                      Screen.setBrightness(1);
+                      Screen.keepOn(true);
+                    }
+                    else{
+                      Screen.setBrightness(-1);
+                    }
+                    
                   });
                 },
               ),
               const SizedBox(width: 10.0),
             ]),
       ]
-          //title: Text("第二頁"),
           ),
       body: Center(
         child: Column(
@@ -68,23 +75,6 @@ class _IdentityPageState extends State<BarcodeScreen> {
               height: 100,
               errorBuilder: (context, error) => Center(child: Text(error)),
             ),
-
-            /*
-            AnimatedCrossFade(
-              firstChild: const Icon(Icons.brightness_7, size: 35),
-              secondChild: const Icon(Icons.brightness_3, size: 35),
-              crossFadeState:
-                  toggle ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-              duration: Duration(seconds: 1),
-            ),
-            Slider(
-                value: _brightness,
-                onChanged: (double b) {
-                  setState(() {
-                    _brightness = b;
-                  });
-                  Screen.setBrightness(b);
-                })*/
           ],
         ),
       ),
@@ -98,11 +88,21 @@ class _IdentityPageState extends State<BarcodeScreen> {
   }
 
   initPlatformState() async {
-    bool keptOn = await Screen.isKeptOn;
+    //bool keptOn = await Screen.isKeptOn;
     double brightness = await Screen.brightness;
     setState(() {
-      _isKeptOn = keptOn;
-      _brightness = brightness;
+      //_isKeptOn = keptOn;
+      Screen.setBrightness(1.0);
+      Screen.keepOn(true);
     });
+  }
+  
+  @override
+  void deactivate(){
+    bool isBack = ModalRoute.of(context)!.isCurrent;
+    if(!isBack){
+      Screen.setBrightness(-1);
+    }
+    super.deactivate();
   }
 }
