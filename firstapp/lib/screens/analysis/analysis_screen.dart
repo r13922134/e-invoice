@@ -1,4 +1,7 @@
+// ignore_for_file: prefer_const_constructors, unnecessary_new
+
 import 'package:firstapp/constants.dart';
+import 'package:firstapp/screens/analysis/water_dailyintake.dart';
 import 'package:flutter/material.dart';
 import 'package:firstapp/screens/analysis/analysis_bar.dart';
 import 'package:firstapp/screens/analysis/water_intake_progressbar.dart';
@@ -9,6 +12,7 @@ import 'package:firstapp/screens/analysis/card_info.dart';
 import 'package:firstapp/screens/analysis/card_detail.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 DateTime now = DateTime.now();
 DateTime date = DateTime(now.year, now.month, now.day);
@@ -43,6 +47,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
     var size = MediaQuery.of(context).size;
 
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
             child: Padding(
                 padding: const EdgeInsets.all(15),
@@ -382,7 +387,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                       const SizedBox(height: 20),
                       const AnalysisBar(),
                       const SizedBox(height: 20),
-                      Row(
+                      /*Row(
                         children: [
                           Container(
                             width: (size.width - 80) / 2,
@@ -439,7 +444,54 @@ class _IdentityPageState extends State<AnalysisScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 70),
+                      const SizedBox(height: 20),*/
+                      /*Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          new CircularPercentIndicator(
+                            radius: 120.0,
+                            lineWidth: 50.0,
+                            animation: true,
+                            percent: 1200 / 2000,
+                            center: new Text(
+                              '70',
+                              style: new TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20.0),
+                            ),
+                            footer: new Text(
+                              "",
+                              style: new TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 17.0),
+                            ),
+                            circularStrokeCap: CircularStrokeCap.round,
+                            progressColor: Color.fromARGB(255, 137, 187, 228),
+                          ),
+                        ],
+                      ),
+                      //const SizedBox(height: 20),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(20),
+                            child: Column(
+                              children: [
+                                //extEditingController username = TextEditingController();
+                                TextField(
+                                    //controller: username,
+                                    decoration: InputDecoration(
+                                  labelText: "飲水量 (ml)",
+                                  prefixIcon: Icon(Icons.local_drink),
+                                )),
+                                Container(height: 20),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),*/
+                      const WaterIntake(),
+                      const SizedBox(height: 200),
                     ]))));
   }
 }
