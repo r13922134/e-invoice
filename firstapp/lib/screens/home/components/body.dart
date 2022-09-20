@@ -982,7 +982,7 @@ class CategoriesScroller extends StatelessWidget {
                         height: 10,
                       ),
                       ElevatedButton(
-                        onPressed: _launchUrl2,
+                        onPressed: _launchUrl5,
                         child:  
                           const Text("糖尿病飲食建議",
                           style: TextStyle(fontSize: 17, color: Color.fromARGB(255, 141, 129, 129)),),
@@ -993,7 +993,7 @@ class CategoriesScroller extends StatelessWidget {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: _launchUrl3,
+                        onPressed: _launchUrl6,
                         child:  
                           const Text("16種抗糖尿病明星食物",
                           style: TextStyle(fontSize: 17, color: Color.fromARGB(255, 141, 129, 129)),),
