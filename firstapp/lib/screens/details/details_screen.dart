@@ -248,7 +248,7 @@ class DetailsScreen extends StatelessWidget {
                               height: 93,
                             ),
                           )),
-                    if (w == 'w')
+                    if (w != 'f')
                       Positioned(
                           top: 0,
                           right: 25,
