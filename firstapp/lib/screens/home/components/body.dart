@@ -1,4 +1,3 @@
-import 'package:firstapp/database/details_database.dart';
 import 'package:flutter/material.dart';
 import '../../../constants.dart';
 import 'package:firstapp/screens/details/details_screen.dart';
@@ -64,37 +63,37 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
         } else if (h.invNum.substring(3, 10) ==
                 wlist[0].firstPrizeNo1.substring(1, 8) ||
             h.invNum.substring(3, 10) ==
-                wlist[0].firstPrizeNo1.substring(1, 8) ||
+                wlist[0].firstPrizeNo2.substring(1, 8) ||
             h.invNum.substring(3, 10) ==
-                wlist[0].firstPrizeNo1.substring(1, 8)) {
+                wlist[0].firstPrizeNo3.substring(1, 8)) {
           await HeaderHelper.instance.update(h, '40000');
         } else if (h.invNum.substring(4, 10) ==
                 wlist[0].firstPrizeNo1.substring(2, 8) ||
             h.invNum.substring(4, 10) ==
-                wlist[0].firstPrizeNo1.substring(2, 8) ||
+                wlist[0].firstPrizeNo2.substring(2, 8) ||
             h.invNum.substring(4, 10) ==
-                wlist[0].firstPrizeNo1.substring(2, 8)) {
+                wlist[0].firstPrizeNo3.substring(2, 8)) {
           await HeaderHelper.instance.update(h, '10000');
         } else if (h.invNum.substring(5, 10) ==
                 wlist[0].firstPrizeNo1.substring(3, 8) ||
             h.invNum.substring(5, 10) ==
-                wlist[0].firstPrizeNo1.substring(3, 8) ||
+                wlist[0].firstPrizeNo2.substring(3, 8) ||
             h.invNum.substring(5, 10) ==
-                wlist[0].firstPrizeNo1.substring(3, 8)) {
+                wlist[0].firstPrizeNo3.substring(3, 8)) {
           await HeaderHelper.instance.update(h, '4000');
         } else if (h.invNum.substring(6, 10) ==
                 wlist[0].firstPrizeNo1.substring(4, 8) ||
             h.invNum.substring(6, 10) ==
-                wlist[0].firstPrizeNo1.substring(4, 8) ||
+                wlist[0].firstPrizeNo2.substring(4, 8) ||
             h.invNum.substring(6, 10) ==
-                wlist[0].firstPrizeNo1.substring(4, 8)) {
+                wlist[0].firstPrizeNo3.substring(4, 8)) {
           await HeaderHelper.instance.update(h, '1000');
         } else if (h.invNum.substring(7, 10) ==
                 wlist[0].firstPrizeNo1.substring(5, 8) ||
             h.invNum.substring(7, 10) ==
-                wlist[0].firstPrizeNo1.substring(5, 8) ||
+                wlist[0].firstPrizeNo2.substring(5, 8) ||
             h.invNum.substring(7, 10) ==
-                wlist[0].firstPrizeNo1.substring(5, 8)) {
+                wlist[0].firstPrizeNo3.substring(5, 8)) {
           await HeaderHelper.instance.update(h, '200');
         }
       }
@@ -839,15 +838,19 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     );
   }
 }
-final Uri _url = Uri.parse("https://www.ch.com.tw/index.aspx?sv=ch_fitness&chapter=ABD031002");
-final Uri _url2 = Uri.parse("https://www.womenshealthmag.com/tw/food-nutrition/diet/g37253866/6-healthy-diet/");
+
+final Uri _url = Uri.parse(
+    "https://www.ch.com.tw/index.aspx?sv=ch_fitness&chapter=ABD031002");
+final Uri _url2 = Uri.parse(
+    "https://www.womenshealthmag.com/tw/food-nutrition/diet/g37253866/6-healthy-diet/");
 final Uri _url3 = Uri.parse("https://pupupepe.com/zhtw/article/detail/2748");
 final Uri _url4 = Uri.parse("https://www.edh.tw/article/13013");
 final Uri _url5 = Uri.parse("https://www.chp.gov.hk/tc/static/102339.html");
 final Uri _url6 = Uri.parse("https://www.commonhealth.com.tw/article/75826");
+
 class CategoriesScroller extends StatelessWidget {
   const CategoriesScroller();
-  
+
   @override
   Widget build(BuildContext context) {
     final double categoryHeight =
@@ -886,23 +889,29 @@ class CategoriesScroller extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl1,
-                        child:  
-                          const Text("喝水是一門學問",
-                          style: TextStyle(fontSize: 17, color: Colors.white),),
-                        style:  ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(kPrimaryColor),
-                          side: MaterialStateProperty.all(BorderSide(color:kPrimaryColor,width: 1)),
+                        child: const Text(
+                          "喝水是一門學問",
+                          style: TextStyle(fontSize: 17, color: Colors.white),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(kPrimaryColor),
+                          side: MaterialStateProperty.all(
+                              BorderSide(color: kPrimaryColor, width: 1)),
                           elevation: MaterialStateProperty.all(0),
                         ),
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl4,
-                        child:  
-                          const Text("一天要喝多少水才夠?",
-                          style: TextStyle(fontSize: 17, color: Colors.white),),
-                        style:  ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(kPrimaryColor),
-                          side: MaterialStateProperty.all(BorderSide(color:kPrimaryColor,width: 1)),
+                        child: const Text(
+                          "一天要喝多少水才夠?",
+                          style: TextStyle(fontSize: 17, color: Colors.white),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(kPrimaryColor),
+                          side: MaterialStateProperty.all(
+                              BorderSide(color: kPrimaryColor, width: 1)),
                           elevation: MaterialStateProperty.all(0),
                         ),
                       ),
@@ -934,23 +943,29 @@ class CategoriesScroller extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl2,
-                        child:  
-                          const Text("6個不復胖飲食習慣!",
-                          style: TextStyle(fontSize: 17, color: Colors.white),),
-                        style:  ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(kSecondaryColor),
-                          side: MaterialStateProperty.all(BorderSide(color:kSecondaryColor,width: 1)),
+                        child: const Text(
+                          "6個不復胖飲食習慣!",
+                          style: TextStyle(fontSize: 17, color: Colors.white),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(kSecondaryColor),
+                          side: MaterialStateProperty.all(
+                              BorderSide(color: kSecondaryColor, width: 1)),
                           elevation: MaterialStateProperty.all(0),
                         ),
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl3,
-                        child:  
-                          const Text("30+無痛體態維持",
-                          style: TextStyle(fontSize: 17, color: Colors.white),),
-                        style:  ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(kSecondaryColor),
-                          side: MaterialStateProperty.all(BorderSide(color:kSecondaryColor,width: 1)),
+                        child: const Text(
+                          "30+無痛體態維持",
+                          style: TextStyle(fontSize: 17, color: Colors.white),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(kSecondaryColor),
+                          side: MaterialStateProperty.all(
+                              BorderSide(color: kSecondaryColor, width: 1)),
                           elevation: MaterialStateProperty.all(0),
                         ),
                       ),
@@ -983,23 +998,33 @@ class CategoriesScroller extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl5,
-                        child:  
-                          const Text("糖尿病飲食建議",
-                          style: TextStyle(fontSize: 17, color: Color.fromARGB(255, 141, 129, 129)),),
-                        style:  ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.white),
-                          side: MaterialStateProperty.all(BorderSide(color:Colors.white,width: 1)),
+                        child: const Text(
+                          "糖尿病飲食建議",
+                          style: TextStyle(
+                              fontSize: 17,
+                              color: Color.fromARGB(255, 141, 129, 129)),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.white),
+                          side: MaterialStateProperty.all(
+                              BorderSide(color: Colors.white, width: 1)),
                           elevation: MaterialStateProperty.all(0),
                         ),
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl6,
-                        child:  
-                          const Text("16種抗糖尿病明星食物",
-                          style: TextStyle(fontSize: 17, color: Color.fromARGB(255, 141, 129, 129)),),
-                        style:  ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.white),
-                          side: MaterialStateProperty.all(BorderSide(color:Colors.white,width: 1)),
+                        child: const Text(
+                          "16種抗糖尿病明星食物",
+                          style: TextStyle(
+                              fontSize: 17,
+                              color: Color.fromARGB(255, 141, 129, 129)),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.white),
+                          side: MaterialStateProperty.all(
+                              BorderSide(color: Colors.white, width: 1)),
                           elevation: MaterialStateProperty.all(0),
                         ),
                       ),
@@ -1050,7 +1075,3 @@ Future<void> _launchUrl6() async {
     throw 'Could not launch $_url6';
   }
 }
-
-
-
-

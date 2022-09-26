@@ -7,8 +7,8 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'dart:convert';
-import 'package:flutter_svg/svg.dart';
 import 'package:selectable_list/selectable_list.dart';
+import 'package:firstapp/screens/analysis/calculate.dart';
 
 class AccountRevise extends StatefulWidget {
   const AccountRevise({Key? key}) : super(key: key);
@@ -86,25 +86,52 @@ class _ProfileState extends State<AccountRevise> {
 
   Future<void> setProfile(
       heightValue, weightValue, ageValue, genderValue) async {
+    String tmpgender;
+    String tmpact;
     SharedPreferences pref = await SharedPreferences.getInstance();
     final String encodedData = Disease.encode(_selectedDisease);
     pref.setString('select_diseases', encodedData);
     if (genderValue == 0) {
+      tmpgender = '男';
       pref.setString('gender', "男");
     } else {
+      tmpgender = '女';
       pref.setString('gender', "女");
     }
     pref.setInt('height', heightValue);
     pref.setInt('weight', weightValue);
     pref.setInt('age', ageValue);
-    if (activityValue == null) {
+    if (activityValue == '') {
+      tmpact = 'Light exercise';
       pref.setString('activity', "Light exercise");
     } else if (activityValue == "Light exercise") {
+      tmpact = 'Light exercise';
+
       pref.setString('activity', "Light exercise");
     } else if (activityValue == "Moderate exercise") {
+      tmpact = 'Moderate exercise';
+
       pref.setString('activity', "Moderate exercise");
     } else {
+      tmpact = 'Heavy exercise';
+
       pref.setString('activity', "Heavy exercise");
+    }
+    Calculate c = Calculate(
+        height: heightValue,
+        weight: weightValue,
+        gender: tmpgender,
+        activity: tmpact);
+    c.calculateBMI();
+    String bmirange = c.getInterpretation();
+    if (ageValue > 18) {
+      pref.setInt('mixCalorie', c.getdailyCalorie());
+    } else if (ageValue > 15) {
+      pref.setInt('mixCalorie', c.getdailyCalorie_teenager());
+    } else if (ageValue >= 13) {
+      pref.setInt('mixCalorie', c.getdailyCalorie_child());
+    } else {
+      pref.setInt('mixCalorie', 1200);
     }
   }
 

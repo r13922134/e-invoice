@@ -4,15 +4,12 @@ import 'package:firstapp/constants.dart';
 import 'package:firstapp/screens/analysis/water_dailyintake.dart';
 import 'package:flutter/material.dart';
 import 'package:firstapp/screens/analysis/analysis_bar.dart';
-import 'package:firstapp/screens/analysis/water_intake_progressbar.dart';
-import 'package:firstapp/screens/analysis/water_intake_timeline.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:firstapp/screens/analysis/card_info.dart';
 import 'package:firstapp/screens/analysis/card_detail.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 
 DateTime now = DateTime.now();
 DateTime date = DateTime(now.year, now.month, now.day);
@@ -27,14 +24,14 @@ class AnalysisScreen extends StatefulWidget {
 }
 
 class _IdentityPageState extends State<AnalysisScreen> {
-  String bmirange = '';
   String _date = tmpdate;
 
-  Future<void> readData() async {
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-    bmirange = pref.getString('bmirange') ?? '';
+  Future<int> getmixcalorie() async {
+    int mixCalorie = -1;
 
-    setState(() {});
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    mixCalorie = pref.getInt('mixCalorie') ?? -1;
+    return mixCalorie;
   }
 
   @override
@@ -307,189 +304,191 @@ class _IdentityPageState extends State<AnalysisScreen> {
                             }
                           }),
                       const SizedBox(height: 20),
-                      Container(
-                        width: double.infinity,
-                        height: 145,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            color: const Color.fromARGB(255, 110, 136, 148)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: SizedBox(
-                                  width: (size.width),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text(
-                                        "BMI (Body Mass Index)",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                      ),
-                                      Text(
-                                        "You have a $bmirange weight",
-                                        style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.white),
-                                      ),
-                                      Container(
-                                        width: 95,
-                                        height: 35,
-                                        decoration: BoxDecoration(
-                                            color: kSecondaryColor,
-                                            borderRadius:
-                                                BorderRadius.circular(20)),
-                                        child: const Center(
-                                          child: Text(
-                                            "View More",
-                                            style: TextStyle(
-                                                fontSize: 13,
-                                                color: Colors.white),
+                      FutureBuilder<int>(
+                          future: getmixcalorie(),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (snapshot.data == -1) {
+                                return Container(
+                                  width: double.infinity,
+                                  height: 145,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      color: const Color.fromARGB(
+                                          255, 110, 136, 148)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: Row(
+                                      children: [
+                                        Flexible(
+                                          child: SizedBox(
+                                            width: (size.width),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                const Text(
+                                                  "BMI (Body Mass Index)",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                                Text(
+                                                  "You have a bmirange weight",
+                                                  style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Colors.white),
+                                                ),
+                                                Container(
+                                                  width: 95,
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                      color: kSecondaryColor,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20)),
+                                                  child: const Center(
+                                                    child: Text(
+                                                      "View More",
+                                                      style: TextStyle(
+                                                          fontSize: 13,
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              Container(
-                                width: 100,
-                                height: 100,
-                                decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: kBackgroundColor),
-                                child: const Center(
-                                  child: Text(
-                                    "20.3",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color:
-                                            Color.fromARGB(255, 57, 161, 31)),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      const AnalysisBar(),
-                      const SizedBox(height: 20),
-                      /*Row(
-                        children: [
-                          Container(
-                            width: (size.width - 80) / 2,
-                            height: 320,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.black.withOpacity(0.01),
-                                      spreadRadius: 20,
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 10))
-                                ],
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Row(
-                                children: [
-                                  const WateIntakeProgressBar(),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
-                                  Flexible(
-                                    child: Column(
-                                      children: [
-                                        const Text(
-                                          "Water Intake",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold),
+                                        const SizedBox(
+                                          width: 20,
                                         ),
-                                        const Spacer(),
-                                        Column(
-                                          children: [
-                                            Text(
-                                              "Real time updates",
+                                        Container(
+                                          width: 100,
+                                          height: 100,
+                                          decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: kBackgroundColor),
+                                          child: const Center(
+                                            child: Text(
+                                              "20.3",
                                               style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: Colors.black
-                                                      .withOpacity(0.5)),
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color.fromARGB(
+                                                      255, 57, 161, 31)),
                                             ),
-                                            const SizedBox(
-                                              height: 15,
-                                            ),
-                                            const WaterIntakeTimeLine()
-                                          ],
+                                          ),
                                         )
                                       ],
                                     ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),*/
-                      /*Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          new CircularPercentIndicator(
-                            radius: 120.0,
-                            lineWidth: 50.0,
-                            animation: true,
-                            percent: 1200 / 2000,
-                            center: new Text(
-                              '70',
-                              style: new TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20.0),
-                            ),
-                            footer: new Text(
-                              "",
-                              style: new TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 17.0),
-                            ),
-                            circularStrokeCap: CircularStrokeCap.round,
-                            progressColor: Color.fromARGB(255, 137, 187, 228),
-                          ),
-                        ],
-                      ),
-                      //const SizedBox(height: 20),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(20),
-                            child: Column(
-                              children: [
-                                //extEditingController username = TextEditingController();
-                                TextField(
-                                    //controller: username,
-                                    decoration: InputDecoration(
-                                  labelText: "飲水量 (ml)",
-                                  prefixIcon: Icon(Icons.local_drink),
-                                )),
-                                Container(height: 20),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),*/
+                                  ),
+                                );
+                              } else {
+                                return Container(
+                                  width: double.infinity,
+                                  height: 145,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      color: const Color.fromARGB(
+                                          255, 110, 136, 148)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: Row(
+                                      children: [
+                                        Flexible(
+                                          child: SizedBox(
+                                            width: (size.width),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                const Text(
+                                                  "BMI (Body Mass Index)",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white),
+                                                ),
+                                                Text(
+                                                  "You have a  weight",
+                                                  style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Colors.white),
+                                                ),
+                                                Container(
+                                                  width: 95,
+                                                  height: 35,
+                                                  decoration: BoxDecoration(
+                                                      color: kSecondaryColor,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20)),
+                                                  child: const Center(
+                                                    child: Text(
+                                                      "View More",
+                                                      style: TextStyle(
+                                                          fontSize: 13,
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+                                        Container(
+                                          width: 100,
+                                          height: 100,
+                                          decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: kBackgroundColor),
+                                          child: Center(
+                                            child: Text(
+                                              snapshot.data.toString(),
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color.fromARGB(
+                                                      255, 57, 161, 31)),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else {
+                              return Center(
+                                  child:
+                                      LoadingAnimationWidget.staggeredDotsWave(
+                                color: kPrimaryColor,
+                                size: 80,
+                              ));
+                            }
+                          }),
+                      const SizedBox(height: 20),
+                      const AnalysisBar(),
+                      const SizedBox(height: 20),
                       const WaterIntake(),
                       const SizedBox(height: 200),
                     ]))));

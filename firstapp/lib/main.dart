@@ -13,7 +13,6 @@ import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
 import 'package:firstapp/screens/account/components/account_revise.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/screens/home/components/home_barcode.dart';
-import 'package:firstapp/screens/analysis/calculate.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:firstapp/database/winninglist_database.dart';
@@ -241,23 +240,7 @@ class _MyAppState extends State<MyApp> {
     weightValue = pref.getInt('weight') ?? 30;
     ageValue = pref.getInt('age') ?? 1;
     activityValue = pref.getString('activity') ?? '';
-    Calculate c = Calculate(
-        height: heightValue,
-        weight: weightValue,
-        gender: genderValue,
-        activity: activityValue);
-    c.calculateBMI();
-    bmirange = c.getInterpretation();
-    pref.setString('bmirange', bmirange);
-    if (ageValue > 18) {
-      mixCalorie = c.getdailyCalorie();
-    } else if (ageValue > 15) {
-      mixCalorie = c.getdailyCalorie_teenager();
-    } else if (ageValue >= 13) {
-      mixCalorie = c.getdailyCalorie_child();
-    } else {
-      mixCalorie = 1200;
-    }
+    mixCalorie = pref.getInt('mixCalorie') ?? 0;
 
     setState(() {});
   }
