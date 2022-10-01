@@ -667,7 +667,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     controller.addListener(() {
-      double value = controller.offset / 119;
+      double value = controller.offset / 112;
 
       setState(() {
         topContainer = value;
@@ -797,7 +797,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                         onPressed: rightclick,
                       )
                     ]),
-                const SizedBox(height: 18),
+                const SizedBox(height: 15),
                 Expanded(
                     child: LiquidPullToRefresh(
                         height: 90,
