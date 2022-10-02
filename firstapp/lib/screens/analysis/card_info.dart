@@ -56,6 +56,7 @@ class CardInfo {
       {required this.name,
       required this.calorie,
       this.images,
+      this.total,
       required this.invnum,
       required this.type,
       required this.date,
@@ -64,7 +65,7 @@ class CardInfo {
       required this.tag});
   int position;
   String name;
-  List<String> calorie;
+  String calorie;
   String? images;
   String invnum;
   int type;
@@ -72,6 +73,7 @@ class CardInfo {
   String date;
   String quantity;
   String amount;
+  int? total;
 }
 
 class Plist {
@@ -148,7 +150,7 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
                 amount: de['amount']));
             cards.add(CardInfo(count++,
                 name: de['description'],
-                calorie: [],
+                calorie: '0',
                 type: 0,
                 invnum: element.invNum,
                 tag: element.tag,
@@ -164,7 +166,7 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
       for (invoice_details value in response) {
         cards.add(CardInfo(count++,
             name: value.name,
-            calorie: [],
+            calorie: '0',
             type: value.type ?? 0,
             invnum: value.invNum,
             tag: value.tag,
@@ -178,13 +180,12 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
   List<Ename> tmparray = [];
   String tmpbody;
   String path1;
-  final regex =
-      RegExp(r'(\d+(?:\.\d+)?)\s*(kcal|Kcal|cal|大卡|卡|Kilocalorie|kilocalorie)');
-  final num = RegExp(r'(\d+(?:\.\d+)?)');
+  int total_calorie = 0;
+  final num = RegExp(r'(/\d+\&)');
   int index_count = 1;
   List<CardInfo> returncards = [];
   for (CardInfo c in cards) {
-    path1 = 'https://www.google.com/search?q=' + c.name + '熱量';
+    path1 = 'https://www.google.com/search?q=' + c.name + 'myfitnesspal';
     tmparray = [];
     if (c.type == 0) {
       tmparray.add(Ename(name: c.name));
@@ -207,36 +208,27 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
                 c.type == 4 ||
                 c.type == 6) {
               try {
-                List<String> sample = [];
                 var re = await http.get(Uri.parse(path1));
                 if (re.statusCode == 200) {
                   BeautifulSoup soup1 = BeautifulSoup(re.body);
-                  List<Bs4Element> r1 =
-                      soup1.findAll("span", class_: "FCUp0c rQMQod");
-                  List<Bs4Element> r2 =
-                      soup1.findAll("td", class_: "sjsZvd s5aIid OE1use");
-
-                  for (Bs4Element bs4 in r1) {
-                    if (regex.hasMatch(bs4.getText())) {
-                      sample.add(bs4.getText());
-                    } else if (num.hasMatch(bs4.getText())) {
-                      sample.add(bs4.getText());
-                    }
-                  }
-                  if (sample.isEmpty) {
-                    for (Bs4Element bs4 in r2) {
-                      String str = bs4.parent?.getText() ?? "%";
-                      if (regex.hasMatch(str) & str.contains(c.name)) {
-                        var match = regex.firstMatch(str);
-                        str = match?.group(0) ?? '';
-                        sample.add(str);
-                      } else if (num.hasMatch(str) & str.contains(c.name)) {
-                        sample.add(str);
-                      }
-                    }
+                  Bs4Element? r1 = soup1.find('h3', class_: "zBAuLc l97dzf");
+                  String mstring = r1?.parent?.toString() ?? "";
+                  var match = num.firstMatch(mstring);
+                  mstring = match?.group(0) ?? '';
+                  int len = mstring.length;
+                  if (len > 1) {
+                    mstring = mstring.substring(1, len - 1);
                   }
 
-                  c.calorie = sample;
+                  String path2 =
+                      'https://www.myfitnesspal.jp/zh-TW/food/calories/' +
+                          mstring;
+                  re = await http.get(Uri.parse(path2));
+
+                  soup1 = BeautifulSoup(re.body);
+                  r1 = soup1.find('span',
+                      class_: "MuiTypography-root MuiTypography-d3");
+                  c.calorie = r1?.getText() ?? '';
                 }
               } catch (e) {
                 print("error");
@@ -259,35 +251,49 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
         c.type == 4 ||
         c.type == 6) {
       try {
-        List<String> sample = [];
         var re = await http.get(Uri.parse(path1));
         if (re.statusCode == 200) {
           BeautifulSoup soup1 = BeautifulSoup(re.body);
-          List<Bs4Element> r1 = soup1.findAll("span", class_: "FCUp0c rQMQod");
-          List<Bs4Element> r2 =
-              soup1.findAll("td", class_: "sjsZvd s5aIid OE1use");
-
-          for (Bs4Element bs4 in r1) {
-            if (regex.hasMatch(bs4.getText())) {
-              sample.add(bs4.getText());
-            } else if (num.hasMatch(bs4.getText())) {
-              sample.add(bs4.getText());
-            }
-          }
-          if (sample.isEmpty) {
-            for (Bs4Element bs4 in r2) {
-              String str = bs4.parent?.getText() ?? "%";
-              if (regex.hasMatch(str) & str.contains(c.name)) {
-                var match = regex.firstMatch(str);
-                str = match?.group(0) ?? '';
-                sample.add(str);
-              } else if (num.hasMatch(str) & str.contains(c.name)) {
-                sample.add(str);
-              }
-            }
+          Bs4Element? r1 = soup1.find('h3', class_: "zBAuLc l97dzf");
+          String mstring = r1?.parent?.toString() ?? "";
+          var match = num.firstMatch(mstring);
+          mstring = match?.group(0) ?? '';
+          int len = mstring.length;
+          if (len > 1) {
+            mstring = mstring.substring(1, len - 1);
           }
 
-          c.calorie = sample;
+          String path2 =
+              'https://www.myfitnesspal.jp/zh-TW/food/calories/' + mstring;
+          re = await http.get(Uri.parse(path2));
+
+          soup1 = BeautifulSoup(re.body);
+          r1 =
+              soup1.find('span', class_: "MuiTypography-root MuiTypography-d3");
+          c.calorie = r1?.getText() ?? '0';
+
+          // List<Bs4Element> r2 =
+          //     soup1.findAll("td", class_: "sjsZvd s5aIid OE1use");
+
+          // for (Bs4Element bs4 in r1) {
+          //   if (regex.hasMatch(bs4.getText())) {
+          //     sample.add(bs4.getText());
+          //   } else if (num.hasMatch(bs4.getText())) {
+          //     sample.add(bs4.getText());
+          //   }
+          // }
+          // if (sample.isEmpty) {
+          //   for (Bs4Element bs4 in r2) {
+          //     String str = bs4.parent?.getText() ?? "%";
+          //     if (regex.hasMatch(str) & str.contains(c.name)) {
+          //       var match = regex.firstMatch(str);
+          //       str = match?.group(0) ?? '';
+          //       sample.add(str);
+          //     } else if (num.hasMatch(str) & str.contains(c.name)) {
+          //       sample.add(str);
+          //     }
+          //   }
+          // }
         }
       } catch (e) {
         print("error");
@@ -295,14 +301,19 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
       c.images = pic[dict[c.type] ?? ''] ?? '';
       c.position = index_count++;
 
+      total_calorie += int.parse(c.quantity) * int.parse(c.calorie);
+
       returncards.add(c);
     }
   }
   client.close();
   int j = 0;
+
   while (returncards.length < 5) {
     returncards.add(returncards[j++]);
   }
+  returncards[0].total = total_calorie;
+
   return returncards;
 }
 

@@ -35,17 +35,16 @@ class DetailPage extends StatelessWidget {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        for (String s in cardInfo.calorie)
-                          Text(
-                            s,
-                            style: const TextStyle(
-                              fontFamily: 'Avenir',
-                              fontSize: 31,
-                              color: kTextColor,
-                              fontWeight: FontWeight.w300,
-                            ),
-                            textAlign: TextAlign.left,
+                        Text(
+                          cardInfo.calorie,
+                          style: const TextStyle(
+                            fontFamily: 'Avenir',
+                            fontSize: 31,
+                            color: kTextColor,
+                            fontWeight: FontWeight.w300,
                           ),
+                          textAlign: TextAlign.left,
+                        ),
                         const Divider(color: Colors.black38),
                         const SizedBox(height: 32),
                         const Divider(color: Colors.black38),
