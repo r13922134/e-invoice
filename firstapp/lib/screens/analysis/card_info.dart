@@ -181,11 +181,12 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
   String tmpbody;
   String path1;
   int total_calorie = 0;
-  final num = RegExp(r'(/\d+\&)');
+  final num = RegExp(r'(\d+)');
   int index_count = 1;
   List<CardInfo> returncards = [];
   for (CardInfo c in cards) {
-    path1 = 'https://www.google.com/search?q=' + c.name + 'myfitnesspal';
+    path1 =
+        'https://www.myfitnesspal.com/es/nutrition-facts-calories/' + c.name;
     tmparray = [];
     if (c.type == 0) {
       tmparray.add(Ename(name: c.name));
@@ -254,23 +255,48 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
         var re = await http.get(Uri.parse(path1));
         if (re.statusCode == 200) {
           BeautifulSoup soup1 = BeautifulSoup(re.body);
-          Bs4Element? r1 = soup1.find('h3', class_: "zBAuLc l97dzf");
-          String mstring = r1?.parent?.toString() ?? "";
-          var match = num.firstMatch(mstring);
-          mstring = match?.group(0) ?? '';
-          int len = mstring.length;
-          if (len > 1) {
-            mstring = mstring.substring(1, len - 1);
+          List<Bs4Element> r1 = soup1.findAll('p',
+              class_: 'MuiTypography-root MuiTypography-body1 css-1qfs5w1');
+          List tmp_list = [];
+          var match;
+          var map = Map();
+
+          for (int i = 1; i < r1.length; i += 5) {
+            match = num.firstMatch(r1[i].getText());
+            tmp_list.add(match?.group(0).toString());
           }
 
-          String path2 =
-              'https://www.myfitnesspal.jp/zh-TW/food/calories/' + mstring;
-          re = await http.get(Uri.parse(path2));
+          tmp_list.forEach((element) {
+            if (!map.containsKey(element)) {
+              map[element] = 1;
+            } else {
+              map[element] += 1;
+            }
+          });
 
-          soup1 = BeautifulSoup(re.body);
-          r1 =
-              soup1.find('span', class_: "MuiTypography-root MuiTypography-d3");
-          c.calorie = r1?.getText() ?? '0';
+          List sortedValues = map.values.toList()..sort();
+          int popularValue = sortedValues.last;
+          map.forEach((k, v) {
+            if (v == popularValue) {
+              c.calorie = k;
+            }
+          });
+          // String mstring = r1?.parent?.toString() ?? "";
+          // var match = num.firstMatch(mstring);
+          // mstring = match?.group(0) ?? '';
+          // int len = mstring.length;
+          // if (len > 1) {
+          //   mstring = mstring.substring(1, len - 1);
+          // }
+
+          // String path2 =
+          //     'https://www.myfitnesspal.jp/zh-TW/food/calories/' + mstring;
+          // re = await http.get(Uri.parse(path2));
+
+          // soup1 = BeautifulSoup(re.body);
+          // r1 =
+          //     soup1.find('span', class_: "MuiTypography-root MuiTypography-d3");
+          // c.calorie = r1?.getText() ?? '0';
 
           // List<Bs4Element> r2 =
           //     soup1.findAll("td", class_: "sjsZvd s5aIid OE1use");
