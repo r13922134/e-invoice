@@ -505,8 +505,16 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                               CupertinoIcons
                                                                   .tag_solid,
                                                               size: 15,
-                                                              color: Colors
-                                                                  .blueGrey),
+                                                              color: sum <
+                                                                      mixCalorie
+                                                                  ? Colors
+                                                                      .blueGrey
+                                                                  : Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          221,
+                                                                          186,
+                                                                          30)),
                                                           Text(
                                                             "年齡:",
                                                             style: TextStyle(
@@ -549,8 +557,16 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                             29)),
                                                           ),
                                                           Icon(Icons.boy,
-                                                              color: Colors
-                                                                  .blueGrey),
+                                                              color: sum <
+                                                                      mixCalorie
+                                                                  ? Colors
+                                                                      .blueGrey
+                                                                  : Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          221,
+                                                                          186,
+                                                                          30)),
                                                           Text(
                                                             "身高:",
                                                             style: TextStyle(
@@ -596,8 +612,16 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                           Icon(
                                                               Icons
                                                                   .accessibility,
-                                                              color: Colors
-                                                                  .blueGrey),
+                                                              color: sum <
+                                                                      mixCalorie
+                                                                  ? Colors
+                                                                      .blueGrey
+                                                                  : Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          221,
+                                                                          186,
+                                                                          30)),
                                                           Text(
                                                             "體重:",
                                                             style: TextStyle(
