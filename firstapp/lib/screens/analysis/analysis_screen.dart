@@ -27,17 +27,18 @@ class AnalysisScreen extends StatefulWidget {
 }
 
 class _IdentityPageState extends State<AnalysisScreen> {
-  String _date = tmpdate;
-
   int heightValue = 0, weightValue = 0, ageValue = 0;
   int mixCalorie = -1;
+  String _date = tmpdate;
 
   void getmixcalorie() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
-    mixCalorie = pref.getInt('mixCalorie') ?? -1;
-    heightValue = pref.getInt('height') ?? 120;
-    weightValue = pref.getInt('weight') ?? 30;
-    ageValue = pref.getInt('age') ?? 1;
+    setState(() {
+      mixCalorie = pref.getInt('mixCalorie') ?? -1;
+      heightValue = pref.getInt('height') ?? 120;
+      weightValue = pref.getInt('weight') ?? 30;
+      ageValue = pref.getInt('age') ?? 1;
+    });
   }
 
   @override
@@ -641,59 +642,79 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                           ),
                                                         ],
                                                       ),
-                                                      GestureDetector(
-                                                          onTap: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        const AccountRevise(),
-                                                              ),
-                                                            );
-                                                          },
-                                                          child: Container(
-                                                            width: 95,
-                                                            height: 35,
-                                                            decoration: BoxDecoration(
+                                                      Row(
+                                                        children: [
+                                                          GestureDetector(
+                                                              onTap: () {
+                                                                Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            const AccountRevise(),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              child: Container(
+                                                                width: 95,
+                                                                height: 35,
+                                                                decoration: BoxDecoration(
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            239,
+                                                                            247,
+                                                                            245),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            20)),
+                                                                child: Center(
+                                                                    child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: const [
+                                                                    Icon(
+                                                                        Icons
+                                                                            .edit,
+                                                                        color: Color.fromARGB(
+                                                                            255,
+                                                                            108,
+                                                                            141,
+                                                                            133),
+                                                                        size:
+                                                                            15),
+                                                                    Text(
+                                                                      "修改資料",
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              13,
+                                                                          color: Color.fromARGB(
+                                                                              255,
+                                                                              108,
+                                                                              141,
+                                                                              133)),
+                                                                    ),
+                                                                  ],
+                                                                )),
+                                                              )),
+                                                          Container(
+                                                            width: 10,
+                                                          ),
+                                                          GestureDetector(
+                                                            onTap:
+                                                                getmixcalorie,
+                                                            child: Icon(
+                                                                Icons.refresh,
                                                                 color: Color
                                                                     .fromARGB(
                                                                         255,
                                                                         239,
                                                                         247,
-                                                                        245),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            20)),
-                                                            child: Center(
-                                                                child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: const [
-                                                                Icon(Icons.edit,
-                                                                    color: Color
-                                                                        .fromARGB(
-                                                                            255,
-                                                                            108,
-                                                                            141,
-                                                                            133),
-                                                                    size: 15),
-                                                                Text(
-                                                                  "修改資料",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          13,
-                                                                      color: Color.fromARGB(
-                                                                          255,
-                                                                          108,
-                                                                          141,
-                                                                          133)),
-                                                                ),
-                                                              ],
-                                                            )),
-                                                          ))
+                                                                        245)),
+                                                          )
+                                                        ],
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
