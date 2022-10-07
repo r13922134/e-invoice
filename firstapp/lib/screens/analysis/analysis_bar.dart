@@ -141,38 +141,40 @@ class BarChartSample1State extends State<AnalysisBar> {
         List result = r['results'];
 
         for (int i = 0; i < result.length; i++) {
-          if (result[i][0] == 1 ||
-              result[i][0] == 2 ||
-              result[i][0] == 3 ||
-              result[i][0] == 4 ||
-              result[i][0] == 4) {
-            food += int.parse(l[i].price);
-          } else if (result[i][0] == 7 ||
-              result[i][0] == 8 ||
-              result[i][0] == 10 ||
-              result[i][0] == 12) {
-            clothe += int.parse(l[i].price);
-          } else if (result[i][0] == 9 ||
-              result[i][0] == 13 ||
-              result[i][0] == 14 ||
-              result[i][0] == 16 ||
-              result[i][0] == 17 ||
-              result[i][0] == 18 ||
-              result[i][0] == 19 ||
-              result[i][0] == 20 ||
-              result[i][0] == 22 ||
-              result[i][0] == 23 ||
-              result[i][0] == 24 ||
-              result[i][0] == 25 ||
-              result[i][0] == 26 ||
-              result[i][0] == 29) {
-            items += int.parse(l[i].price);
-          } else if (result[i][0] == 28 ||
-              result[i][0] == 32 ||
-              result[i][0] == 15) {
-            tech += int.parse(l[i].price);
-          } else {
-            other += int.parse(l[i].price);
+          if (int.parse(l[i].price) > 0) {
+            if (result[i][0] == 1 ||
+                result[i][0] == 2 ||
+                result[i][0] == 3 ||
+                result[i][0] == 4 ||
+                result[i][0] == 4) {
+              food += int.parse(l[i].price);
+            } else if (result[i][0] == 7 ||
+                result[i][0] == 8 ||
+                result[i][0] == 10 ||
+                result[i][0] == 12) {
+              clothe += int.parse(l[i].price);
+            } else if (result[i][0] == 9 ||
+                result[i][0] == 13 ||
+                result[i][0] == 14 ||
+                result[i][0] == 16 ||
+                result[i][0] == 17 ||
+                result[i][0] == 18 ||
+                result[i][0] == 19 ||
+                result[i][0] == 20 ||
+                result[i][0] == 22 ||
+                result[i][0] == 23 ||
+                result[i][0] == 24 ||
+                result[i][0] == 25 ||
+                result[i][0] == 26 ||
+                result[i][0] == 29) {
+              items += int.parse(l[i].price);
+            } else if (result[i][0] == 28 ||
+                result[i][0] == 32 ||
+                result[i][0] == 15) {
+              tech += int.parse(l[i].price);
+            } else {
+              other += int.parse(l[i].price);
+            }
           }
         }
       }
@@ -360,8 +362,7 @@ class BarChartSample1State extends State<AnalysisBar> {
           case 3:
             return makeGroupData(3, tech, isTouched: i == touchedIndex);
           case 4:
-            return makeGroupData(4, other < 0 ? -other : other,
-                isTouched: i == touchedIndex);
+            return makeGroupData(4, other, isTouched: i == touchedIndex);
           default:
             return throw Error();
         }

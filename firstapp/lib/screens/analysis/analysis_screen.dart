@@ -19,6 +19,7 @@ DateTime date = DateTime(now.year, now.month, now.day);
 List<String> splitted = date.toString().split('-');
 String tmpdate =
     splitted[0] + '/' + splitted[1] + '/' + splitted[2][0] + splitted[2][1];
+String _date = tmpdate;
 
 class AnalysisScreen extends StatefulWidget {
   const AnalysisScreen({Key? key}) : super(key: key);
@@ -29,12 +30,11 @@ class AnalysisScreen extends StatefulWidget {
 class _IdentityPageState extends State<AnalysisScreen> {
   int heightValue = 0, weightValue = 0, ageValue = 0;
   int mixCalorie = -1;
-  String _date = tmpdate;
 
   void getmixcalorie() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      mixCalorie = pref.getInt('mixCalorie') ?? -1;
+      mixCalorie = pref.getInt('mixCalorie') ?? 0;
       heightValue = pref.getInt('height') ?? 120;
       weightValue = pref.getInt('weight') ?? 30;
       ageValue = pref.getInt('age') ?? 1;
@@ -126,6 +126,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                               } else {
                                 int len = snapshot.data.length - 1;
                                 int sum = snapshot.data[0].total ?? 0;
+
                                 return Column(children: [
                                   Swiper(
                                     index: len,
@@ -232,24 +233,94 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                               ),
                                                         const SizedBox(
                                                             height: 15),
-                                                        Text(
-                                                          "x" +
+                                                        Row(
+                                                          children: [
+                                                            Text(
                                                               snapshot
                                                                   .data[len -
                                                                       index]
-                                                                  .quantity,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontFamily:
-                                                                'Avenir',
-                                                            fontSize: 30,
-                                                            color: Color(
-                                                                0xff47455f),
-                                                            fontWeight:
-                                                                FontWeight.w900,
-                                                          ),
-                                                          textAlign:
-                                                              TextAlign.left,
+                                                                  .calorie,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontFamily:
+                                                                    'Avenir',
+                                                                fontSize: 30,
+                                                                color:
+                                                                    kPrimaryColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w900,
+                                                              ),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .left,
+                                                            ),
+                                                            Text(
+                                                              ' kcal  ',
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontFamily:
+                                                                    'Avenir',
+                                                                fontSize: 20,
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        175,
+                                                                        175,
+                                                                        175),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .left,
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(6),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        247,
+                                                                        252,
+                                                                        255),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15),
+                                                              ),
+                                                              child: Text(
+                                                                " x" +
+                                                                    snapshot
+                                                                        .data[len -
+                                                                            index]
+                                                                        .quantity +
+                                                                    ' ',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontFamily:
+                                                                      'Avenir',
+                                                                  fontSize: 12,
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          199,
+                                                                          199,
+                                                                          199),
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                ),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .left,
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                         const SizedBox(
                                                             height: 10),
@@ -257,7 +328,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                           children: const <
                                                               Widget>[
                                                             Text(
-                                                              '查詢熱量',
+                                                              '更多資訊',
                                                               style: TextStyle(
                                                                 fontFamily:
                                                                     'Avenir',
@@ -431,7 +502,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                     BorderRadius.circular(25)),
                                             depth: 10,
                                             lightSource: LightSource.topRight,
-                                            color: sum < mixCalorie
+                                            color: sum <= mixCalorie
                                                 ? Color.fromARGB(
                                                     255, 206, 223, 217)
                                                 : Color.fromARGB(
@@ -460,7 +531,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -505,7 +576,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                               CupertinoIcons
                                                                   .tag_solid,
                                                               size: 15,
-                                                              color: sum <
+                                                              color: sum <=
                                                                       mixCalorie
                                                                   ? Colors
                                                                       .blueGrey
@@ -522,7 +593,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -541,7 +612,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -557,7 +628,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                             29)),
                                                           ),
                                                           Icon(Icons.boy,
-                                                              color: sum <
+                                                              color: sum <=
                                                                       mixCalorie
                                                                   ? Colors
                                                                       .blueGrey
@@ -574,7 +645,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -594,7 +665,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -612,7 +683,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                           Icon(
                                                               Icons
                                                                   .accessibility,
-                                                              color: sum <
+                                                              color: sum <=
                                                                       mixCalorie
                                                                   ? Colors
                                                                       .blueGrey
@@ -629,7 +700,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -649,7 +720,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -765,7 +836,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                         fontSize: 22,
                                                         fontWeight:
                                                             FontWeight.w700,
-                                                        color: sum < mixCalorie
+                                                        color: sum <= mixCalorie
                                                             ? Color.fromARGB(
                                                                 255,
                                                                 57,

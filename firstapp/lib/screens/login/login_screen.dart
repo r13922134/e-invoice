@@ -1,4 +1,5 @@
 import 'package:firstapp/constants.dart';
+import 'package:firstapp/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:http/http.dart' as http;
@@ -10,7 +11,6 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'dart:convert';
 import 'package:firstapp/database/invoice_database.dart';
 import 'package:firstapp/database/winninglist_database.dart';
-
 import 'dart:math';
 
 class LoginScreen extends StatelessWidget {
@@ -181,7 +181,12 @@ class LoginScreen extends StatelessWidget {
       onLogin: _authUser,
       onSignup: _signupUser,
       onSubmitAnimationCompleted: () {
-        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MyApp(),
+          ),
+        );
         showTopSnackBar(
           context,
           const CustomSnackBar.success(

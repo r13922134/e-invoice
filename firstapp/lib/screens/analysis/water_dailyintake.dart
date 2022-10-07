@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firstapp/constants.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -112,13 +113,20 @@ class _WaterIntake extends State<WaterIntake> {
             //mainAxisAlignment: MainAxisAlignment.start,
             //mainAxisSize: MainAxisSize.max,
             children: [
-              const Text(
-                '飲水量紀錄',
-                style: TextStyle(
-                    color: Color.fromARGB(255, 87, 96, 120),
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold),
-              ),
+              Row(children: const [
+                Icon(
+                  Icons.water_drop_rounded,
+                  color: kBackgroundColor,
+                ),
+                Text(
+                  ' 飲水量紀錄',
+                  style: TextStyle(
+                      color: Color.fromARGB(255, 87, 96, 120),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold),
+                ),
+              ]),
+
               Container(height: 15),
               CircularPercentIndicator(
                 radius: 100.0,
