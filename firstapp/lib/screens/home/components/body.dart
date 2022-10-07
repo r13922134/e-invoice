@@ -322,9 +322,17 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                       if (responseList[i].w == 'f')
                         Hero(
                           tag: responseList[i].invNum,
-                          child: Image.asset(
-                            "assets/images/image_1.png",
-                            height: 46,
+                          child: Container(
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                                image: const DecorationImage(
+                                    image:
+                                        AssetImage("assets/images/image_1.png"),
+                                    fit: BoxFit.fill),
+                                color: Colors.white,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(15)),
                           ),
                         ),
                       if (responseList[i].w != "f")
@@ -667,11 +675,11 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     controller.addListener(() {
-      double value = controller.offset / 112;
+      double value = controller.offset / 111;
 
       setState(() {
         topContainer = value;
-        closeTopContainer = controller.offset > 220;
+        closeTopContainer = controller.offset > 320;
       });
     });
     super.initState();

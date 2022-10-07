@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:firstapp/database/details_database.dart';
 import 'dart:math';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 class QRViewExample extends StatefulWidget {
   const QRViewExample({Key? key}) : super(key: key);
@@ -206,19 +207,22 @@ class _QRViewExampleState extends State<QRViewExample> {
           onTap: () {
             scanQR();
           },
-          child: Container(
-            width: 150,
-            height: 150,
-            decoration: const BoxDecoration(
-                color: kPrimaryColor,
-                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          child: Neumorphic(
+            style: NeumorphicStyle(
+                shape: NeumorphicShape.concave,
+                intensity: 0.9,
+                boxShape:
+                    NeumorphicBoxShape.roundRect(BorderRadius.circular(25)),
+                depth: 10,
+                lightSource: LightSource.topRight,
+                color: kPrimaryColor),
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: const <Widget>[
                   Text(
-                    "掃描",
+                    "掃描輸入",
                     style: TextStyle(
                         fontSize: 20,
                         color: Colors.white,
@@ -243,14 +247,17 @@ class _QRViewExampleState extends State<QRViewExample> {
               ),
             );
           },
-          child: Container(
-            width: 150,
-            height: 150,
-            decoration: const BoxDecoration(
-                color: kSecondaryColor,
-                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          child: Neumorphic(
+            style: NeumorphicStyle(
+                shape: NeumorphicShape.concave,
+                intensity: 0.9,
+                boxShape:
+                    NeumorphicBoxShape.roundRect(BorderRadius.circular(25)),
+                depth: 10,
+                lightSource: LightSource.topRight,
+                color: const Color.fromARGB(255, 207, 219, 235)),
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: const <Widget>[
@@ -322,7 +329,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                 ),
                 Image.asset(
                   "assets/images/image_1.png",
-                  height: 53,
+                  height: 50,
                 )
               ],
             ),

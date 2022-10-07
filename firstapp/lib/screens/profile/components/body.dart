@@ -46,6 +46,7 @@ class ProfileBody extends State<Body> {
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Column(
         children: [
+          const SizedBox(height: 20),
           const ProfilePic(),
           const SizedBox(height: 20),
           ProfileMenu(

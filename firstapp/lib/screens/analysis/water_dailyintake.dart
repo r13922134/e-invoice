@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:firstapp/constants.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -136,7 +136,7 @@ class DetailsScreen extends StatelessWidget {
                                 padding: const EdgeInsets.all(25),
                                 child: Column(
                                   children: <Widget>[
-                                    const SizedBox(height: 30),
+                                    const SizedBox(height: 15),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -147,7 +147,9 @@ class DetailsScreen extends StatelessWidget {
                                         Text("小計  ")
                                       ],
                                     ),
-                                    const SizedBox(height: 30),
+                                    const SizedBox(height: 10),
+                                    const Divider(),
+                                    const SizedBox(height: 16),
                                     for (invoice_details value
                                         in snapshot.data ?? [])
                                       (CustomRow(
@@ -239,15 +241,24 @@ class DetailsScreen extends StatelessWidget {
                     ),
                     if (w == 'f')
                       Positioned(
-                          top: 0,
-                          right: 25,
-                          child: Hero(
-                            tag: invNum,
-                            child: Image.asset(
-                              "assets/images/image_1.png",
-                              height: 93,
-                            ),
-                          )),
+                        top: 0,
+                        right: 30,
+                        child: Hero(
+                          tag: invNum,
+                          child: Container(
+                            height: 70,
+                            width: 70,
+                            decoration: BoxDecoration(
+                                image: const DecorationImage(
+                                    image:
+                                        AssetImage("assets/images/image_1.png"),
+                                    fit: BoxFit.fill),
+                                color: Colors.white,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(25)),
+                          ),
+                        ),
+                      ),
                     if (w != 'f')
                       Positioned(
                           top: 0,

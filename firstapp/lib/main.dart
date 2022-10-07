@@ -16,24 +16,45 @@ import 'package:firstapp/screens/home/components/home_barcode.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:firstapp/database/winninglist_database.dart';
+import 'package:animated_splash_screen/animated_splash_screen.dart';
+import 'package:page_transition/page_transition.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData(
-      scaffoldBackgroundColor: kBackgroundColor,
-      primarySwatch: Colors.blueGrey,
-      primaryColor: kPrimaryColor,
-      textTheme: const TextTheme(
-        bodyText2: TextStyle(color: kTextColor),
-      ),
-      visualDensity: VisualDensity.adaptivePlatformDensity,
-    ),
-    home: const MyApp(),
-  ));
-  updateData();
+  runApp(
+    const Splash(),
+  );
+}
+
+class Splash extends StatelessWidget {
+  const Splash({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          scaffoldBackgroundColor: kBackgroundColor,
+          primarySwatch: Colors.blueGrey,
+          primaryColor: kPrimaryColor,
+          textTheme: const TextTheme(
+            bodyText2: TextStyle(color: kTextColor),
+          ),
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: AnimatedSplashScreen.withScreenFunction(
+            duration: 3000,
+            splash: 'assets/images/image_2.png',
+            splashIconSize: 65,
+            screenFunction: () async {
+              updateData();
+              return const MyApp();
+            },
+            splashTransition: SplashTransition.fadeTransition,
+            pageTransitionType: PageTransitionType.fade,
+            backgroundColor: kPrimaryColor));
+  }
 }
 
 Future<void> updateData() async {
@@ -354,11 +375,11 @@ class _MyAppState extends State<MyApp> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
-                width: 128.0,
-                height: 128.0,
+                width: 120.0,
+                height: 120.0,
                 margin: const EdgeInsets.only(
-                  top: 24.0,
-                  bottom: 64.0,
+                  top: 35.0,
+                  bottom: 34.0,
                 ),
                 clipBehavior: Clip.antiAlias,
                 decoration: const BoxDecoration(
@@ -366,7 +387,7 @@ class _MyAppState extends State<MyApp> {
                   shape: BoxShape.circle,
                 ),
                 child: Image.asset(
-                  'assets/images/logo.png',
+                  'assets/images/image_1.png',
                 ),
               ),
               ListTile(
