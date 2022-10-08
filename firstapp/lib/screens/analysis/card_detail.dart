@@ -167,12 +167,14 @@ class DetailPage extends StatelessWidget {
                           );
                         } else {
                           return SizedBox(
-                              height: 300,
+                              height: 200,
                               child: Center(
-                                  child:
-                                      LoadingAnimationWidget.staggeredDotsWave(
-                                color: const Color.fromARGB(255, 226, 192, 68),
-                                size: 80,
+                                  child: LoadingAnimationWidget.flickr(
+                                rightDotColor:
+                                    const Color.fromARGB(255, 57, 62, 65),
+                                leftDotColor:
+                                    const Color.fromARGB(255, 226, 192, 68),
+                                size: 50,
                               )));
                         }
                       }),

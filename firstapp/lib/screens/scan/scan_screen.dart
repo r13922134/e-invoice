@@ -217,7 +217,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                 lightSource: LightSource.topRight,
                 color: kPrimaryColor),
             child: Padding(
-              padding: const EdgeInsets.all(22),
+              padding: const EdgeInsets.all(28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: const <Widget>[
@@ -257,7 +257,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                 lightSource: LightSource.topRight,
                 color: const Color.fromARGB(255, 207, 219, 235)),
             child: Padding(
-              padding: const EdgeInsets.all(22),
+              padding: const EdgeInsets.all(28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: const <Widget>[
