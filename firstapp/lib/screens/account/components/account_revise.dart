@@ -9,6 +9,7 @@ import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'dart:convert';
 import 'package:selectable_list/selectable_list.dart';
 import 'package:firstapp/screens/analysis/calculate.dart';
+import 'package:firstapp/screens/home/components/interestednews.dart';
 
 class AccountRevise extends StatefulWidget {
   const AccountRevise({Key? key}) : super(key: key);
@@ -64,9 +65,9 @@ class _ProfileState extends State<AccountRevise> {
   String? listString;
   int height = 120, weight = 30, age = 1, gender = 0;
   static final List<Disease> _diseases = [
-    Disease(id: 1, name: "糖尿病"),
-    Disease(id: 2, name: "高血壓"),
-    Disease(id: 3, name: "高血脂"),
+    Disease(id: 1, name: "糖尿病飲食"),
+    Disease(id: 2, name: "高血壓飲食"),
+    Disease(id: 3, name: "高血脂飲食"),
     Disease(id: 4, name: "腎功能異常"),
   ];
   String? activityValue;
@@ -339,7 +340,7 @@ class _ProfileState extends State<AccountRevise> {
                     searchable: true,
                     unselectedColor: const Color.fromARGB(255, 179, 178, 178),
                     buttonText: const Text(
-                      "疾病史",
+                      "感興趣的健康議題(至多三項)",
                       style: TextStyle(
                         color: Color.fromARGB(255, 80, 80, 80),
                         fontSize: 15,
@@ -380,6 +381,10 @@ class _ProfileState extends State<AccountRevise> {
                       fontSize: 15, fontWeight: FontWeight.bold)),
               onPressed: () {
                 setProfile(heightValue, weightValue, ageValue, genderValue);
+                //final response = await get2url();
+                //final response2 = await get3url();
+                //final response3 = await get4url();
+                //setUrl();
                 CoolAlert.show(
                   context: context,
                   type: CoolAlertType.success,
@@ -415,3 +420,13 @@ class _ProfileState extends State<AccountRevise> {
     );
   }
 }
+
+/*List<> setUrl()async{
+  var response = await get2url();
+  var response2 = await get3url();
+  var response3 = await get4url();
+  return[response,response2,response3];
+}*/
+
+
+

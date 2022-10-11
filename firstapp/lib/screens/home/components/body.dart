@@ -11,8 +11,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/database/winninglist_database.dart';
 import 'package:url_launcher/url_launcher.dart';
-//import 'package:firstapp/screens/home/components/news.dart';
-//import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'package:firstapp/screens/home/components/interestednews.dart';
+import 'package:firstapp/screens/account/components/account_revise.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -838,18 +838,25 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     );
   }
 }
+//setUrl();
+var resultkeyword = '雲端發票兌獎';
+var resulttitle = '雲端發票中獎怎麼領?雲端...';
+var resulturl = "https://roo.cash/blog/e-invoice-redeem-guide/";
+var resultkeyword2 = '168斷食';
+var resulttitle2 = '「168斷食」間歇性斷食不是吃越少瘦越快';
+var resulturl2 = "https://event.womenshealth.com.tw/2021/168/";
+var resultkeyword3 = '肩頸痠痛';
+var resulttitle3 = '7種疾病是你肩頸痠痛的原因!3招還你健...';
+var resulturl3 = "https://heho.com.tw/archives/72826";
 
-final Uri _url = Uri.parse(
-    "https://www.ch.com.tw/index.aspx?sv=ch_fitness&chapter=ABD031002");
-final Uri _url2 = Uri.parse(
-    "https://www.womenshealthmag.com/tw/food-nutrition/diet/g37253866/6-healthy-diet/");
-final Uri _url3 = Uri.parse("https://pupupepe.com/zhtw/article/detail/2748");
-final Uri _url4 = Uri.parse("https://www.edh.tw/article/13013");
-final Uri _url5 = Uri.parse("https://www.chp.gov.hk/tc/static/102339.html");
-final Uri _url6 = Uri.parse("https://www.commonhealth.com.tw/article/75826");
+final Uri _url1 = Uri.parse(resulturl);
+final Uri _url2 = Uri.parse(resulturl2);
+final Uri _url3 = Uri.parse(resulturl3);
+
 
 class CategoriesScroller extends StatelessWidget {
   const CategoriesScroller();
+  
 
   @override
   Widget build(BuildContext context) {
@@ -878,7 +885,7 @@ class CategoriesScroller extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "每日飲水量",
+                        "$resultkeyword",
                         style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
@@ -889,9 +896,9 @@ class CategoriesScroller extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl1,
-                        child: const Text(
-                          "喝水是一門學問",
-                          style: TextStyle(fontSize: 17, color: Colors.white),
+                        child: Text(
+                          "$resulttitle",
+                          style: TextStyle(fontSize: 13, color: Colors.white),
                         ),
                         style: ButtonStyle(
                           backgroundColor:
@@ -902,11 +909,27 @@ class CategoriesScroller extends StatelessWidget {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: _launchUrl4,
-                        child: const Text(
-                          "一天要喝多少水才夠?",
-                          style: TextStyle(fontSize: 17, color: Colors.white),
+                        child:  Text(
+                          "待處理",
+                          style: TextStyle(fontSize: 10, color: Colors.white),
                         ),
+                        onPressed: () async {
+                            //getselectedkeyword;
+                            //final response = await geturl(_selectedkeywordlist[0]);
+                            final response = await get2url();
+                            resultkeyword = response[0];
+                            resulttitle = response[1];
+                            resulturl = response[2];
+                            final response2 = await get3url();
+                            resultkeyword2 = response2[0];
+                            resulttitle2 = response2[1];
+                            resulturl2 = response2[2];
+                            final response3 = await get4url();
+                            resultkeyword3 = response3[0];
+                            resulttitle3= response3[1];
+                            resulturl3 = response3[2];
+                            //_url4 = Uri.parse(resulturl);
+                        },
                         style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(kPrimaryColor),
@@ -932,7 +955,7 @@ class CategoriesScroller extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "維持體態",
+                        "$resultkeyword2",
                         style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
@@ -943,8 +966,8 @@ class CategoriesScroller extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl2,
-                        child: const Text(
-                          "6個不復胖飲食習慣!",
+                        child: Text(
+                          "$resulttitle2",
                           style: TextStyle(fontSize: 17, color: Colors.white),
                         ),
                         style: ButtonStyle(
@@ -955,7 +978,7 @@ class CategoriesScroller extends StatelessWidget {
                           elevation: MaterialStateProperty.all(0),
                         ),
                       ),
-                      ElevatedButton(
+                      /*ElevatedButton(
                         onPressed: _launchUrl3,
                         child: const Text(
                           "30+無痛體態維持",
@@ -968,7 +991,7 @@ class CategoriesScroller extends StatelessWidget {
                               BorderSide(color: kSecondaryColor, width: 1)),
                           elevation: MaterialStateProperty.all(0),
                         ),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
@@ -986,7 +1009,7 @@ class CategoriesScroller extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "糖尿病飲食",
+                        "$resultkeyword3",
                         style: TextStyle(
                             fontSize: 20,
                             color: Colors.black,
@@ -997,9 +1020,9 @@ class CategoriesScroller extends StatelessWidget {
                         height: 10,
                       ),
                       ElevatedButton(
-                        onPressed: _launchUrl5,
-                        child: const Text(
-                          "糖尿病飲食建議",
+                        onPressed: _launchUrl3,
+                        child:  Text(
+                          "$resulttitle3",
                           style: TextStyle(
                               fontSize: 17,
                               color: Color.fromARGB(255, 141, 129, 129)),
@@ -1012,7 +1035,7 @@ class CategoriesScroller extends StatelessWidget {
                           elevation: MaterialStateProperty.all(0),
                         ),
                       ),
-                      ElevatedButton(
+                      /*ElevatedButton(
                         onPressed: _launchUrl6,
                         child: const Text(
                           "16種抗糖尿病明星食物",
@@ -1027,7 +1050,7 @@ class CategoriesScroller extends StatelessWidget {
                               BorderSide(color: Colors.white, width: 1)),
                           elevation: MaterialStateProperty.all(0),
                         ),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
@@ -1041,8 +1064,8 @@ class CategoriesScroller extends StatelessWidget {
 }
 
 Future<void> _launchUrl1() async {
-  if (!await launchUrl(_url)) {
-    throw 'Could not launch $_url';
+  if (!await launchUrl(_url1)) {
+    throw 'Could not launch $_url1';
   }
 }
 
@@ -1055,23 +1078,5 @@ Future<void> _launchUrl2() async {
 Future<void> _launchUrl3() async {
   if (!await launchUrl(_url3)) {
     throw 'Could not launch $_url3';
-  }
-}
-
-Future<void> _launchUrl4() async {
-  if (!await launchUrl(_url4)) {
-    throw 'Could not launch $_url4';
-  }
-}
-
-Future<void> _launchUrl5() async {
-  if (!await launchUrl(_url5)) {
-    throw 'Could not launch $_url5';
-  }
-}
-
-Future<void> _launchUrl6() async {
-  if (!await launchUrl(_url6)) {
-    throw 'Could not launch $_url6';
   }
 }
