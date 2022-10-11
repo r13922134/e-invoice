@@ -10,6 +10,7 @@ import 'package:firstapp/database/invoice_database.dart';
 import 'package:firstapp/database/details_database.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -28,6 +29,12 @@ class ProfileBody extends State<Body> {
     return barcode;
   }
 
+  Future link(String link) async {
+    if (!await launchUrl(Uri.parse(link))) {
+      throw 'Could not launch $link';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -35,45 +42,48 @@ class ProfileBody extends State<Body> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-        future: getBarcode(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.data == 'null') {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    const ProfilePic(),
-                    const SizedBox(height: 20),
-                    ProfileMenu(
-                      text: "基本資料",
-                      icon: "assets/icons/User Icon.svg",
-                      press: () => {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AccountRevise(),
-                          ),
-                        ),
-                      },
-                    ),
-                    ProfileMenu(
-                      text: "Notifications",
-                      icon: "assets/icons/Bell.svg",
-                      press: () {},
-                    ),
-                    ProfileMenu(
-                      text: "Settings",
-                      icon: "assets/icons/Settings.svg",
-                      press: () {},
-                    ),
-                    ProfileMenu(
-                      text: "Help Center",
-                      icon: "assets/icons/Question mark.svg",
-                      press: () {},
-                    ),
-                    ProfileMenu(
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          const ProfilePic(),
+          const SizedBox(height: 20),
+          ProfileMenu(
+            text: "基本資料",
+            icon: "assets/icons/User Icon.svg",
+            press: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AccountRevise(),
+                ),
+              ),
+            },
+          ),
+          ProfileMenu(
+            text: "Notifications",
+            icon: "assets/icons/Bell.svg",
+            press: () {},
+          ),
+          ProfileMenu(
+            text: "Settings",
+            icon: "assets/icons/Settings.svg",
+            press: () {},
+          ),
+          ProfileMenu(
+            text: "手機條碼申請",
+            icon: "assets/icons/Question mark.svg",
+            press: () {
+              link('https://www.einvoice.nat.gov.tw/APCONSUMER/BTC501W/');
+            },
+          ),
+          FutureBuilder<String>(
+              future: getBarcode(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data == 'null') {
+                    return ProfileMenu(
                       text: "登入",
                       icon: "assets/icons/Log in.svg",
                       press: () => {
@@ -84,45 +94,9 @@ class ProfileBody extends State<Body> {
                           ),
                         ),
                       },
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    const ProfilePic(),
-                    const SizedBox(height: 20),
-                    ProfileMenu(
-                      text: "基本資料",
-                      icon: "assets/icons/User Icon.svg",
-                      press: () => {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AccountRevise(),
-                          ),
-                        ),
-                      },
-                    ),
-                    ProfileMenu(
-                      text: "Notifications",
-                      icon: "assets/icons/Bell.svg",
-                      press: () {},
-                    ),
-                    ProfileMenu(
-                      text: "Settings",
-                      icon: "assets/icons/Settings.svg",
-                      press: () {},
-                    ),
-                    ProfileMenu(
-                      text: "Help Center",
-                      icon: "assets/icons/Question mark.svg",
-                      press: () {},
-                    ),
-                    ProfileMenu(
+                    );
+                  } else {
+                    return ProfileMenu(
                         text: "登出",
                         icon: "assets/icons/Log out.svg",
                         press: () => {
@@ -148,49 +122,14 @@ class ProfileBody extends State<Body> {
                                 },
                                 text: "登出確認",
                               )
-                            }),
-                  ],
-                ),
-              );
-            }
-          } else {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Column(
-                children: [
-                  const ProfilePic(),
-                  const SizedBox(height: 20),
-                  ProfileMenu(
-                    text: "基本資料",
-                    icon: "assets/icons/User Icon.svg",
-                    press: () => {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AccountRevise(),
-                        ),
-                      ),
-                    },
-                  ),
-                  ProfileMenu(
-                    text: "Notifications",
-                    icon: "assets/icons/Bell.svg",
-                    press: () {},
-                  ),
-                  ProfileMenu(
-                    text: "Settings",
-                    icon: "assets/icons/Settings.svg",
-                    press: () {},
-                  ),
-                  ProfileMenu(
-                    text: "Help Center",
-                    icon: "assets/icons/Question mark.svg",
-                    press: () {},
-                  ),
-                ],
-              ),
-            );
-          }
-        });
+                            });
+                  }
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              })
+        ],
+      ),
+    );
   }
 }

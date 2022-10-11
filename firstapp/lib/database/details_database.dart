@@ -79,6 +79,19 @@ class DetailHelper {
     return detailList;
   }
 
+  Future<List<Bardata>> getmonth(String tag) async {
+    Database db = await instance.database;
+    var detail = await db.rawQuery('SELECT * FROM detail WHERE tag = ?', [tag]);
+    List<Bardata> l = [];
+
+    for (int i = 0; i < detail.length; i++) {
+      l.add(Bardata(
+          name: detail[i]['name'].toString(),
+          price: detail[i]['amount'].toString()));
+    }
+    return l;
+  }
+
   Future<void> updateType(CardInfo cards, int type) async {
     Database db = await instance.database;
 
@@ -106,4 +119,15 @@ class DetailHelper {
     Database db = await instance.database;
     await db.rawDelete('DELETE FROM detail');
   }
+}
+
+class Bardata {
+  String name;
+
+  String price;
+
+  Bardata({
+    required this.name,
+    required this.price,
+  });
 }

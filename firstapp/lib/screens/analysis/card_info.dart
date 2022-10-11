@@ -213,8 +213,7 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
                 if (re.statusCode == 200) {
                   BeautifulSoup soup1 = BeautifulSoup(re.body);
                   List<Bs4Element> r1 = soup1.findAll('p',
-                      class_:
-                          'MuiTypography-root MuiTypography-body1 css-1qfs5w1');
+                      class_: 'MuiTypography-body1 css-w1kjmb');
                   List tmp_list = [];
                   var match;
                   var map = Map();
@@ -264,8 +263,8 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
         var re = await http.get(Uri.parse(path1));
         if (re.statusCode == 200) {
           BeautifulSoup soup1 = BeautifulSoup(re.body);
-          List<Bs4Element> r1 = soup1.findAll('p',
-              class_: 'MuiTypography-root MuiTypography-body1 css-1qfs5w1');
+          List<Bs4Element> r1 =
+              soup1.findAll('p', class_: 'MuiTypography-body1 css-w1kjmb');
           List tmp_list = [];
           var match;
           var map = Map();
@@ -275,13 +274,13 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
             tmp_list.add(match?.group(0).toString());
           }
 
-          tmp_list.forEach((element) {
+          for (var element in tmp_list) {
             if (!map.containsKey(element)) {
               map[element] = 1;
             } else {
               map[element] += 1;
             }
-          });
+          }
 
           List sortedValues = map.values.toList()..sort();
           int popularValue = sortedValues.last;
@@ -290,6 +289,7 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
               c.calorie = k;
             }
           });
+
           // String mstring = r1?.parent?.toString() ?? "";
           // var match = num.firstMatch(mstring);
           // mstring = match?.group(0) ?? '';

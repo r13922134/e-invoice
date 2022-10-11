@@ -2,7 +2,7 @@
     package="com.example.firstapp">
    <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="firstapp"
+        android:label="Cloud-rie"
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">

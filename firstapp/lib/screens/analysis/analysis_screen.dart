@@ -4,7 +4,6 @@ import 'package:firstapp/constants.dart';
 import 'package:firstapp/screens/analysis/water_dailyintake.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/screens/analysis/analysis_bar.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:firstapp/screens/analysis/card_info.dart';
@@ -20,6 +19,7 @@ DateTime date = DateTime(now.year, now.month, now.day);
 List<String> splitted = date.toString().split('-');
 String tmpdate =
     splitted[0] + '/' + splitted[1] + '/' + splitted[2][0] + splitted[2][1];
+String _date = tmpdate;
 
 class AnalysisScreen extends StatefulWidget {
   const AnalysisScreen({Key? key}) : super(key: key);
@@ -28,17 +28,17 @@ class AnalysisScreen extends StatefulWidget {
 }
 
 class _IdentityPageState extends State<AnalysisScreen> {
-  String _date = tmpdate;
-
   int heightValue = 0, weightValue = 0, ageValue = 0;
   int mixCalorie = -1;
 
   void getmixcalorie() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
-    mixCalorie = pref.getInt('mixCalorie') ?? -1;
-    heightValue = pref.getInt('height') ?? 120;
-    weightValue = pref.getInt('weight') ?? 30;
-    ageValue = pref.getInt('age') ?? 1;
+    setState(() {
+      mixCalorie = pref.getInt('mixCalorie') ?? 0;
+      heightValue = pref.getInt('height') ?? 120;
+      weightValue = pref.getInt('weight') ?? 30;
+      ageValue = pref.getInt('age') ?? 1;
+    });
   }
 
   @override
@@ -126,6 +126,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                               } else {
                                 int len = snapshot.data.length - 1;
                                 int sum = snapshot.data[0].total ?? 0;
+
                                 return Column(children: [
                                   Swiper(
                                     index: len,
@@ -232,24 +233,94 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                               ),
                                                         const SizedBox(
                                                             height: 15),
-                                                        Text(
-                                                          "x" +
+                                                        Row(
+                                                          children: [
+                                                            Text(
                                                               snapshot
                                                                   .data[len -
                                                                       index]
-                                                                  .quantity,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontFamily:
-                                                                'Avenir',
-                                                            fontSize: 30,
-                                                            color: Color(
-                                                                0xff47455f),
-                                                            fontWeight:
-                                                                FontWeight.w900,
-                                                          ),
-                                                          textAlign:
-                                                              TextAlign.left,
+                                                                  .calorie,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontFamily:
+                                                                    'Avenir',
+                                                                fontSize: 30,
+                                                                color:
+                                                                    kPrimaryColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w900,
+                                                              ),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .left,
+                                                            ),
+                                                            Text(
+                                                              ' kcal  ',
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontFamily:
+                                                                    'Avenir',
+                                                                fontSize: 20,
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        175,
+                                                                        175,
+                                                                        175),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .left,
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(6),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        247,
+                                                                        252,
+                                                                        255),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15),
+                                                              ),
+                                                              child: Text(
+                                                                " x" +
+                                                                    snapshot
+                                                                        .data[len -
+                                                                            index]
+                                                                        .quantity +
+                                                                    ' ',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontFamily:
+                                                                      'Avenir',
+                                                                  fontSize: 12,
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          199,
+                                                                          199,
+                                                                          199),
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                ),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .left,
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                         const SizedBox(
                                                             height: 10),
@@ -257,7 +328,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                           children: const <
                                                               Widget>[
                                                             Text(
-                                                              '查詢熱量',
+                                                              '更多資訊',
                                                               style: TextStyle(
                                                                 fontFamily:
                                                                     'Avenir',
@@ -431,7 +502,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                     BorderRadius.circular(25)),
                                             depth: 10,
                                             lightSource: LightSource.topRight,
-                                            color: sum < mixCalorie
+                                            color: sum <= mixCalorie
                                                 ? Color.fromARGB(
                                                     255, 206, 223, 217)
                                                 : Color.fromARGB(
@@ -460,7 +531,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -505,8 +576,16 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                               CupertinoIcons
                                                                   .tag_solid,
                                                               size: 15,
-                                                              color: Colors
-                                                                  .blueGrey),
+                                                              color: sum <=
+                                                                      mixCalorie
+                                                                  ? Colors
+                                                                      .blueGrey
+                                                                  : Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          221,
+                                                                          186,
+                                                                          30)),
                                                           Text(
                                                             "年齡:",
                                                             style: TextStyle(
@@ -514,7 +593,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -533,7 +612,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -549,8 +628,16 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                             29)),
                                                           ),
                                                           Icon(Icons.boy,
-                                                              color: Colors
-                                                                  .blueGrey),
+                                                              color: sum <=
+                                                                      mixCalorie
+                                                                  ? Colors
+                                                                      .blueGrey
+                                                                  : Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          221,
+                                                                          186,
+                                                                          30)),
                                                           Text(
                                                             "身高:",
                                                             style: TextStyle(
@@ -558,7 +645,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -578,7 +665,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -596,8 +683,16 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                           Icon(
                                                               Icons
                                                                   .accessibility,
-                                                              color: Colors
-                                                                  .blueGrey),
+                                                              color: sum <=
+                                                                      mixCalorie
+                                                                  ? Colors
+                                                                      .blueGrey
+                                                                  : Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          221,
+                                                                          186,
+                                                                          30)),
                                                           Text(
                                                             "體重:",
                                                             style: TextStyle(
@@ -605,7 +700,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -625,7 +720,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                color: sum <
+                                                                color: sum <=
                                                                         mixCalorie
                                                                     ? Color
                                                                         .fromARGB(
@@ -642,59 +737,79 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                           ),
                                                         ],
                                                       ),
-                                                      GestureDetector(
-                                                          onTap: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        const AccountRevise(),
-                                                              ),
-                                                            );
-                                                          },
-                                                          child: Container(
-                                                            width: 95,
-                                                            height: 35,
-                                                            decoration: BoxDecoration(
+                                                      Row(
+                                                        children: [
+                                                          GestureDetector(
+                                                              onTap: () {
+                                                                Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            const AccountRevise(),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              child: Container(
+                                                                width: 95,
+                                                                height: 35,
+                                                                decoration: BoxDecoration(
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            239,
+                                                                            247,
+                                                                            245),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            20)),
+                                                                child: Center(
+                                                                    child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: const [
+                                                                    Icon(
+                                                                        Icons
+                                                                            .edit,
+                                                                        color: Color.fromARGB(
+                                                                            255,
+                                                                            108,
+                                                                            141,
+                                                                            133),
+                                                                        size:
+                                                                            15),
+                                                                    Text(
+                                                                      "修改資料",
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              13,
+                                                                          color: Color.fromARGB(
+                                                                              255,
+                                                                              108,
+                                                                              141,
+                                                                              133)),
+                                                                    ),
+                                                                  ],
+                                                                )),
+                                                              )),
+                                                          Container(
+                                                            width: 10,
+                                                          ),
+                                                          GestureDetector(
+                                                            onTap:
+                                                                getmixcalorie,
+                                                            child: Icon(
+                                                                Icons.refresh,
                                                                 color: Color
                                                                     .fromARGB(
                                                                         255,
                                                                         239,
                                                                         247,
-                                                                        245),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            20)),
-                                                            child: Center(
-                                                                child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: const [
-                                                                Icon(Icons.edit,
-                                                                    color: Color
-                                                                        .fromARGB(
-                                                                            255,
-                                                                            108,
-                                                                            141,
-                                                                            133),
-                                                                    size: 15),
-                                                                Text(
-                                                                  "修改資料",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          13,
-                                                                      color: Color.fromARGB(
-                                                                          255,
-                                                                          108,
-                                                                          141,
-                                                                          133)),
-                                                                ),
-                                                              ],
-                                                            )),
-                                                          ))
+                                                                        245)),
+                                                          )
+                                                        ],
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -721,7 +836,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                                         fontSize: 22,
                                                         fontWeight:
                                                             FontWeight.w700,
-                                                        color: sum < mixCalorie
+                                                        color: sum <= mixCalorie
                                                             ? Color.fromARGB(
                                                                 255,
                                                                 57,
@@ -752,707 +867,11 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                   )));
                             }
                           }),
-                      const SizedBox(height: 20),
-                      // FutureBuilder<int>(
-                      //     future: getmixcalorie(),
-                      //     builder:
-                      //         (BuildContext context, AsyncSnapshot snapshot) {
-                      //       if (snapshot.connectionState ==
-                      //           ConnectionState.done) {
-                      //         if (snapshot.data == -1) {
-                      //           return FlipCard(
-                      //               fill: Fill
-                      //                   .fillBack, // Fill the back side of the card to make in the same size as the front.
-                      //               direction:
-                      //                   FlipDirection.VERTICAL, // default
-                      //               front: Neumorphic(
-                      //                 style: NeumorphicStyle(
-                      //                     shape: NeumorphicShape.concave,
-                      //                     intensity: 0.9,
-                      //                     boxShape:
-                      //                         NeumorphicBoxShape.roundRect(
-                      //                             BorderRadius.circular(25)),
-                      //                     depth: 10,
-                      //                     lightSource: LightSource.topRight,
-                      //                     color: const Color.fromARGB(
-                      //                         255, 110, 136, 148)),
-                      //                 child: Padding(
-                      //                   padding: const EdgeInsets.all(20),
-                      //                   child: Row(
-                      //                     children: [
-                      //                       Flexible(
-                      //                         child: SizedBox(
-                      //                           width: (size.width),
-                      //                           child: Column(
-                      //                             crossAxisAlignment:
-                      //                                 CrossAxisAlignment.start,
-                      //                             mainAxisAlignment:
-                      //                                 MainAxisAlignment
-                      //                                     .spaceBetween,
-                      //                             children: [
-                      //                               const Text(
-                      //                                 "單日熱量加總(kcal)",
-                      //                                 style: TextStyle(
-                      //                                     fontSize: 15,
-                      //                                     fontWeight:
-                      //                                         FontWeight.bold,
-                      //                                     color: Colors.white),
-                      //                               ),
-                      //                               Row(
-                      //                                 children: [
-                      //                                   Icon(Icons.date_range,
-                      //                                       size: 15,
-                      //                                       color:
-                      //                                           Color.fromARGB(
-                      //                                               255,
-                      //                                               219,
-                      //                                               227,
-                      //                                               231)),
-                      //                                   Text(
-                      //                                     "日期:  " + _date,
-                      //                                     style:
-                      //                                         const TextStyle(
-                      //                                             fontSize: 13,
-                      //                                             fontWeight:
-                      //                                                 FontWeight
-                      //                                                     .w700,
-                      //                                             color: Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     219,
-                      //                                                     227,
-                      //                                                     231)),
-                      //                                   ),
-                      //                                 ],
-                      //                               ),
-                      //                               Icon(
-                      //                                 Icons.rotate_left_rounded,
-                      //                                 color: Colors.white,
-                      //                               )
-                      //                             ],
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                       const SizedBox(
-                      //                         width: 20,
-                      //                       ),
-                      //                       Neumorphic(
-                      //                         padding: EdgeInsets.all(31),
-                      //                         style: NeumorphicStyle(
-                      //                             intensity: 0.9,
-                      //                             surfaceIntensity: 0.9,
-                      //                             boxShape: NeumorphicBoxShape
-                      //                                 .circle(),
-                      //                             depth: -5,
-                      //                             lightSource:
-                      //                                 LightSource.topRight,
-                      //                             color: Color.fromARGB(
-                      //                                 255, 238, 238, 238)),
-                      //                         child: Center(
-                      //                           child: Text(
-                      //                             sum_calorie.toString(),
-                      //                             style: TextStyle(
-                      //                                 fontSize: 22,
-                      //                                 fontWeight:
-                      //                                     FontWeight.bold,
-                      //                                 color: Color.fromARGB(
-                      //                                     255, 57, 161, 31)),
-                      //                           ),
-                      //                         ),
-                      //                       )
-                      //                     ],
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //               back: Neumorphic(
-                      //                 style: NeumorphicStyle(
-                      //                     shape: NeumorphicShape.concave,
-                      //                     intensity: 0.5,
-                      //                     boxShape:
-                      //                         NeumorphicBoxShape.roundRect(
-                      //                             BorderRadius.circular(25)),
-                      //                     depth: 10,
-                      //                     lightSource: LightSource.topRight,
-                      //                     color: Color.fromARGB(
-                      //                         255, 206, 223, 217)),
-                      //                 child: Padding(
-                      //                   padding: const EdgeInsets.all(20),
-                      //                   child: Row(
-                      //                     children: [
-                      //                       Flexible(
-                      //                         child: SizedBox(
-                      //                           width: (size.width),
-                      //                           child: Column(
-                      //                             crossAxisAlignment:
-                      //                                 CrossAxisAlignment.start,
-                      //                             mainAxisAlignment:
-                      //                                 MainAxisAlignment
-                      //                                     .spaceBetween,
-                      //                             children: [
-                      //                               const Text(
-                      //                                 "每日建議攝取量(kcal)",
-                      //                                 style: TextStyle(
-                      //                                     fontSize: 14,
-                      //                                     fontWeight:
-                      //                                         FontWeight.bold,
-                      //                                     color: Color.fromARGB(
-                      //                                         255,
-                      //                                         108,
-                      //                                         141,
-                      //                                         133)),
-                      //                               ),
-                      //                               Row(
-                      //                                 children: const [
-                      //                                   Icon(
-                      //                                       Icons
-                      //                                           .find_in_page_rounded,
-                      //                                       color:
-                      //                                           Color.fromARGB(
-                      //                                               255,
-                      //                                               223,
-                      //                                               127,
-                      //                                               120)),
-                      //                                   Text(
-                      //                                     "請先填寫基本資料",
-                      //                                     style: TextStyle(
-                      //                                         fontSize: 11,
-                      //                                         fontWeight:
-                      //                                             FontWeight
-                      //                                                 .bold,
-                      //                                         color: Color
-                      //                                             .fromARGB(
-                      //                                                 255,
-                      //                                                 223,
-                      //                                                 127,
-                      //                                                 120)),
-                      //                                   ),
-                      //                                 ],
-                      //                               ),
-                      //                               GestureDetector(
-                      //                                   onTap: () {
-                      //                                     Navigator.push(
-                      //                                       context,
-                      //                                       MaterialPageRoute(
-                      //                                         builder: (context) =>
-                      //                                             const AccountRevise(),
-                      //                                       ),
-                      //                                     );
-                      //                                   },
-                      //                                   child: Container(
-                      //                                     width: 95,
-                      //                                     height: 35,
-                      //                                     decoration: BoxDecoration(
-                      //                                         color: Color
-                      //                                             .fromARGB(
-                      //                                                 255,
-                      //                                                 239,
-                      //                                                 247,
-                      //                                                 245),
-                      //                                         borderRadius:
-                      //                                             BorderRadius
-                      //                                                 .circular(
-                      //                                                     20)),
-                      //                                     child: Center(
-                      //                                         child: Row(
-                      //                                       mainAxisAlignment:
-                      //                                           MainAxisAlignment
-                      //                                               .center,
-                      //                                       children: const [
-                      //                                         Icon(Icons.edit,
-                      //                                             color: Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     108,
-                      //                                                     141,
-                      //                                                     133),
-                      //                                             size: 15),
-                      //                                         Text(
-                      //                                           "修改資料",
-                      //                                           style: TextStyle(
-                      //                                               fontSize:
-                      //                                                   13,
-                      //                                               color: Color
-                      //                                                   .fromARGB(
-                      //                                                       255,
-                      //                                                       108,
-                      //                                                       141,
-                      //                                                       133)),
-                      //                                         ),
-                      //                                       ],
-                      //                                     )),
-                      //                                   ))
-                      //                             ],
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                       const SizedBox(
-                      //                         width: 20,
-                      //                       ),
-                      //                       Neumorphic(
-                      //                         padding: EdgeInsets.all(31),
-                      //                         style: NeumorphicStyle(
-                      //                             intensity: 0.9,
-                      //                             surfaceIntensity: 0.9,
-                      //                             boxShape: NeumorphicBoxShape
-                      //                                 .circle(),
-                      //                             depth: -5,
-                      //                             lightSource:
-                      //                                 LightSource.topRight,
-                      //                             color: Color.fromARGB(
-                      //                                 255, 238, 238, 238)),
-                      //                         child: Center(
-                      //                           child: Text(
-                      //                             "?",
-                      //                             style: TextStyle(
-                      //                                 fontSize: 28,
-                      //                                 fontWeight:
-                      //                                     FontWeight.bold,
-                      //                                 color: Color.fromARGB(
-                      //                                     255, 57, 161, 31)),
-                      //                           ),
-                      //                         ),
-                      //                       )
-                      //                     ],
-                      //                   ),
-                      //                 ),
-                      //               ));
-                      //         } else {
-                      //           return FlipCard(
-                      //               fill: Fill
-                      //                   .fillBack, // Fill the back side of the card to make in the same size as the front.
-                      //               direction:
-                      //                   FlipDirection.VERTICAL, // default
-                      //               front: Neumorphic(
-                      //                 style: NeumorphicStyle(
-                      //                     shape: NeumorphicShape.concave,
-                      //                     intensity: 0.9,
-                      //                     boxShape:
-                      //                         NeumorphicBoxShape.roundRect(
-                      //                             BorderRadius.circular(25)),
-                      //                     depth: 10,
-                      //                     lightSource: LightSource.topRight,
-                      //                     color: const Color.fromARGB(
-                      //                         255, 110, 136, 148)),
-                      //                 child: Padding(
-                      //                   padding: const EdgeInsets.all(20),
-                      //                   child: Row(
-                      //                     children: [
-                      //                       Flexible(
-                      //                         child: SizedBox(
-                      //                           width: (size.width),
-                      //                           child: Column(
-                      //                             crossAxisAlignment:
-                      //                                 CrossAxisAlignment.start,
-                      //                             mainAxisAlignment:
-                      //                                 MainAxisAlignment
-                      //                                     .spaceBetween,
-                      //                             children: [
-                      //                               const Text(
-                      //                                 "單日熱量加總(kcal)",
-                      //                                 style: TextStyle(
-                      //                                     fontSize: 15,
-                      //                                     fontWeight:
-                      //                                         FontWeight.bold,
-                      //                                     color: Colors.white),
-                      //                               ),
-                      //                               Row(
-                      //                                 children: [
-                      //                                   Icon(Icons.date_range,
-                      //                                       size: 15,
-                      //                                       color:
-                      //                                           Color.fromARGB(
-                      //                                               255,
-                      //                                               219,
-                      //                                               227,
-                      //                                               231)),
-                      //                                   Text(
-                      //                                     "日期:  " + _date,
-                      //                                     style:
-                      //                                         const TextStyle(
-                      //                                             fontSize: 13,
-                      //                                             fontWeight:
-                      //                                                 FontWeight
-                      //                                                     .w700,
-                      //                                             color: Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     219,
-                      //                                                     227,
-                      //                                                     231)),
-                      //                                   ),
-                      //                                 ],
-                      //                               ),
-                      //                               Icon(
-                      //                                 Icons.rotate_left_rounded,
-                      //                                 color: Colors.white,
-                      //                               )
-                      //                             ],
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                       const SizedBox(
-                      //                         width: 20,
-                      //                       ),
-                      //                       Neumorphic(
-                      //                         padding: EdgeInsets.all(31),
-                      //                         style: NeumorphicStyle(
-                      //                             intensity: 0.9,
-                      //                             surfaceIntensity: 0.9,
-                      //                             boxShape: NeumorphicBoxShape
-                      //                                 .circle(),
-                      //                             depth: -5,
-                      //                             lightSource:
-                      //                                 LightSource.topRight,
-                      //                             color: Color.fromARGB(
-                      //                                 255, 238, 238, 238)),
-                      //                         child: Center(
-                      //                           child: Text(
-                      //                             sum_calorie.toString(),
-                      //                             style: TextStyle(
-                      //                                 fontSize: 22,
-                      //                                 fontWeight:
-                      //                                     FontWeight.bold,
-                      //                                 color: Color.fromARGB(
-                      //                                     255, 57, 161, 31)),
-                      //                           ),
-                      //                         ),
-                      //                       )
-                      //                     ],
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //               back: Neumorphic(
-                      //                 style: NeumorphicStyle(
-                      //                     shape: NeumorphicShape.concave,
-                      //                     intensity: 0.5,
-                      //                     boxShape:
-                      //                         NeumorphicBoxShape.roundRect(
-                      //                             BorderRadius.circular(25)),
-                      //                     depth: 10,
-                      //                     lightSource: LightSource.topRight,
-                      //                     color: sum_calorie < snapshot.data
-                      //                         ? Color.fromARGB(
-                      //                             255, 206, 223, 217)
-                      //                         : Color.fromARGB(
-                      //                             255, 243, 120, 112)),
-                      //                 child: Padding(
-                      //                   padding: const EdgeInsets.all(20),
-                      //                   child: Row(
-                      //                     children: [
-                      //                       Flexible(
-                      //                         child: SizedBox(
-                      //                           width: (size.width),
-                      //                           child: Column(
-                      //                             crossAxisAlignment:
-                      //                                 CrossAxisAlignment.start,
-                      //                             mainAxisAlignment:
-                      //                                 MainAxisAlignment
-                      //                                     .spaceBetween,
-                      //                             children: [
-                      //                               Row(
-                      //                                 children: [
-                      //                                   Text(
-                      //                                     "每日建議攝取量(kcal)  ",
-                      //                                     style: TextStyle(
-                      //                                         fontSize: 14,
-                      //                                         fontWeight:
-                      //                                             FontWeight
-                      //                                                 .bold,
-                      //                                         color: sum_calorie <
-                      //                                                 snapshot
-                      //                                                     .data
-                      //                                             ? Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     108,
-                      //                                                     141,
-                      //                                                     133)
-                      //                                             : Colors
-                      //                                                 .white),
-                      //                                   ),
-                      //                                   if (sum_calorie >
-                      //                                       snapshot.data)
-                      //                                     Row(
-                      //                                       children: const [
-                      //                                         Icon(
-                      //                                             Icons.warning,
-                      //                                             color: Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     240,
-                      //                                                     184,
-                      //                                                     29),
-                      //                                             size: 15),
-                      //                                         Text(
-                      //                                           "超出上限",
-                      //                                           style: TextStyle(
-                      //                                               fontSize:
-                      //                                                   10,
-                      //                                               fontWeight:
-                      //                                                   FontWeight
-                      //                                                       .bold,
-                      //                                               color: Colors
-                      //                                                   .white),
-                      //                                         ),
-                      //                                       ],
-                      //                                     )
-                      //                                 ],
-                      //                               ),
-                      //                               Row(
-                      //                                 children: [
-                      //                                   Icon(
-                      //                                       CupertinoIcons
-                      //                                           .tag_solid,
-                      //                                       size: 15,
-                      //                                       color: Colors
-                      //                                           .blueGrey),
-                      //                                   Text(
-                      //                                     "年齡:",
-                      //                                     style: TextStyle(
-                      //                                         fontSize: 11,
-                      //                                         fontWeight:
-                      //                                             FontWeight
-                      //                                                 .bold,
-                      //                                         color: sum_calorie <
-                      //                                                 snapshot
-                      //                                                     .data
-                      //                                             ? Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     108,
-                      //                                                     141,
-                      //                                                     133)
-                      //                                             : Colors
-                      //                                                 .white),
-                      //                                   ),
-                      //                                   Text(
-                      //                                     ageValue.toString() +
-                      //                                         ' ',
-                      //                                     style: TextStyle(
-                      //                                         fontSize: 13,
-                      //                                         fontWeight:
-                      //                                             FontWeight
-                      //                                                 .bold,
-                      //                                         color: sum_calorie <
-                      //                                                 snapshot
-                      //                                                     .data
-                      //                                             ? Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     4,
-                      //                                                     71,
-                      //                                                     7)
-                      //                                             : Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     240,
-                      //                                                     184,
-                      //                                                     29)),
-                      //                                   ),
-                      //                                   Icon(Icons.boy,
-                      //                                       color: Colors
-                      //                                           .blueGrey),
-                      //                                   Text(
-                      //                                     "身高:",
-                      //                                     style: TextStyle(
-                      //                                         fontSize: 11,
-                      //                                         fontWeight:
-                      //                                             FontWeight
-                      //                                                 .bold,
-                      //                                         color: sum_calorie <
-                      //                                                 snapshot
-                      //                                                     .data
-                      //                                             ? Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     108,
-                      //                                                     141,
-                      //                                                     133)
-                      //                                             : Colors
-                      //                                                 .white),
-                      //                                   ),
-                      //                                   Text(
-                      //                                     heightValue
-                      //                                             .toString() +
-                      //                                         ' ',
-                      //                                     style: TextStyle(
-                      //                                         fontSize: 13,
-                      //                                         fontWeight:
-                      //                                             FontWeight
-                      //                                                 .bold,
-                      //                                         color: sum_calorie <
-                      //                                                 snapshot
-                      //                                                     .data
-                      //                                             ? Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     4,
-                      //                                                     71,
-                      //                                                     7)
-                      //                                             : Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     240,
-                      //                                                     184,
-                      //                                                     29)),
-                      //                                   ),
-                      //                                   Icon(
-                      //                                       Icons.accessibility,
-                      //                                       color: Colors
-                      //                                           .blueGrey),
-                      //                                   Text(
-                      //                                     "體重:",
-                      //                                     style: TextStyle(
-                      //                                         fontSize: 11,
-                      //                                         fontWeight:
-                      //                                             FontWeight
-                      //                                                 .bold,
-                      //                                         color: sum_calorie <
-                      //                                                 snapshot
-                      //                                                     .data
-                      //                                             ? Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     108,
-                      //                                                     141,
-                      //                                                     133)
-                      //                                             : Colors
-                      //                                                 .white),
-                      //                                   ),
-                      //                                   Text(
-                      //                                     weightValue
-                      //                                             .toString() +
-                      //                                         ' ',
-                      //                                     style: TextStyle(
-                      //                                         fontSize: 13,
-                      //                                         fontWeight:
-                      //                                             FontWeight
-                      //                                                 .bold,
-                      //                                         color: sum_calorie <
-                      //                                                 snapshot
-                      //                                                     .data
-                      //                                             ? Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     4,
-                      //                                                     71,
-                      //                                                     7)
-                      //                                             : Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     240,
-                      //                                                     184,
-                      //                                                     29)),
-                      //                                   ),
-                      //                                 ],
-                      //                               ),
-                      //                               GestureDetector(
-                      //                                   onTap: () {
-                      //                                     Navigator.push(
-                      //                                       context,
-                      //                                       MaterialPageRoute(
-                      //                                         builder: (context) =>
-                      //                                             const AccountRevise(),
-                      //                                       ),
-                      //                                     );
-                      //                                   },
-                      //                                   child: Container(
-                      //                                     width: 95,
-                      //                                     height: 35,
-                      //                                     decoration: BoxDecoration(
-                      //                                         color: Color
-                      //                                             .fromARGB(
-                      //                                                 255,
-                      //                                                 239,
-                      //                                                 247,
-                      //                                                 245),
-                      //                                         borderRadius:
-                      //                                             BorderRadius
-                      //                                                 .circular(
-                      //                                                     20)),
-                      //                                     child: Center(
-                      //                                         child: Row(
-                      //                                       mainAxisAlignment:
-                      //                                           MainAxisAlignment
-                      //                                               .center,
-                      //                                       children: const [
-                      //                                         Icon(Icons.edit,
-                      //                                             color: Color
-                      //                                                 .fromARGB(
-                      //                                                     255,
-                      //                                                     108,
-                      //                                                     141,
-                      //                                                     133),
-                      //                                             size: 15),
-                      //                                         Text(
-                      //                                           "修改資料",
-                      //                                           style: TextStyle(
-                      //                                               fontSize:
-                      //                                                   13,
-                      //                                               color: Color
-                      //                                                   .fromARGB(
-                      //                                                       255,
-                      //                                                       108,
-                      //                                                       141,
-                      //                                                       133)),
-                      //                                         ),
-                      //                                       ],
-                      //                                     )),
-                      //                                   ))
-                      //                             ],
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                       const SizedBox(
-                      //                         width: 20,
-                      //                       ),
-                      //                       Neumorphic(
-                      //                         padding: EdgeInsets.all(20),
-                      //                         style: NeumorphicStyle(
-                      //                             intensity: 0.9,
-                      //                             surfaceIntensity: 0.9,
-                      //                             boxShape: NeumorphicBoxShape
-                      //                                 .circle(),
-                      //                             depth: -5,
-                      //                             lightSource:
-                      //                                 LightSource.topRight,
-                      //                             color: Color.fromARGB(
-                      //                                 255, 238, 238, 238)),
-                      //                         child: Center(
-                      //                           child: Text(
-                      //                             snapshot.data.toString(),
-                      //                             style: TextStyle(
-                      //                                 fontSize: 22,
-                      //                                 fontWeight:
-                      //                                     FontWeight.w700,
-                      //                                 color: sum_calorie <
-                      //                                         snapshot.data
-                      //                                     ? Color.fromARGB(
-                      //                                         255, 57, 161, 31)
-                      //                                     : Color.fromARGB(255,
-                      //                                         240, 184, 29)),
-                      //                           ),
-                      //                         ),
-                      //                       )
-                      //                     ],
-                      //                   ),
-                      //                 ),
-                      //               ));
-                      //         }
-                      //       } else {
-                      //         return Center(
-                      //             child:
-                      //                 LoadingAnimationWidget.staggeredDotsWave(
-                      //           color: kPrimaryColor,
-                      //           size: 80,
-                      //         ));
-                      //       }
-                      //     }),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
                       const AnalysisBar(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
                       const WaterIntake(),
-                      const SizedBox(height: 200),
+                      const SizedBox(height: 80),
                     ]))));
   }
 }

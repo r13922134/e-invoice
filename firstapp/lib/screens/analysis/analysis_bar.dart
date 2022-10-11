@@ -3,6 +3,33 @@ import 'dart:math';
 import 'package:firstapp/constants.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:firstapp/database/details_database.dart';
+import 'package:firstapp/database/invoice_database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+class Plist {
+  Plist({
+    required this.plist,
+  });
+  List<Ename> plist;
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'products': plist,
+      };
+}
+
+class Ename {
+  Ename({
+    required this.name,
+  });
+
+  String name;
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'name': name,
+      };
+}
 
 class AnalysisBar extends StatefulWidget {
   final List<Color> availableColors = const [
@@ -20,13 +47,158 @@ class AnalysisBar extends StatefulWidget {
   State<StatefulWidget> createState() => BarChartSample1State();
 }
 
+var time = DateTime.now();
+var date = DateTime(time.year - 1911, time.month);
+String current = date.year.toString() + date.month.toString();
+
 class BarChartSample1State extends State<AnalysisBar> {
   final Color barBackgroundColor = const Color(0xff72d8bf);
   final Duration animDuration = const Duration(milliseconds: 250);
-
   int touchedIndex = -1;
-
   bool isPlaying = false;
+  double food = 0, clothe = 0, items = 0, tech = 0, other = 0;
+
+  Future<void> classify(String current) async {
+    food = 0;
+    clothe = 0;
+    items = 0;
+    tech = 0;
+    other = 0;
+    List<invoice_details> responseList = [];
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    String barcode = pref.getString('barcode') ?? "";
+    String password = pref.getString('password') ?? "";
+    List<Header>? relist = await HeaderHelper.instance.getHeader(current);
+    var client = http.Client();
+
+    for (Header h in relist) {
+      responseList = await DetailHelper.instance.getDetail(h.tag, h.invNum);
+
+      if (responseList.isEmpty) {
+        int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
+        int exp = timestamp + 70000;
+        var rng = Random();
+        int uuid = rng.nextInt(1000);
+        var rbody = {
+          "version": "0.5",
+          "cardType": "3J0002",
+          "cardNo": barcode,
+          "expTimeStamp": exp.toString().substring(0, 10),
+          "action": "carrierInvDetail",
+          "timeStamp": timestamp.toString().substring(0, 10),
+          "invNum": h.invNum,
+          "invDate": h.date,
+          "uuid": uuid.toString(),
+          "appID": 'EINV0202204156709',
+          "cardEncrypt": password,
+        };
+        try {
+          var response = await client.post(
+            Uri.parse(
+                "https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ"),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: rbody,
+          );
+          if (response.statusCode == 200) {
+            String responseString = response.body;
+            var r = jsonDecode(responseString);
+            List d = r['details'];
+            for (var de in d) {
+              await DetailHelper.instance.add(invoice_details(
+                  tag: h.tag,
+                  invNum: h.invNum,
+                  name: de['description'],
+                  date: h.date,
+                  quantity: de['quantity'],
+                  amount: de['amount']));
+            }
+          }
+        } catch (e) {
+          debugPrint("$e");
+        }
+      }
+    }
+    List<Bardata> l = await DetailHelper.instance.getmonth(current);
+    List<Ename> tmparray = [];
+
+    for (Bardata s in l) {
+      tmparray.add(Ename(name: s.name));
+    }
+    Plist p = Plist(plist: tmparray);
+    String tmpbody = json.encoder.convert(p);
+    try {
+      var _response2 = await client.post(
+          Uri.parse(
+              "https://cloudrie-product-classifier.herokuapp.com/product_class"),
+          headers: {"Content-Type": "application/json"},
+          body: tmpbody);
+
+      if (_response2.statusCode == 200) {
+        String responseString2 = _response2.body;
+        var r = jsonDecode(responseString2);
+        List result = r['results'];
+
+        for (int i = 0; i < result.length; i++) {
+          if (int.parse(l[i].price) > 0) {
+            if (result[i][0] == 1 ||
+                result[i][0] == 2 ||
+                result[i][0] == 3 ||
+                result[i][0] == 4 ||
+                result[i][0] == 4) {
+              food += int.parse(l[i].price);
+            } else if (result[i][0] == 7 ||
+                result[i][0] == 8 ||
+                result[i][0] == 10 ||
+                result[i][0] == 12) {
+              clothe += int.parse(l[i].price);
+            } else if (result[i][0] == 9 ||
+                result[i][0] == 13 ||
+                result[i][0] == 14 ||
+                result[i][0] == 16 ||
+                result[i][0] == 17 ||
+                result[i][0] == 18 ||
+                result[i][0] == 19 ||
+                result[i][0] == 20 ||
+                result[i][0] == 22 ||
+                result[i][0] == 23 ||
+                result[i][0] == 24 ||
+                result[i][0] == 25 ||
+                result[i][0] == 26 ||
+                result[i][0] == 29) {
+              items += int.parse(l[i].price);
+            } else if (result[i][0] == 28 ||
+                result[i][0] == 32 ||
+                result[i][0] == 15) {
+              tech += int.parse(l[i].price);
+            } else {
+              other += int.parse(l[i].price);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print("error");
+    }
+    client.close();
+  }
+
+  void leftclick() {
+    date = DateTime(date.year, date.month - 1);
+    setState(() {
+      current = date.year.toString() + date.month.toString();
+      classify(current);
+    });
+  }
+
+  void rightclick() {
+    date = DateTime(date.year, date.month + 1);
+    setState(() {
+      current = date.year.toString() + date.month.toString();
+      classify(current);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,34 +216,79 @@ class BarChartSample1State extends State<AnalysisBar> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
-                  const Text(
-                    'Mingguan',
-                    style: TextStyle(
-                        color: kPrimaryColor,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold),
-                  ),
+                  Row(
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.bar_chart,
+                            color: Color.fromARGB(255, 233, 226, 126)),
+                        Text(
+                          ' 消費分析',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ]),
                   const SizedBox(
-                    height: 4,
+                    height: 10,
                   ),
-                  const Text(
-                    'Grafik konsumsi kalori',
-                    style: TextStyle(
-                        color: Colors.blueGrey,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
-                  ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton(
+                          child: const Icon(Icons.arrow_circle_left),
+                          onPressed: leftclick,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Text(
+                              '  ' +
+                                  date.year.toString() +
+                                  '年' +
+                                  ' ' +
+                                  date.month.toString() +
+                                  '月' +
+                                  '  ',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              )),
+                        ),
+                        TextButton(
+                          child: const Icon(Icons.arrow_circle_right),
+                          onPressed: rightclick,
+                        )
+                      ]),
                   const SizedBox(
                     height: 38,
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: BarChart(
-                        isPlaying ? randomData() : mainBarData(),
-                        swapAnimationDuration: animDuration,
-                      ),
-                    ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: FutureBuilder(
+                            future: classify(current),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.done) {
+                                return BarChart(
+                                  isPlaying ? randomData() : mainBarData(),
+                                  swapAnimationDuration: animDuration,
+                                );
+                              }
+                              return SizedBox(
+                                  height: 10,
+                                  child: Center(
+                                      child: LoadingAnimationWidget.inkDrop(
+                                    color: Colors.blueGrey,
+                                    size: 60,
+                                  )));
+                            })),
                   ),
                   const SizedBox(
                     height: 12,
@@ -79,26 +296,26 @@ class BarChartSample1State extends State<AnalysisBar> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
-                  icon: Icon(
-                    isPlaying ? Icons.pause : Icons.play_arrow,
-                    color: Colors.blueGrey,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      isPlaying = !isPlaying;
-                      if (isPlaying) {
-                        refreshState();
-                      }
-                    });
-                  },
-                ),
-              ),
-            )
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: Align(
+            //     alignment: Alignment.topRight,
+            //     child: IconButton(
+            //       icon: Icon(
+            //         isPlaying ? Icons.pause : Icons.play_arrow,
+            //         color: Colors.blueGrey,
+            //       ),
+            //       onPressed: () {
+            //         setState(() {
+            //           isPlaying = !isPlaying;
+            //           if (isPlaying) {
+            //             refreshState();
+            //           }
+            //         });
+            //       },
+            //     ),
+            //   ),
+            // )
           ],
         ),
       ),
@@ -118,7 +335,7 @@ class BarChartSample1State extends State<AnalysisBar> {
       barRods: [
         BarChartRodData(
           toY: isTouched ? y + 1 : y,
-          color: isTouched ? Colors.yellow : barColor,
+          color: const Color.fromARGB(255, 233, 226, 126),
           width: width,
           borderSide: isTouched
               ? const BorderSide(color: Colors.yellow, width: 1)
@@ -134,22 +351,18 @@ class BarChartSample1State extends State<AnalysisBar> {
     );
   }
 
-  List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
+  List<BarChartGroupData> showingGroups() => List.generate(5, (i) {
         switch (i) {
           case 0:
-            return makeGroupData(0, 5, isTouched: i == touchedIndex);
+            return makeGroupData(0, food, isTouched: i == touchedIndex);
           case 1:
-            return makeGroupData(1, 6.5, isTouched: i == touchedIndex);
+            return makeGroupData(1, clothe, isTouched: i == touchedIndex);
           case 2:
-            return makeGroupData(2, 5, isTouched: i == touchedIndex);
+            return makeGroupData(2, items, isTouched: i == touchedIndex);
           case 3:
-            return makeGroupData(3, 7.5, isTouched: i == touchedIndex);
+            return makeGroupData(3, tech, isTouched: i == touchedIndex);
           case 4:
-            return makeGroupData(4, 9, isTouched: i == touchedIndex);
-          case 5:
-            return makeGroupData(5, 11.5, isTouched: i == touchedIndex);
-          case 6:
-            return makeGroupData(6, 6.5, isTouched: i == touchedIndex);
+            return makeGroupData(4, other, isTouched: i == touchedIndex);
           default:
             return throw Error();
         }
@@ -164,26 +377,21 @@ class BarChartSample1State extends State<AnalysisBar> {
               String weekDay;
               switch (group.x.toInt()) {
                 case 0:
-                  weekDay = 'Monday';
+                  weekDay = '飲食';
                   break;
                 case 1:
-                  weekDay = 'Tuesday';
+                  weekDay = '衣物配件';
                   break;
                 case 2:
-                  weekDay = 'Wednesday';
+                  weekDay = '日用品';
                   break;
                 case 3:
-                  weekDay = 'Thursday';
+                  weekDay = '3C家電';
                   break;
                 case 4:
-                  weekDay = 'Friday';
+                  weekDay = '其他';
                   break;
-                case 5:
-                  weekDay = 'Saturday';
-                  break;
-                case 6:
-                  weekDay = 'Sunday';
-                  break;
+
                 default:
                   throw Error();
               }
@@ -196,7 +404,7 @@ class BarChartSample1State extends State<AnalysisBar> {
                 ),
                 children: <TextSpan>[
                   TextSpan(
-                    text: (rod.toY - 1).toString(),
+                    text: (rod.toY).toString(),
                     style: const TextStyle(
                       color: Colors.yellow,
                       fontSize: 16,
@@ -207,15 +415,15 @@ class BarChartSample1State extends State<AnalysisBar> {
               );
             }),
         touchCallback: (FlTouchEvent event, barTouchResponse) {
-          setState(() {
-            if (!event.isInterestedForInteractions ||
-                barTouchResponse == null ||
-                barTouchResponse.spot == null) {
-              touchedIndex = -1;
-              return;
-            }
-            touchedIndex = barTouchResponse.spot!.touchedBarGroupIndex;
-          });
+          // setState(() {
+          //   if (!event.isInterestedForInteractions ||
+          //       barTouchResponse == null ||
+          //       barTouchResponse.spot == null) {
+          //     touchedIndex = -1;
+          //     return;
+          //   }
+          //   touchedIndex = barTouchResponse.spot!.touchedBarGroupIndex;
+          // });
         },
       ),
       titlesData: FlTitlesData(
@@ -249,33 +457,28 @@ class BarChartSample1State extends State<AnalysisBar> {
 
   Widget getTitles(double value, TitleMeta meta) {
     const style = TextStyle(
-      color: Colors.white,
+      color: Color.fromARGB(255, 19, 80, 109),
       fontWeight: FontWeight.bold,
-      fontSize: 14,
+      fontSize: 13,
     );
     Widget text;
     switch (value.toInt()) {
       case 0:
-        text = const Text('M', style: style);
+        text = const Text('飲食', style: style);
         break;
       case 1:
-        text = const Text('T', style: style);
+        text = const Text('衣物配件', style: style);
         break;
       case 2:
-        text = const Text('W', style: style);
+        text = const Text('日用品', style: style);
         break;
       case 3:
-        text = const Text('T', style: style);
+        text = const Text('3C家電', style: style);
         break;
       case 4:
-        text = const Text('F', style: style);
+        text = const Text('其他', style: style);
         break;
-      case 5:
-        text = const Text('S', style: style);
-        break;
-      case 6:
-        text = const Text('S', style: style);
-        break;
+
       default:
         text = const Text('', style: style);
         break;
@@ -320,7 +523,7 @@ class BarChartSample1State extends State<AnalysisBar> {
       borderData: FlBorderData(
         show: false,
       ),
-      barGroups: List.generate(7, (i) {
+      barGroups: List.generate(5, (i) {
         switch (i) {
           case 0:
             return makeGroupData(0, Random().nextInt(15).toDouble() + 6,
@@ -342,14 +545,7 @@ class BarChartSample1State extends State<AnalysisBar> {
             return makeGroupData(4, Random().nextInt(15).toDouble() + 6,
                 barColor: widget.availableColors[
                     Random().nextInt(widget.availableColors.length)]);
-          case 5:
-            return makeGroupData(5, Random().nextInt(15).toDouble() + 6,
-                barColor: widget.availableColors[
-                    Random().nextInt(widget.availableColors.length)]);
-          case 6:
-            return makeGroupData(6, Random().nextInt(15).toDouble() + 6,
-                barColor: widget.availableColors[
-                    Random().nextInt(widget.availableColors.length)]);
+
           default:
             return throw Error();
         }
