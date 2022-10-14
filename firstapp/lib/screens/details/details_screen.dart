@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'dart:convert';
-import 'dart:math';
 
 class DetailsScreen extends StatelessWidget {
   final String tag, invDate, invNum, seller, address, time, amount, w;
@@ -34,8 +33,6 @@ class DetailsScreen extends StatelessWidget {
     if (responseList.isEmpty) {
       int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
       int exp = timestamp + 70000;
-      var rng = Random();
-      int uuid = rng.nextInt(1000);
       var rbody = {
         "version": "0.5",
         "cardType": "3J0002",
@@ -45,10 +42,12 @@ class DetailsScreen extends StatelessWidget {
         "timeStamp": timestamp.toString().substring(0, 10),
         "invNum": invNum,
         "invDate": invDate,
-        "uuid": uuid.toString(),
+        "uuid": '1000',
         "appID": 'EINV0202204156709',
         "cardEncrypt": password,
       };
+      print(rbody);
+
       var client = http.Client();
       try {
         var response = await client.post(
@@ -71,14 +70,16 @@ class DetailsScreen extends StatelessWidget {
                 name: de['description'],
                 date: invDate.toString(),
                 quantity: de['quantity'],
-                amount: de['amount']));
+                amount: de['amount'],
+                type: 0));
             responseList.add(invoice_details(
                 tag: tag.toString(),
                 invNum: invNum.toString(),
                 name: de['description'],
                 date: invDate.toString(),
                 quantity: de['quantity'],
-                amount: de['amount']));
+                amount: de['amount'],
+                type: 0));
           }
         } else {
           print(response.statusCode);

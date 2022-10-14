@@ -12,7 +12,7 @@ class invoice_details {
   String date;
   String quantity;
   String amount;
-  int? type;
+  int type;
 
   invoice_details({
     required this.tag,
@@ -21,7 +21,7 @@ class invoice_details {
     required this.date,
     required this.quantity,
     required this.amount,
-    this.type,
+    required this.type,
   });
   factory invoice_details.fromMap(Map<String, dynamic> json) => invoice_details(
         tag: json['tag'],
@@ -65,7 +65,7 @@ class DetailHelper {
 
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE DETAIL(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,tag TEXT,invNum TEXT,name TEXT,date TEXT,quantity TEXT,amount TEXT,type INTEGER)
+      CREATE TABLE DETAIL(tag TEXT,invNum TEXT,name TEXT,date TEXT,quantity TEXT,amount TEXT,type INTEGER)
 ''');
   }
 
@@ -110,9 +110,20 @@ class DetailHelper {
         ]);
   }
 
-  Future<int> add(invoice_details detail) async {
+  Future<void> add(invoice_details detail) async {
     Database db = await instance.database;
-    return await db.insert('detail', detail.toMap());
+
+    await db.rawInsert(
+        'INSERT INTO detail(tag, invNum, name, date, quantity,amount,type) VALUES(?, ?, ?,?,?,?,?)',
+        [
+          detail.tag,
+          detail.invNum,
+          detail.name,
+          detail.date,
+          detail.quantity,
+          detail.amount,
+          detail.type,
+        ]);
   }
 
   Future<void> delete() async {

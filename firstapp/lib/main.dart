@@ -17,14 +17,11 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:firstapp/database/winninglist_database.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:page_transition/page_transition.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(
-    const Splash(),
-  );
+  runApp(const Splash());
 }
 
 class Splash extends StatelessWidget {
@@ -52,7 +49,6 @@ class Splash extends StatelessWidget {
               return const MyApp();
             },
             splashTransition: SplashTransition.fadeTransition,
-            pageTransitionType: PageTransitionType.fade,
             backgroundColor: kPrimaryColor));
   }
 }
@@ -68,7 +64,7 @@ Future<void> updateData() async {
     var rng = Random();
     var now = DateTime.now();
     int uuid = rng.nextInt(1000);
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 30000;
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 25000;
     int exp = timestamp + 50000;
 
     var formatter = DateFormat('yyyy/MM/dd');
@@ -79,7 +75,8 @@ Future<void> updateData() async {
     String term;
     for (int j = 5; j >= 0; j--) {
       uuid = rng.nextInt(1000);
-
+      timestamp += 5000;
+      exp += 5000;
       start = DateTime(now.year, now.month - j, 01);
       last = DateTime(start.year, start.month + 1, 0);
       sdate = formatter.format(start);
@@ -269,7 +266,7 @@ class _MyAppState extends State<MyApp> {
   // ignore: non_constant_identifier_names
   var PagesAll = [
     const HomeScreen(),
-    const QRViewExample(),
+    ScanScreen(),
     const AnalysisScreen(),
     const ProfileScreen()
   ];

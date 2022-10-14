@@ -198,7 +198,8 @@ class _AddInvoice extends State<AddInvoice> {
                                       name: element.name,
                                       date: tmpdate,
                                       quantity: element.quantity,
-                                      amount: element.price));
+                                      amount: element.price,
+                                      type: 0));
                                 }
                                 HeaderHelper.instance.add(Header(
                                     tag: tag,
@@ -370,7 +371,7 @@ class _AddInvoice extends State<AddInvoice> {
       backgroundColor: kPrimaryColor,
       elevation: 0,
       leading: IconButton(
-        icon: SvgPicture.asset("assets/icons/back_arrow.svg"),
+        icon: Icon(Icons.arrow_back_outlined, color: Colors.white),
         onPressed: () {
           Navigator.pop(context);
         },

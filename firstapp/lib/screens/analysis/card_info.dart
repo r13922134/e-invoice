@@ -147,7 +147,8 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
                 name: de['description'],
                 date: element.date,
                 quantity: de['quantity'],
-                amount: de['amount']));
+                amount: de['amount'],
+                type: 0));
             cards.add(CardInfo(count++,
                 name: de['description'],
                 calorie: '0',
@@ -167,7 +168,7 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
         cards.add(CardInfo(count++,
             name: value.name,
             calorie: '0',
-            type: value.type ?? 0,
+            type: value.type,
             invnum: value.invNum,
             tag: value.tag,
             date: value.date,
@@ -336,10 +337,9 @@ Future<List<CardInfo>> getcurrentdate(String date) async {
       c.images = pic[dict[c.type] ?? ''] ?? '';
       c.position = index_count++;
 
-      total_calorie += int.parse(c.quantity) * int.parse(c.calorie);
-
       returncards.add(c);
     }
+    total_calorie += int.parse(c.quantity) * int.parse(c.calorie);
   }
   client.close();
   int j = 0;

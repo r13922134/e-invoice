@@ -34,7 +34,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
   void getmixcalorie() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      mixCalorie = pref.getInt('mixCalorie') ?? 0;
+      mixCalorie = pref.getInt('mixCalorie') ?? 1200;
       heightValue = pref.getInt('height') ?? 120;
       weightValue = pref.getInt('weight') ?? 30;
       ageValue = pref.getInt('age') ?? 1;
@@ -108,7 +108,7 @@ class _IdentityPageState extends State<AnalysisScreen> {
                                 ConnectionState.done) {
                               if (snapshot.data?.isEmpty ?? true) {
                                 return SizedBox(
-                                    height: 300,
+                                    height: 260,
                                     child: Center(
                                         child: Column(children: [
                                       const SizedBox(height: 50),

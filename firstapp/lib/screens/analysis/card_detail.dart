@@ -30,7 +30,8 @@ class DetailPage extends StatelessWidget {
   Future<List<Linkstr>> getnews(String str) async {
     var client = http.Client();
     List<Linkstr> tlist = [];
-    String path = 'https://www.google.com/search?q=' + str + '熱量&tbm=nws';
+    String path = 'https://www.google.com/search?q=' + str + ' 熱量&tbm=nws';
+    String path2 = 'https://www.google.com/search?q=' + str + ' &tbm=nws';
 
     try {
       var re = await http.get(Uri.parse(path));
@@ -49,10 +50,29 @@ class DetailPage extends StatelessWidget {
           tlist.add(Linkstr(title: b.getText(), link: tmp));
         }
       }
+      if (tlist.isEmpty) {
+        re = await http.get(Uri.parse(path2));
+
+        if (re.statusCode == 200) {
+          BeautifulSoup soup = BeautifulSoup(re.body);
+          String tmp;
+          List<Bs4Element> r1 =
+              soup.findAll('div', class_: 'Gx5Zad fP1Qef xpd EtOod pkphOe');
+          for (Bs4Element b in r1) {
+            tmp = b.find('a')?.getAttrValue('href') ?? '';
+            tmp = tmp.substring(7);
+            String searchString = '&sa';
+            int index = tmp.indexOf(searchString);
+            tmp = tmp.substring(0, index);
+            tlist.add(Linkstr(title: b.getText(), link: tmp));
+          }
+        }
+      }
     } catch (e) {
       print("error");
     }
     client.close();
+
     return tlist;
   }
 
@@ -77,7 +97,7 @@ class DetailPage extends StatelessWidget {
                           cardInfo.name,
                           style: const TextStyle(
                             fontFamily: 'Avenir',
-                            fontSize: 56,
+                            fontSize: 40,
                             color: kTextColor,
                             fontWeight: FontWeight.w900,
                           ),

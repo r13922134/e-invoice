@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +12,68 @@ import 'dart:convert';
 import 'package:firstapp/database/details_database.dart';
 import 'dart:math';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:lottie/lottie.dart';
+import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'dart:io';
+
+class ScanScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Column(children: [
+      SizedBox(height: 10),
+      Container(
+        // padding: const EdgeInsets.all(12.0),
+        color: kBackgroundColor,
+        width: 500,
+        height: 700,
+        child: ContainedTabBarView(
+          tabBarProperties: TabBarProperties(
+              indicatorSize: TabBarIndicatorSize.label,
+              labelColor: kPrimaryColor,
+              labelStyle: TextStyle(fontWeight: FontWeight.w900)),
+          tabBarViewProperties: TabBarViewProperties(
+            physics: NeverScrollableScrollPhysics(),
+          ),
+          tabs: [
+            Text('掃描/輸入'),
+            Text(
+              '開獎號碼',
+            ),
+          ],
+          views: [QRViewExample(), WebViewExample()],
+          onChange: (index) => print(index),
+        ),
+      ),
+    ]));
+  }
+}
+
+class WebViewExample extends StatefulWidget {
+  @override
+  WebViewExampleState createState() => WebViewExampleState();
+}
+
+class WebViewExampleState extends State<WebViewExample> {
+  @override
+  void initState() {
+    super.initState();
+    // Enable virtual display.
+    if (Platform.isAndroid) WebView.platform = AndroidWebView();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.all(12),
+        child: Scaffold(
+            body: WebView(
+          javascriptMode: JavascriptMode.unrestricted,
+          initialUrl: 'https://www.ecloudlife.com/w/redeem/redeem-lottery',
+        )));
+  }
+}
 
 class QRViewExample extends StatefulWidget {
   const QRViewExample({Key? key}) : super(key: key);
@@ -143,7 +205,8 @@ class _QRViewExampleState extends State<QRViewExample> {
                       name: dde['description'],
                       date: tmpdate,
                       quantity: splitted[0],
-                      amount: dde['amount']));
+                      amount: dde['amount'],
+                      type: 0));
 
                   amount += int.parse(dde['amount']);
                 }
@@ -217,22 +280,18 @@ class _QRViewExampleState extends State<QRViewExample> {
                 lightSource: LightSource.topRight,
                 color: kPrimaryColor),
             child: Padding(
-              padding: const EdgeInsets.all(28),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const <Widget>[
+                children: <Widget>[
                   Text(
-                    "掃描輸入",
+                    "   掃描輸入   ",
                     style: TextStyle(
                         fontSize: 20,
                         color: Colors.white,
                         fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Icon(Icons.qr_code_scanner_outlined,
-                      color: Colors.white, size: 50)
+                  Lottie.asset('assets/scan.json', width: 100, height: 100),
                 ],
               ),
             ),
@@ -257,29 +316,25 @@ class _QRViewExampleState extends State<QRViewExample> {
                 lightSource: LightSource.topRight,
                 color: const Color.fromARGB(255, 207, 219, 235)),
             child: Padding(
-              padding: const EdgeInsets.all(28),
+              padding: const EdgeInsets.all(15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const <Widget>[
+                children: <Widget>[
                   Text(
-                    "手動輸入",
+                    "   手動輸入   ",
                     style: TextStyle(
                         fontSize: 20,
                         color: Colors.blueGrey,
                         fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Icon(Icons.keyboard_alt_outlined,
-                      color: Colors.blueGrey, size: 50)
+                  Lottie.asset('assets/sheet.json', width: 100, height: 100),
                 ],
               ),
             ),
           ),
         )
       ]),
-      const SizedBox(height: 100),
+      const SizedBox(height: 60),
       Container(
           height: 145,
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -327,10 +382,17 @@ class _QRViewExampleState extends State<QRViewExample> {
                     )
                   ],
                 ),
-                Image.asset(
-                  "assets/images/image_1.png",
+                Container(
                   height: 50,
-                )
+                  width: 50,
+                  decoration: BoxDecoration(
+                      image: const DecorationImage(
+                          image: AssetImage("assets/images/image_1.png"),
+                          fit: BoxFit.fill),
+                      color: Colors.white,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(20)),
+                ),
               ],
             ),
           )),

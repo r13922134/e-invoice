@@ -24,8 +24,8 @@ class LoginScreen extends StatelessWidget {
     pref.setString('barcode', data.name);
     pref.setString('password', data.password);
 
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
-    int exp = timestamp + 70000;
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 25000;
+    int exp = timestamp + 65000;
     var now = DateTime.now();
     var formatter = DateFormat('yyyy/MM/dd');
     String responseString;
@@ -50,6 +50,8 @@ class LoginScreen extends StatelessWidget {
       } else {
         term = (start.year - 1911).toString() + start.month.toString();
       }
+      timestamp += 5000;
+      exp += 5000;
       sdate = formatter.format(start);
       edate = formatter.format(last);
       var rbody = {

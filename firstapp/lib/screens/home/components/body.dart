@@ -493,7 +493,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     var rng = Random();
     var now = DateTime.now();
     int uuid = rng.nextInt(1000);
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 30000;
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
     int exp = timestamp + 50000;
     int m = now.month;
 
@@ -510,6 +510,8 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
       last = DateTime(start.year, start.month + 1, 0);
       sdate = formatter.format(start);
       edate = formatter.format(last);
+      timestamp += 5000;
+      exp += 5000;
       if (start.month < 10) {
         term = (start.year - 1911).toString() + '0' + start.month.toString();
       } else {
@@ -675,11 +677,11 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     controller.addListener(() {
-      double value = controller.offset / 111;
+      double value = controller.offset / 109;
 
       setState(() {
         topContainer = value;
-        closeTopContainer = controller.offset > 320;
+        closeTopContainer = controller.offset > 1000;
       });
     });
     super.initState();

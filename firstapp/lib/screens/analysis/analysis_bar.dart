@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:math';
 import 'package:firstapp/constants.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 import 'package:firstapp/database/details_database.dart';
 import 'package:firstapp/database/invoice_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 class Plist {
   Plist({
@@ -69,16 +69,17 @@ class BarChartSample1State extends State<AnalysisBar> {
     String barcode = pref.getString('barcode') ?? "";
     String password = pref.getString('password') ?? "";
     List<Header>? relist = await HeaderHelper.instance.getHeader(current);
+    List<Bardata> l = await DetailHelper.instance.getmonth(current);
     var client = http.Client();
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 40000;
+    int exp = timestamp + 65000;
 
-    for (Header h in relist) {
-      responseList = await DetailHelper.instance.getDetail(h.tag, h.invNum);
-
+    for (int i = 0; i < relist.length; i++) {
+      timestamp += 5000;
+      exp += 5000;
+      responseList = await DetailHelper.instance
+          .getDetail(relist[i].tag, relist[i].invNum);
       if (responseList.isEmpty) {
-        int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
-        int exp = timestamp + 70000;
-        var rng = Random();
-        int uuid = rng.nextInt(1000);
         var rbody = {
           "version": "0.5",
           "cardType": "3J0002",
@@ -86,9 +87,9 @@ class BarChartSample1State extends State<AnalysisBar> {
           "expTimeStamp": exp.toString().substring(0, 10),
           "action": "carrierInvDetail",
           "timeStamp": timestamp.toString().substring(0, 10),
-          "invNum": h.invNum,
-          "invDate": h.date,
-          "uuid": uuid.toString(),
+          "invNum": relist[i].invNum,
+          "invDate": relist[i].date,
+          "uuid": '1000',
           "appID": 'EINV0202204156709',
           "cardEncrypt": password,
         };
@@ -96,9 +97,6 @@ class BarChartSample1State extends State<AnalysisBar> {
           var response = await client.post(
             Uri.parse(
                 "https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ"),
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
             body: rbody,
           );
           if (response.statusCode == 200) {
@@ -106,21 +104,18 @@ class BarChartSample1State extends State<AnalysisBar> {
             var r = jsonDecode(responseString);
             List d = r['details'];
             for (var de in d) {
-              await DetailHelper.instance.add(invoice_details(
-                  tag: h.tag,
-                  invNum: h.invNum,
-                  name: de['description'],
-                  date: h.date,
-                  quantity: de['quantity'],
-                  amount: de['amount']));
+              l.add(Bardata(name: de['description'], price: de['amount']));
             }
           }
         } catch (e) {
           debugPrint("$e");
         }
+      } else {
+        for (invoice_details ind in responseList) {
+          l.add(Bardata(name: ind.name, price: ind.amount));
+        }
       }
     }
-    List<Bardata> l = await DetailHelper.instance.getmonth(current);
     List<Ename> tmparray = [];
 
     for (Bardata s in l) {
@@ -139,7 +134,6 @@ class BarChartSample1State extends State<AnalysisBar> {
         String responseString2 = _response2.body;
         var r = jsonDecode(responseString2);
         List result = r['results'];
-
         for (int i = 0; i < result.length; i++) {
           if (int.parse(l[i].price) > 0) {
             if (result[i][0] == 1 ||
@@ -188,25 +182,30 @@ class BarChartSample1State extends State<AnalysisBar> {
     date = DateTime(date.year, date.month - 1);
     setState(() {
       current = date.year.toString() + date.month.toString();
-      classify(current);
     });
+    classify(current);
   }
 
   void rightclick() {
     date = DateTime(date.year, date.month + 1);
     setState(() {
       current = date.year.toString() + date.month.toString();
-      classify(current);
     });
+    classify(current);
   }
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 1,
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        color: kSecondaryColor,
+      child: Neumorphic(
+        style: NeumorphicStyle(
+            shape: NeumorphicShape.concave,
+            intensity: 0.9,
+            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(25)),
+            depth: 10,
+            lightSource: LightSource.topRight,
+            color: Color.fromARGB(255, 211, 217, 221)),
         child: Stack(
           children: <Widget>[
             Padding(
@@ -220,12 +219,12 @@ class BarChartSample1State extends State<AnalysisBar> {
                       // mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Icon(Icons.bar_chart,
-                            color: Color.fromARGB(255, 233, 226, 126)),
+                            color: Color.fromARGB(255, 255, 245, 155)),
                         Text(
                           ' 消費分析',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              color: Colors.blueGrey,
+                              color: Color.fromARGB(255, 59, 110, 110),
                               fontSize: 20,
                               fontWeight: FontWeight.bold),
                         ),
@@ -237,13 +236,16 @@ class BarChartSample1State extends State<AnalysisBar> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         TextButton(
-                          child: const Icon(Icons.arrow_circle_left),
+                          child: const Icon(
+                            Icons.arrow_circle_left,
+                            color: kBackgroundColor,
+                          ),
                           onPressed: leftclick,
                         ),
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.blueGrey,
+                            color: kBackgroundColor,
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Text(
@@ -256,12 +258,13 @@ class BarChartSample1State extends State<AnalysisBar> {
                                   '  ',
                               style: const TextStyle(
                                 fontSize: 13,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
+                                color: Color.fromARGB(255, 59, 110, 110),
+                                fontWeight: FontWeight.w700,
                               )),
                         ),
                         TextButton(
-                          child: const Icon(Icons.arrow_circle_right),
+                          child: const Icon(Icons.arrow_circle_right,
+                              color: kBackgroundColor),
                           onPressed: rightclick,
                         )
                       ]),
@@ -277,7 +280,7 @@ class BarChartSample1State extends State<AnalysisBar> {
                               if (snapshot.connectionState ==
                                   ConnectionState.done) {
                                 return BarChart(
-                                  isPlaying ? randomData() : mainBarData(),
+                                  mainBarData(),
                                   swapAnimationDuration: animDuration,
                                 );
                               }
@@ -285,7 +288,7 @@ class BarChartSample1State extends State<AnalysisBar> {
                                   height: 10,
                                   child: Center(
                                       child: LoadingAnimationWidget.inkDrop(
-                                    color: Colors.blueGrey,
+                                    color: Color.fromARGB(255, 255, 245, 155),
                                     size: 60,
                                   )));
                             })),
@@ -335,11 +338,10 @@ class BarChartSample1State extends State<AnalysisBar> {
       barRods: [
         BarChartRodData(
           toY: isTouched ? y + 1 : y,
-          color: const Color.fromARGB(255, 233, 226, 126),
+          color: Color.fromARGB(255, 255, 245, 155),
           width: width,
-          borderSide: isTouched
-              ? const BorderSide(color: Colors.yellow, width: 1)
-              : const BorderSide(color: Colors.white, width: 0),
+          borderSide: const BorderSide(
+              color: Color.fromARGB(255, 240, 234, 181), width: 1),
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
             toY: 20,
@@ -354,7 +356,7 @@ class BarChartSample1State extends State<AnalysisBar> {
   List<BarChartGroupData> showingGroups() => List.generate(5, (i) {
         switch (i) {
           case 0:
-            return makeGroupData(0, food, isTouched: i == touchedIndex);
+            return makeGroupData(0, 100, isTouched: i == touchedIndex);
           case 1:
             return makeGroupData(1, clothe, isTouched: i == touchedIndex);
           case 2:
@@ -457,7 +459,7 @@ class BarChartSample1State extends State<AnalysisBar> {
 
   Widget getTitles(double value, TitleMeta meta) {
     const style = TextStyle(
-      color: Color.fromARGB(255, 19, 80, 109),
+      color: Color.fromARGB(255, 59, 110, 110),
       fontWeight: FontWeight.bold,
       fontSize: 13,
     );
