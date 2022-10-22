@@ -18,6 +18,7 @@ import 'dart:math';
 import 'package:firstapp/database/winninglist_database.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:quick_actions/quick_actions.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -249,6 +250,27 @@ class _MyAppState extends State<MyApp> {
   //int dailyCalorie = 0;
   String bmirange = '';
   int mixCalorie = 0;
+  final quickActions = const QuickActions();
+
+  @override
+  void initState(){
+    super.initState();
+    quickActions.setShortcutItems([
+      ShortcutItem(
+        type: 'barcode_event',
+        localizedTitle: '手機條碼',
+        icon: 'icon_barcode_event',
+      ),
+    ]);
+    quickActions.initialize((type) {
+      if (type == 'barcode_event'){
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => BarcodeScreen()),
+        );
+      }
+     });
+
+  }
 
   Future<void> readData() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();

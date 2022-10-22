@@ -4,7 +4,6 @@ import 'package:screen/screen.dart';
 import '../../../constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:barcode_widget/barcode_widget.dart';
-//import 'package:wakelock/wakelock.dart';
 
 // Show the carrier barcode
 class BarcodeScreen extends StatefulWidget {
