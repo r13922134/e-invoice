@@ -249,6 +249,9 @@ class _MyAppState extends State<MyApp> {
   //int dailyCalorie = 0;
   String bmirange = '';
   int mixCalorie = 0;
+  String resultkeyword= '';
+  String  resulttitle= '';
+  String  resulturl= '';
 
   Future<void> readData() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();
@@ -262,6 +265,7 @@ class _MyAppState extends State<MyApp> {
     ageValue = pref.getInt('age') ?? 1;
     activityValue = pref.getString('activity') ?? '';
     mixCalorie = pref.getInt('mixCalorie') ?? 0;
+    
 
     setState(() {});
   }

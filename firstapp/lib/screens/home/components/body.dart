@@ -14,6 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:firstapp/screens/home/components/interestednews.dart';
 import 'package:firstapp/screens/account/components/account_revise.dart';
 
+
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
 
@@ -25,13 +26,69 @@ var time = DateTime.now();
 var date = DateTime(time.year - 1911, time.month);
 String current = date.year.toString() + date.month.toString();
 
+var resultkeyword = '雲端發票兌獎';
+var resulttitle = '雲端發票中獎怎麼領?雲端...';
+var resulturl = "https://roo.cash/blog/e-invoice-redeem-guide/";
+var resultkeyword2 = '168斷食';
+var resulttitle2 = '「168斷食」間歇性斷食不是吃越少瘦越快';
+var resulturl2 = "https://event.womenshealth.com.tw/2021/168/";
+var resultkeyword3 = '肩頸痠痛';
+var resulttitle3 = '7種疾病是你肩頸痠痛的原因!3招還你健...';
+var resulturl3 = "https://heho.com.tw/archives/72826";
+
+
 class _State extends State<Body> with SingleTickerProviderStateMixin {
-  final CategoriesScroller categoriesScroller = const CategoriesScroller();
+  CategoriesScroller categoriesScroller =  CategoriesScroller();
   ScrollController controller = ScrollController();
   bool closeTopContainer = false;
   double topContainer = 0;
 
   List<Widget> itemsData = [];
+
+  Future<void> getresonsedata() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    resultkeyword = pref.getString('resultkeyword')!;
+    resulttitle = pref.getString('resulttitle')!;
+    resulturl = pref.getString('resulturl')!;
+    resultkeyword2 = pref.getString('resultkeyword2')!;
+    resulttitle2 = pref.getString('resulttitle2')!;
+    resulturl2 = pref.getString('resulturl2')!;
+    resultkeyword3 = pref.getString('resultkeyword3')!;
+    resulttitle3 = pref.getString('resulttitle3')!;
+    resulturl3 = pref.getString('resulturl3')!;
+
+    
+    /*if(pref.getString('resultkeyword')!= null){
+      resultkeyword = pref.getString('resultkeyword')!;
+      resulttitle = pref.getString('resulttitle')!;
+      resulturl = pref.getString('resulturl')!;
+    }else{
+      resultkeyword = '雲端發票兌獎';
+      resulttitle = '雲端發票中獎怎麼領?雲端...';
+      resulturl = "https://roo.cash/blog/e-invoice-redeem-guide/";
+    }*/
+
+    /*if(pref.getString('resultkeyword2') == null){
+      resultkeyword2 = '168斷食';
+      resulttitle2 = '「168斷食」間歇性斷食不是吃越少瘦越快';
+      resulturl2 = "https://event.womenshealth.com.tw/2021/168/";
+    }else{
+      resultkeyword2 = pref.getString('resultkeyword2')!;
+      resulttitle2 = pref.getString('resulttitle2')!;
+      resulturl2 = pref.getString('resulturl2')!;
+    }
+
+    if(pref.getString('resultkeyword3') == null){
+      resultkeyword3 = '肩頸痠痛';
+      resulttitle3 = '7種疾病是你肩頸痠痛的原因!3招還你健...';
+      resulturl3 = "https://heho.com.tw/archives/72826";
+    }else{
+      resultkeyword3 = pref.getString('resultkeyword3')!;
+      resulttitle3 = pref.getString('resulttitle3')!;
+      resulturl3 = pref.getString('resulturl3')!;
+    }*/
+    setState(() {});
+  }
 
   Future<List<Widget>> getPostsData(String current) async {
     List<Widget> listItems = [];
@@ -322,17 +379,9 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                       if (responseList[i].w == 'f')
                         Hero(
                           tag: responseList[i].invNum,
-                          child: Container(
-                            height: 50,
-                            width: 50,
-                            decoration: BoxDecoration(
-                                image: const DecorationImage(
-                                    image:
-                                        AssetImage("assets/images/image_1.png"),
-                                    fit: BoxFit.fill),
-                                color: Colors.white,
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(15)),
+                          child: Image.asset(
+                            "assets/images/image_1.png",
+                            height: 46,
                           ),
                         ),
                       if (responseList[i].w != "f")
@@ -675,14 +724,15 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     controller.addListener(() {
-      double value = controller.offset / 111;
-
+      double value = controller.offset / 112;
+      
       setState(() {
         topContainer = value;
-        closeTopContainer = controller.offset > 320;
+        closeTopContainer = controller.offset > 220;
       });
     });
     super.initState();
+    getresonsedata();
   }
 
   @override
@@ -846,25 +896,39 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     );
   }
 }
-//setUrl();
-var resultkeyword = '雲端發票兌獎';
-var resulttitle = '雲端發票中獎怎麼領?雲端...';
-var resulturl = "https://roo.cash/blog/e-invoice-redeem-guide/";
-var resultkeyword2 = '168斷食';
-var resulttitle2 = '「168斷食」間歇性斷食不是吃越少瘦越快';
-var resulturl2 = "https://event.womenshealth.com.tw/2021/168/";
-var resultkeyword3 = '肩頸痠痛';
-var resulttitle3 = '7種疾病是你肩頸痠痛的原因!3招還你健...';
-var resulturl3 = "https://heho.com.tw/archives/72826";
 
-final Uri _url1 = Uri.parse(resulturl);
-final Uri _url2 = Uri.parse(resulturl2);
-final Uri _url3 = Uri.parse(resulturl3);
+class Newslink {
+  Newslink({
+    required this.keyword,
+    required this.title,
+    required this.url,
+  });
+  String keyword;
+  String title;
+  String url;
+}
+
+Future<void> _launchUrl1() async {
+  if (!await launchUrl(Uri.parse(resulturl))) {
+    throw 'Could not launch $resulturl';
+  }
+}
+
+Future<void> _launchUrl2() async {
+  if (!await launchUrl(Uri.parse(resulturl2))) {
+    throw 'Could not launch $resulturl2';
+  }
+}
+
+Future<void> _launchUrl3() async {
+  if (!await launchUrl(Uri.parse(resulturl3))) {
+    throw 'Could not launch $resulturl3';
+  }
+}
 
 
 class CategoriesScroller extends StatelessWidget {
   const CategoriesScroller();
-  
 
   @override
   Widget build(BuildContext context) {
@@ -906,38 +970,8 @@ class CategoriesScroller extends StatelessWidget {
                         onPressed: _launchUrl1,
                         child: Text(
                           "$resulttitle",
-                          style: TextStyle(fontSize: 13, color: Colors.white),
+                          style: TextStyle(fontSize: 17, color: Colors.white),
                         ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kPrimaryColor),
-                          side: MaterialStateProperty.all(
-                              BorderSide(color: kPrimaryColor, width: 1)),
-                          elevation: MaterialStateProperty.all(0),
-                        ),
-                      ),
-                      ElevatedButton(
-                        child:  Text(
-                          "待處理",
-                          style: TextStyle(fontSize: 10, color: Colors.white),
-                        ),
-                        onPressed: () async {
-                            //getselectedkeyword;
-                            //final response = await geturl(_selectedkeywordlist[0]);
-                            final response = await get2url();
-                            resultkeyword = response[0];
-                            resulttitle = response[1];
-                            resulturl = response[2];
-                            final response2 = await get3url();
-                            resultkeyword2 = response2[0];
-                            resulttitle2 = response2[1];
-                            resulturl2 = response2[2];
-                            final response3 = await get4url();
-                            resultkeyword3 = response3[0];
-                            resulttitle3= response3[1];
-                            resulturl3 = response3[2];
-                            //_url4 = Uri.parse(resulturl);
-                        },
                         style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(kPrimaryColor),
@@ -974,7 +1008,8 @@ class CategoriesScroller extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl2,
-                        child: Text(
+                        child: 
+                        Text(
                           "$resulttitle2",
                           style: TextStyle(fontSize: 17, color: Colors.white),
                         ),
@@ -986,20 +1021,6 @@ class CategoriesScroller extends StatelessWidget {
                           elevation: MaterialStateProperty.all(0),
                         ),
                       ),
-                      /*ElevatedButton(
-                        onPressed: _launchUrl3,
-                        child: const Text(
-                          "30+無痛體態維持",
-                          style: TextStyle(fontSize: 17, color: Colors.white),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kSecondaryColor),
-                          side: MaterialStateProperty.all(
-                              BorderSide(color: kSecondaryColor, width: 1)),
-                          elevation: MaterialStateProperty.all(0),
-                        ),
-                      ),*/
                     ],
                   ),
                 ),
@@ -1043,22 +1064,6 @@ class CategoriesScroller extends StatelessWidget {
                           elevation: MaterialStateProperty.all(0),
                         ),
                       ),
-                      /*ElevatedButton(
-                        onPressed: _launchUrl6,
-                        child: const Text(
-                          "16種抗糖尿病明星食物",
-                          style: TextStyle(
-                              fontSize: 17,
-                              color: Color.fromARGB(255, 141, 129, 129)),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.white),
-                          side: MaterialStateProperty.all(
-                              BorderSide(color: Colors.white, width: 1)),
-                          elevation: MaterialStateProperty.all(0),
-                        ),
-                      ),*/
                     ],
                   ),
                 ),
@@ -1071,20 +1076,5 @@ class CategoriesScroller extends StatelessWidget {
   }
 }
 
-Future<void> _launchUrl1() async {
-  if (!await launchUrl(_url1)) {
-    throw 'Could not launch $_url1';
-  }
-}
 
-Future<void> _launchUrl2() async {
-  if (!await launchUrl(_url2)) {
-    throw 'Could not launch $_url2';
-  }
-}
 
-Future<void> _launchUrl3() async {
-  if (!await launchUrl(_url3)) {
-    throw 'Could not launch $_url3';
-  }
-}

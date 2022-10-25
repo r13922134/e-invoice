@@ -5,100 +5,79 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'dart:math';
 import 'package:html/parser.dart' as parser;
 import 'package:firstapp/screens/account/components/account_revise.dart';
+import 'package:flutter/material.dart';
+import 'package:firstapp/constants.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-/*List<String> keywordlist = ['維持體態','多喝水好處'];
-List<String> _selectedkeywordlist = [];
-void getselectedkeyword() async {
+
+
+
+class Newslink {
+  Newslink({
+    required this.keyword,
+    required this.title,
+    required this.url,
+  });
+  String keyword;
+  String title;
+  String url;
+}
+
+Future<List<Newslink>> getnews2(String str) async {
+    var client = http.Client();
+    List<Newslink> tlist = [];
+    String path = 'https://www.google.com/search?q=' + str + '&tbm=nws';
+
+    try {
+      var re = await http.get(Uri.parse(path));
+
+      if (re.statusCode == 200) {
+        BeautifulSoup soup = BeautifulSoup(re.body);
+        String tmp2;
+        String tmp;
+        List<Bs4Element> r1 =
+            soup.findAll('div', class_: 'Gx5Zad fP1Qef xpd EtOod pkphOe');
+        for (Bs4Element b in r1) {
+          tmp = b.find('a')?.getAttrValue('href') ?? '';
+          tmp = tmp.substring(7);
+          String searchString = '&sa';
+          int index = tmp.indexOf(searchString);
+          tmp = tmp.substring(0, index);
+          tmp2 = b.getText().substring(0, 17)+"...";
+          tlist.add(Newslink(keyword: str,title: tmp2, url: tmp));
+        }
+      }
+    } catch (e) {
+      print("error");
+    }
+    client.close();
+    return tlist;
+  }
+
+
+/*Future<List<String>> getkeyword() async {
   final SharedPreferences pref = await SharedPreferences.getInstance();
   String? listString = pref.getString('select_diseases');
-  //List<String> _selectedkeywordlist = [];
   List<Disease> _selectedDisease = [];
+  List<String> _selectedkeywordlist = ["熬夜壞處"];
   if (listString != null) {
       _selectedDisease = Disease.decode(listString);
       for (Disease value in _selectedDisease){
         _selectedkeywordlist.add(value.name.toString());
       }
-  }
-}*/
-/*void getkeyword(){
-  getselectedkeyword();
-  if(_selectedkeywordlist[0]==null){
-    return 
-  }
-}*/
-//bool isLoading = false;
-//String keyword = '';
-
-/*Future<List<String>> geturl(String keyword) async{
-  //String c = "多喝水好處";
-   String c = keyword;
-  //final SharedPreferences pref = await SharedPreferences.getInstance();
-  //var client = http.Client();
-  //int index_count = 1;
-
-  String path1 = 'https://www.google.com/search?q=' + c;
-
-  var response = await http.Client().get(Uri.parse(path1));
-  if (response.statusCode == 200) {
-    BeautifulSoup soup1 = BeautifulSoup(response.body);
-    var document = parser.parse(response.body);
-    try{
-      //var responseString1 = document.getElementsByClassName('rQMQod Xb5VRe')[0];
-      //var responseString2 = document.getElementsByTagName('a href')[0];
-      //var responseString1 = soup1.find("span", class_: "rQMQod Xb5VRe");
-      //String result1 = responseString1.text;
-      //var responseString2 = document.getElementsByClassName('rQMQod Xb5VRe')[0];
-      //String result2 = responseString2.text;
-      //List<Bs4Element> r1 = soup1.findAll("div", class_: "egMi0 kCrYT");
-      //var refind2 = soup1.find("div", class_: "egMi0 kCrYT");
-      //var idk = refind2.contents;
-      //var idk = document.getElementsByClassName('egMi0 kCrYT')[0].firstChild;
-      //var refind = soup1.find("span", class_: "rQMQod Xb5VRe");
-      List<Bs4Element> r1 = soup1.findAll("div", class_: "BNeawe vvjwJb AP7Wnd");
-      String resulttitle = r1[1].getText().toString();
-      List<Bs4Element> r2 = soup1.findAll("div", class_: "egMi0 kCrYT");
-      const start = "/url?q=";
-      const end = "&amp;sa";
-      String noproceedurl = r2[0].a.toString();
-      final startIndex = noproceedurl.indexOf(start);
-      final endIndex = noproceedurl.indexOf(end, startIndex + start.length);
-      String resulturl = noproceedurl.substring(startIndex + start.length, endIndex);
-
-      
-      //var refind3 = refind2.children;
-
-      /*for (int i = 1; i < 2; i += 1){
-        if(r1[i].find("a href") != null){
-          /*n1.add(Newscard(title: c,
-                          resulttitle: soup1.find("h3", class_: "LC20lb MBeuO DKV0Md").toString(),
-                          link:bs4.findAll("a href").toString()));*/
-          var refind2 =r1[i].find("a href").text.trim();
-          
-        }  
-      }*/
-      //String result = r1[0].getText().toString() ;
-      //String result = r2[0].a.toString() ;
-      return [resulttitle,resulturl];
-    } 
-    catch(e){
-      /*n1.add(Newscard(title: c,
-                          resulttitle: "Error",
-                          link:"Error"));*/
-      return ['Error','Error'];
-    } 
-  }else{
-    return ['','ERROR: ${response.statusCode}.'];
-  }
-  //client.close();
-  //return n1;
+  return _selectedkeywordlist;
 }*/
 
-Future<List<String>> get2url() async{
+
+/*Future<List<Newslink>> get2url(String str) async{
   final SharedPreferences pref = await SharedPreferences.getInstance();
   String? listString = pref.getString('select_diseases');
   List<Disease> _selectedDisease = [];
+  List<Newslink> resultnews = [];
+  List<Newslink> resultError = [];
   List<String> _selectedkeywordlist = [];
-  String c = '';
+  String c = str;
   if (listString != null) {
       _selectedDisease = Disease.decode(listString);
       for (Disease value in _selectedDisease){
@@ -134,19 +113,24 @@ Future<List<String>> get2url() async{
       final startIndex = noproceedurl.indexOf(start);
       final endIndex = noproceedurl.indexOf(end, startIndex + start.length);
       String resulturl = noproceedurl.substring(startIndex + start.length, endIndex);
+      resultnews.add(Newslink(keyword: c,title: resulttitle, url: resulturl));
 
-      return [c,resulttitle,resulturl];
+      return resultnews;
     } 
     catch(e){
-      return ['Error','Error','Error'];
+      resultError.add(Newslink(keyword: c,title: 'Error', url: 'Error'));
+      return resultError;
     } 
   }else{
-    return ['','','ERROR: ${response.statusCode}.'];
+    
+    
+    resultError.add(Newslink(keyword: c,title: 'Error', url: response.statusCode.toString()));
+    return resultError;
   }
   
-}
+}*/
 
-Future<List<String>> get3url() async{
+/*Future<List<String>> get3url() async{
   final SharedPreferences pref = await SharedPreferences.getInstance();
   String? listString = pref.getString('select_diseases');
   List<Disease> _selectedDisease = [];
@@ -259,5 +243,5 @@ Future<List<String>> get4url() async{
     return ['','','ERROR: ${response.statusCode}.'];
   }
   
-}
+}*/
 
