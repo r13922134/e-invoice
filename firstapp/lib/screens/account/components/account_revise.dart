@@ -9,6 +9,8 @@ import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'dart:convert';
 import 'package:selectable_list/selectable_list.dart';
 import 'package:firstapp/screens/analysis/calculate.dart';
+import 'package:firstapp/screens/home/components/interestednews.dart';
+
 
 class AccountRevise extends StatefulWidget {
   const AccountRevise({Key? key}) : super(key: key);
@@ -56,6 +58,19 @@ class Activity {
 }
 
 class _ProfileState extends State<AccountRevise> {
+  var _selectedKeyword = ["熬夜壞處"];
+  var response;
+  String resultkeywordvalue = '';
+  String resulttitlevalue = '';
+  String resulturlvalue = '';
+  var response2;
+  String resultkeywordvalue2 = '';
+  String resulttitlevalue2 = '';
+  String resulturlvalue2 = '';
+  var response3;
+  String resultkeywordvalue3 = '';
+  String resulttitlevalue3 = '';
+  String resulturlvalue3 = '';
   int heightValue = 120;
   int weightValue = 30;
   int ageValue = 1;
@@ -64,10 +79,14 @@ class _ProfileState extends State<AccountRevise> {
   String? listString;
   int height = 120, weight = 30, age = 1, gender = 0;
   static final List<Disease> _diseases = [
-    Disease(id: 1, name: "糖尿病"),
-    Disease(id: 2, name: "高血壓"),
-    Disease(id: 3, name: "高血脂"),
+    Disease(id: 1, name: "糖尿病飲食"),
+    Disease(id: 2, name: "高血壓飲食"),
+    Disease(id: 3, name: "高血脂飲食"),
     Disease(id: 4, name: "腎功能異常"),
+    Disease(id: 5, name: "維持體態"),
+    Disease(id: 6, name: "居家運動"),
+    //Disease(id: 3, name: ""),
+    //Disease(id: 4, name: "腎功能異常"),
   ];
   String? activityValue;
   final Activitys = [
@@ -134,6 +153,22 @@ class _ProfileState extends State<AccountRevise> {
       pref.setInt('mixCalorie', 1200);
     }
   }
+
+  Future<void> setResponse(resultkeywordvalue,resulttitlevalue,resulturlvalue,
+                          resultkeywordvalue2,resulttitlevalue2,resulturlvalue2,
+                          resultkeywordvalue3,resulttitlevalue3,resulturlvalue3) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('resultkeyword', resultkeywordvalue);
+    pref.setString('resulttitle', resulttitlevalue);
+    pref.setString('resulturl', resulturlvalue);
+    pref.setString('resultkeyword2', resultkeywordvalue2);
+    pref.setString('resulttitle2', resulttitlevalue2);
+    pref.setString('resulturl2', resulturlvalue2);
+    pref.setString('resultkeyword3', resultkeywordvalue3);
+    pref.setString('resulttitle3', resulttitlevalue3);
+    pref.setString('resulturl3', resulturlvalue3);
+    }
+
 
   @override
   void initState() {
@@ -339,7 +374,7 @@ class _ProfileState extends State<AccountRevise> {
                     searchable: true,
                     unselectedColor: const Color.fromARGB(255, 179, 178, 178),
                     buttonText: const Text(
-                      "疾病史",
+                      "感興趣的健康議題(至多三項)",
                       style: TextStyle(
                         color: Color.fromARGB(255, 80, 80, 80),
                         fontSize: 15,
@@ -378,8 +413,33 @@ class _ProfileState extends State<AccountRevise> {
                       const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                   textStyle: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold)),
-              onPressed: () {
+              onPressed: () async{
                 setProfile(heightValue, weightValue, ageValue, genderValue);
+                
+                //_selectedKeyword = getkeyword() as List<String>;
+                for (Disease value in _selectedDisease){
+                   _selectedKeyword.add(value.name.toString());
+                }
+                
+                response = await getnews2(_selectedKeyword[1]);
+                resultkeywordvalue = response[0].keyword;
+                resulttitlevalue = response[0].title;
+                resulturlvalue = response[0].url;
+                if(_selectedKeyword[2]!=null && _selectedKeyword[2]!=_selectedKeyword[1]){
+                  response2 = await getnews2(_selectedKeyword[2]);
+                  resultkeywordvalue2 = response2[0].keyword;
+                  resulttitlevalue2 = response2[0].title;
+                  resulturlvalue2 = response2[0].url;
+                }
+                if(_selectedKeyword[3]!=null && _selectedKeyword[3]!=_selectedKeyword[1]){
+                  response3 = await getnews2(_selectedKeyword[3]);
+                  resultkeywordvalue3 = response3[0].keyword;
+                  resulttitlevalue3 = response3[0].title;
+                  resulturlvalue3 = response3[0].url;
+                }
+                setResponse(resultkeywordvalue,resulttitlevalue,resulturlvalue,
+                            resultkeywordvalue2,resulttitlevalue2,resulturlvalue2,
+                            resultkeywordvalue3,resulttitlevalue3,resulturlvalue3);
                 CoolAlert.show(
                   context: context,
                   type: CoolAlertType.success,
@@ -415,3 +475,7 @@ class _ProfileState extends State<AccountRevise> {
     );
   }
 }
+
+
+
+

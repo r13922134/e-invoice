@@ -11,8 +11,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/database/winninglist_database.dart';
 import 'package:url_launcher/url_launcher.dart';
-//import 'package:firstapp/screens/home/components/news.dart';
-//import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'package:firstapp/screens/home/components/interestednews.dart';
+import 'package:firstapp/screens/account/components/account_revise.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -25,13 +25,67 @@ var time = DateTime.now();
 var date = DateTime(time.year - 1911, time.month);
 String current = date.year.toString() + date.month.toString();
 
+var resultkeyword = '雲端發票兌獎';
+var resulttitle = '雲端發票中獎怎麼領?雲端...';
+var resulturl = "https://roo.cash/blog/e-invoice-redeem-guide/";
+var resultkeyword2 = '168斷食';
+var resulttitle2 = '「168斷食」間歇性斷食不是吃越少瘦越快';
+var resulturl2 = "https://event.womenshealth.com.tw/2021/168/";
+var resultkeyword3 = '肩頸痠痛';
+var resulttitle3 = '7種疾病是你肩頸痠痛的原因!3招還你健...';
+var resulturl3 = "https://heho.com.tw/archives/72826";
+
 class _State extends State<Body> with SingleTickerProviderStateMixin {
-  final CategoriesScroller categoriesScroller = const CategoriesScroller();
+  CategoriesScroller categoriesScroller = CategoriesScroller();
   ScrollController controller = ScrollController();
   bool closeTopContainer = false;
   double topContainer = 0;
 
   List<Widget> itemsData = [];
+
+  Future<void> getresonsedata() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    resultkeyword = pref.getString('resultkeyword')!;
+    resulttitle = pref.getString('resulttitle')!;
+    resulturl = pref.getString('resulturl')!;
+    resultkeyword2 = pref.getString('resultkeyword2')!;
+    resulttitle2 = pref.getString('resulttitle2')!;
+    resulturl2 = pref.getString('resulturl2')!;
+    resultkeyword3 = pref.getString('resultkeyword3')!;
+    resulttitle3 = pref.getString('resulttitle3')!;
+    resulturl3 = pref.getString('resulturl3')!;
+
+    /*if(pref.getString('resultkeyword')!= null){
+      resultkeyword = pref.getString('resultkeyword')!;
+      resulttitle = pref.getString('resulttitle')!;
+      resulturl = pref.getString('resulturl')!;
+    }else{
+      resultkeyword = '雲端發票兌獎';
+      resulttitle = '雲端發票中獎怎麼領?雲端...';
+      resulturl = "https://roo.cash/blog/e-invoice-redeem-guide/";
+    }*/
+
+    /*if(pref.getString('resultkeyword2') == null){
+      resultkeyword2 = '168斷食';
+      resulttitle2 = '「168斷食」間歇性斷食不是吃越少瘦越快';
+      resulturl2 = "https://event.womenshealth.com.tw/2021/168/";
+    }else{
+      resultkeyword2 = pref.getString('resultkeyword2')!;
+      resulttitle2 = pref.getString('resulttitle2')!;
+      resulturl2 = pref.getString('resulturl2')!;
+    }
+
+    if(pref.getString('resultkeyword3') == null){
+      resultkeyword3 = '肩頸痠痛';
+      resulttitle3 = '7種疾病是你肩頸痠痛的原因!3招還你健...';
+      resulturl3 = "https://heho.com.tw/archives/72826";
+    }else{
+      resultkeyword3 = pref.getString('resultkeyword3')!;
+      resulttitle3 = pref.getString('resulttitle3')!;
+      resulturl3 = pref.getString('resulturl3')!;
+    }*/
+    setState(() {});
+  }
 
   Future<List<Widget>> getPostsData(String current) async {
     List<Widget> listItems = [];
@@ -322,17 +376,9 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                       if (responseList[i].w == 'f')
                         Hero(
                           tag: responseList[i].invNum,
-                          child: Container(
-                            height: 50,
-                            width: 50,
-                            decoration: BoxDecoration(
-                                image: const DecorationImage(
-                                    image:
-                                        AssetImage("assets/images/image_1.png"),
-                                    fit: BoxFit.fill),
-                                color: Colors.white,
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(15)),
+                          child: Image.asset(
+                            "assets/images/image_1.png",
+                            height: 46,
                           ),
                         ),
                       if (responseList[i].w != "f")
@@ -677,14 +723,15 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     controller.addListener(() {
-      double value = controller.offset / 109;
+      double value = controller.offset / 111;
 
       setState(() {
         topContainer = value;
-        closeTopContainer = controller.offset > 1000;
+        closeTopContainer = controller.offset > 320;
       });
     });
     super.initState();
+    getresonsedata();
   }
 
   @override
@@ -849,14 +896,34 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
   }
 }
 
-final Uri _url = Uri.parse(
-    "https://www.ch.com.tw/index.aspx?sv=ch_fitness&chapter=ABD031002");
-final Uri _url2 = Uri.parse(
-    "https://www.womenshealthmag.com/tw/food-nutrition/diet/g37253866/6-healthy-diet/");
-final Uri _url3 = Uri.parse("https://pupupepe.com/zhtw/article/detail/2748");
-final Uri _url4 = Uri.parse("https://www.edh.tw/article/13013");
-final Uri _url5 = Uri.parse("https://www.chp.gov.hk/tc/static/102339.html");
-final Uri _url6 = Uri.parse("https://www.commonhealth.com.tw/article/75826");
+class Newslink {
+  Newslink({
+    required this.keyword,
+    required this.title,
+    required this.url,
+  });
+  String keyword;
+  String title;
+  String url;
+}
+
+Future<void> _launchUrl1() async {
+  if (!await launchUrl(Uri.parse(resulturl))) {
+    throw 'Could not launch $resulturl';
+  }
+}
+
+Future<void> _launchUrl2() async {
+  if (!await launchUrl(Uri.parse(resulturl2))) {
+    throw 'Could not launch $resulturl2';
+  }
+}
+
+Future<void> _launchUrl3() async {
+  if (!await launchUrl(Uri.parse(resulturl3))) {
+    throw 'Could not launch $resulturl3';
+  }
+}
 
 class CategoriesScroller extends StatelessWidget {
   const CategoriesScroller();
@@ -888,7 +955,7 @@ class CategoriesScroller extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "每日飲水量",
+                        "$resultkeyword",
                         style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
@@ -899,22 +966,8 @@ class CategoriesScroller extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl1,
-                        child: const Text(
-                          "喝水是一門學問",
-                          style: TextStyle(fontSize: 17, color: Colors.white),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kPrimaryColor),
-                          side: MaterialStateProperty.all(
-                              BorderSide(color: kPrimaryColor, width: 1)),
-                          elevation: MaterialStateProperty.all(0),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: _launchUrl4,
-                        child: const Text(
-                          "一天要喝多少水才夠?",
+                        child: Text(
+                          "$resulttitle",
                           style: TextStyle(fontSize: 17, color: Colors.white),
                         ),
                         style: ButtonStyle(
@@ -942,7 +995,7 @@ class CategoriesScroller extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "維持體態",
+                        "$resultkeyword2",
                         style: TextStyle(
                             fontSize: 20,
                             color: Colors.white,
@@ -953,22 +1006,8 @@ class CategoriesScroller extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: _launchUrl2,
-                        child: const Text(
-                          "6個不復胖飲食習慣!",
-                          style: TextStyle(fontSize: 17, color: Colors.white),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kSecondaryColor),
-                          side: MaterialStateProperty.all(
-                              BorderSide(color: kSecondaryColor, width: 1)),
-                          elevation: MaterialStateProperty.all(0),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: _launchUrl3,
-                        child: const Text(
-                          "30+無痛體態維持",
+                        child: Text(
+                          "$resulttitle2",
                           style: TextStyle(fontSize: 17, color: Colors.white),
                         ),
                         style: ButtonStyle(
@@ -996,7 +1035,7 @@ class CategoriesScroller extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        "糖尿病飲食",
+                        "$resultkeyword3",
                         style: TextStyle(
                             fontSize: 20,
                             color: Colors.black,
@@ -1007,25 +1046,9 @@ class CategoriesScroller extends StatelessWidget {
                         height: 10,
                       ),
                       ElevatedButton(
-                        onPressed: _launchUrl5,
-                        child: const Text(
-                          "糖尿病飲食建議",
-                          style: TextStyle(
-                              fontSize: 17,
-                              color: Color.fromARGB(255, 141, 129, 129)),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.white),
-                          side: MaterialStateProperty.all(
-                              BorderSide(color: Colors.white, width: 1)),
-                          elevation: MaterialStateProperty.all(0),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: _launchUrl6,
-                        child: const Text(
-                          "16種抗糖尿病明星食物",
+                        onPressed: _launchUrl3,
+                        child: Text(
+                          "$resulttitle3",
                           style: TextStyle(
                               fontSize: 17,
                               color: Color.fromARGB(255, 141, 129, 129)),
@@ -1047,41 +1070,5 @@ class CategoriesScroller extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-Future<void> _launchUrl1() async {
-  if (!await launchUrl(_url)) {
-    throw 'Could not launch $_url';
-  }
-}
-
-Future<void> _launchUrl2() async {
-  if (!await launchUrl(_url2)) {
-    throw 'Could not launch $_url2';
-  }
-}
-
-Future<void> _launchUrl3() async {
-  if (!await launchUrl(_url3)) {
-    throw 'Could not launch $_url3';
-  }
-}
-
-Future<void> _launchUrl4() async {
-  if (!await launchUrl(_url4)) {
-    throw 'Could not launch $_url4';
-  }
-}
-
-Future<void> _launchUrl5() async {
-  if (!await launchUrl(_url5)) {
-    throw 'Could not launch $_url5';
-  }
-}
-
-Future<void> _launchUrl6() async {
-  if (!await launchUrl(_url6)) {
-    throw 'Could not launch $_url6';
   }
 }
