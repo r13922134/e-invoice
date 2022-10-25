@@ -197,132 +197,137 @@ class BarChartSample1State extends State<AnalysisBar> {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1,
-      child: Neumorphic(
-        style: NeumorphicStyle(
-            shape: NeumorphicShape.concave,
-            intensity: 0.9,
-            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(25)),
-            depth: 10,
-            lightSource: LightSource.topRight,
-            color: Color.fromARGB(255, 211, 217, 221)),
-        child: Stack(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Row(
-                      // mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.bar_chart,
-                            color: Color.fromARGB(255, 255, 245, 155)),
-                        Text(
-                          ' 消費分析',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Color.fromARGB(255, 59, 110, 110),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ]),
-                  const SizedBox(
-                    height: 10,
+        aspectRatio: 1,
+        child: Padding(
+          padding: EdgeInsets.all(8),
+          child: Neumorphic(
+            style: NeumorphicStyle(
+                shape: NeumorphicShape.concave,
+                intensity: 0.9,
+                boxShape:
+                    NeumorphicBoxShape.roundRect(BorderRadius.circular(25)),
+                depth: 10,
+                lightSource: LightSource.topRight,
+                color: Color.fromARGB(255, 211, 217, 221)),
+            child: Stack(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Row(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.bar_chart,
+                                color: Color.fromARGB(255, 255, 245, 155)),
+                            Text(
+                              ' 消費分析',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 59, 110, 110),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ]),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            TextButton(
+                              child: const Icon(
+                                Icons.arrow_circle_left,
+                                color: kBackgroundColor,
+                              ),
+                              onPressed: leftclick,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: kBackgroundColor,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Text(
+                                  '  ' +
+                                      date.year.toString() +
+                                      '年' +
+                                      ' ' +
+                                      date.month.toString() +
+                                      '月' +
+                                      '  ',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Color.fromARGB(255, 59, 110, 110),
+                                    fontWeight: FontWeight.w700,
+                                  )),
+                            ),
+                            TextButton(
+                              child: const Icon(Icons.arrow_circle_right,
+                                  color: kBackgroundColor),
+                              onPressed: rightclick,
+                            )
+                          ]),
+                      const SizedBox(
+                        height: 38,
+                      ),
+                      Expanded(
+                        child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: FutureBuilder(
+                                future: classify(current),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.done) {
+                                    return BarChart(
+                                      mainBarData(),
+                                      swapAnimationDuration: animDuration,
+                                    );
+                                  }
+                                  return SizedBox(
+                                      height: 10,
+                                      child: Center(
+                                          child: LoadingAnimationWidget.inkDrop(
+                                        color:
+                                            Color.fromARGB(255, 255, 245, 155),
+                                        size: 60,
+                                      )));
+                                })),
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                    ],
                   ),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        TextButton(
-                          child: const Icon(
-                            Icons.arrow_circle_left,
-                            color: kBackgroundColor,
-                          ),
-                          onPressed: leftclick,
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: kBackgroundColor,
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Text(
-                              '  ' +
-                                  date.year.toString() +
-                                  '年' +
-                                  ' ' +
-                                  date.month.toString() +
-                                  '月' +
-                                  '  ',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Color.fromARGB(255, 59, 110, 110),
-                                fontWeight: FontWeight.w700,
-                              )),
-                        ),
-                        TextButton(
-                          child: const Icon(Icons.arrow_circle_right,
-                              color: kBackgroundColor),
-                          onPressed: rightclick,
-                        )
-                      ]),
-                  const SizedBox(
-                    height: 38,
-                  ),
-                  Expanded(
-                    child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: FutureBuilder(
-                            future: classify(current),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.done) {
-                                return BarChart(
-                                  mainBarData(),
-                                  swapAnimationDuration: animDuration,
-                                );
-                              }
-                              return SizedBox(
-                                  height: 10,
-                                  child: Center(
-                                      child: LoadingAnimationWidget.inkDrop(
-                                    color: Color.fromARGB(255, 255, 245, 155),
-                                    size: 60,
-                                  )));
-                            })),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                ],
-              ),
+                ),
+                // Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: Align(
+                //     alignment: Alignment.topRight,
+                //     child: IconButton(
+                //       icon: Icon(
+                //         isPlaying ? Icons.pause : Icons.play_arrow,
+                //         color: Colors.blueGrey,
+                //       ),
+                //       onPressed: () {
+                //         setState(() {
+                //           isPlaying = !isPlaying;
+                //           if (isPlaying) {
+                //             refreshState();
+                //           }
+                //         });
+                //       },
+                //     ),
+                //   ),
+                // )
+              ],
             ),
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: Align(
-            //     alignment: Alignment.topRight,
-            //     child: IconButton(
-            //       icon: Icon(
-            //         isPlaying ? Icons.pause : Icons.play_arrow,
-            //         color: Colors.blueGrey,
-            //       ),
-            //       onPressed: () {
-            //         setState(() {
-            //           isPlaying = !isPlaying;
-            //           if (isPlaying) {
-            //             refreshState();
-            //           }
-            //         });
-            //       },
-            //     ),
-            //   ),
-            // )
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   BarChartGroupData makeGroupData(
@@ -356,7 +361,7 @@ class BarChartSample1State extends State<AnalysisBar> {
   List<BarChartGroupData> showingGroups() => List.generate(5, (i) {
         switch (i) {
           case 0:
-            return makeGroupData(0, 100, isTouched: i == touchedIndex);
+            return makeGroupData(0, food, isTouched: i == touchedIndex);
           case 1:
             return makeGroupData(1, clothe, isTouched: i == touchedIndex);
           case 2:

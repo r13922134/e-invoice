@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:firstapp/screens/analysis/card_info.dart';
 import 'package:firstapp/screens/analysis/card_detail.dart';
+import 'package:firstapp/screens/analysis/consumption.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flip_card/flip_card.dart';
@@ -869,7 +870,9 @@ class _IdentityPageState extends State<AnalysisScreen> {
                           }),
                       const SizedBox(height: 30),
                       const AnalysisBar(),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 20),
+                      const Consumption(),
+                      const SizedBox(height: 20),
                       const WaterIntake(),
                       const SizedBox(height: 80),
                     ]))));

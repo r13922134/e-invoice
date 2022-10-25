@@ -1,3 +1,4 @@
+import 'package:firstapp/screens/account/components/account_revise.dart';
 import 'package:flutter/material.dart';
 import '../../../constants.dart';
 import 'package:firstapp/screens/details/details_screen.dart';
@@ -11,8 +12,9 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/database/winninglist_database.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:firstapp/screens/home/components/interestednews.dart';
-import 'package:firstapp/screens/account/components/account_revise.dart';
+import 'package:firstapp/screens/analysis/card_detail.dart';
+import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -25,16 +27,6 @@ var time = DateTime.now();
 var date = DateTime(time.year - 1911, time.month);
 String current = date.year.toString() + date.month.toString();
 
-var resultkeyword = '雲端發票兌獎';
-var resulttitle = '雲端發票中獎怎麼領?雲端...';
-var resulturl = "https://roo.cash/blog/e-invoice-redeem-guide/";
-var resultkeyword2 = '168斷食';
-var resulttitle2 = '「168斷食」間歇性斷食不是吃越少瘦越快';
-var resulturl2 = "https://event.womenshealth.com.tw/2021/168/";
-var resultkeyword3 = '肩頸痠痛';
-var resulttitle3 = '7種疾病是你肩頸痠痛的原因!3招還你健...';
-var resulturl3 = "https://heho.com.tw/archives/72826";
-
 class _State extends State<Body> with SingleTickerProviderStateMixin {
   CategoriesScroller categoriesScroller = CategoriesScroller();
   ScrollController controller = ScrollController();
@@ -42,50 +34,6 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
   double topContainer = 0;
 
   List<Widget> itemsData = [];
-
-  Future<void> getresonsedata() async {
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-    resultkeyword = pref.getString('resultkeyword')!;
-    resulttitle = pref.getString('resulttitle')!;
-    resulturl = pref.getString('resulturl')!;
-    resultkeyword2 = pref.getString('resultkeyword2')!;
-    resulttitle2 = pref.getString('resulttitle2')!;
-    resulturl2 = pref.getString('resulturl2')!;
-    resultkeyword3 = pref.getString('resultkeyword3')!;
-    resulttitle3 = pref.getString('resulttitle3')!;
-    resulturl3 = pref.getString('resulturl3')!;
-
-    /*if(pref.getString('resultkeyword')!= null){
-      resultkeyword = pref.getString('resultkeyword')!;
-      resulttitle = pref.getString('resulttitle')!;
-      resulturl = pref.getString('resulturl')!;
-    }else{
-      resultkeyword = '雲端發票兌獎';
-      resulttitle = '雲端發票中獎怎麼領?雲端...';
-      resulturl = "https://roo.cash/blog/e-invoice-redeem-guide/";
-    }*/
-
-    /*if(pref.getString('resultkeyword2') == null){
-      resultkeyword2 = '168斷食';
-      resulttitle2 = '「168斷食」間歇性斷食不是吃越少瘦越快';
-      resulturl2 = "https://event.womenshealth.com.tw/2021/168/";
-    }else{
-      resultkeyword2 = pref.getString('resultkeyword2')!;
-      resulttitle2 = pref.getString('resulttitle2')!;
-      resulturl2 = pref.getString('resulturl2')!;
-    }
-
-    if(pref.getString('resultkeyword3') == null){
-      resultkeyword3 = '肩頸痠痛';
-      resulttitle3 = '7種疾病是你肩頸痠痛的原因!3招還你健...';
-      resulturl3 = "https://heho.com.tw/archives/72826";
-    }else{
-      resultkeyword3 = pref.getString('resultkeyword3')!;
-      resulttitle3 = pref.getString('resulttitle3')!;
-      resulturl3 = pref.getString('resulturl3')!;
-    }*/
-    setState(() {});
-  }
 
   Future<List<Widget>> getPostsData(String current) async {
     List<Widget> listItems = [];
@@ -376,9 +324,17 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
                       if (responseList[i].w == 'f')
                         Hero(
                           tag: responseList[i].invNum,
-                          child: Image.asset(
-                            "assets/images/image_1.png",
-                            height: 46,
+                          child: Container(
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                                image: const DecorationImage(
+                                    image:
+                                        AssetImage("assets/images/image_1.png"),
+                                    fit: BoxFit.fill),
+                                color: Colors.white,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(15)),
                           ),
                         ),
                       if (responseList[i].w != "f")
@@ -727,11 +683,10 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
 
       setState(() {
         topContainer = value;
-        closeTopContainer = controller.offset > 320;
+        closeTopContainer = controller.offset > 550;
       });
     });
     super.initState();
-    getresonsedata();
   }
 
   @override
@@ -896,179 +851,143 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
   }
 }
 
-class Newslink {
-  Newslink({
-    required this.keyword,
-    required this.title,
-    required this.url,
-  });
-  String keyword;
-  String title;
-  String url;
-}
-
-Future<void> _launchUrl1() async {
-  if (!await launchUrl(Uri.parse(resulturl))) {
-    throw 'Could not launch $resulturl';
+Future link(String link) async {
+  if (!await launchUrl(Uri.parse(link))) {
+    throw 'Could not launch $link';
   }
 }
 
-Future<void> _launchUrl2() async {
-  if (!await launchUrl(Uri.parse(resulturl2))) {
-    throw 'Could not launch $resulturl2';
+Future<List<Linkstr>> getnews() async {
+  final SharedPreferences pref = await SharedPreferences.getInstance();
+  String? listString = pref.getString('select_diseases');
+  List<Disease> _select = [];
+  if (listString != null) {
+    _select = Disease.decode(listString);
   }
-}
+  if (_select.length == 0) {
+    _select.add(Disease(id: 1, name: '飲食'));
+  }
 
-Future<void> _launchUrl3() async {
-  if (!await launchUrl(Uri.parse(resulturl3))) {
-    throw 'Could not launch $resulturl3';
+  var client = http.Client();
+  List<Linkstr> tlist = [];
+  for (Disease di in _select) {
+    String path = 'https://www.google.com/search?q=' + di.name + ' &tbm=nws';
+
+    try {
+      var re = await http.get(Uri.parse(path));
+
+      if (re.statusCode == 200) {
+        BeautifulSoup soup = BeautifulSoup(re.body);
+        String tmp;
+        List<Bs4Element> r1 =
+            soup.findAll('div', class_: 'Gx5Zad fP1Qef xpd EtOod pkphOe');
+        for (Bs4Element b in r1) {
+          tmp = b.find('a')?.getAttrValue('href') ?? '';
+          tmp = tmp.substring(7);
+          String searchString = '&sa';
+          int index = tmp.indexOf(searchString);
+          tmp = tmp.substring(0, index);
+          tlist.add(Linkstr(title: b.getText(), link: tmp));
+        }
+      }
+    } catch (e) {
+      print("error");
+    }
   }
+
+  client.close();
+  tlist.shuffle();
+  return tlist;
 }
 
 class CategoriesScroller extends StatelessWidget {
   const CategoriesScroller();
-
   @override
   Widget build(BuildContext context) {
     final double categoryHeight =
         MediaQuery.of(context).size.height * 0.30 - 70;
     return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-        child: FittedBox(
-          fit: BoxFit.fill,
-          alignment: Alignment.topCenter,
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: 150,
-                margin: const EdgeInsets.only(right: 20),
-                height: categoryHeight,
-                decoration: const BoxDecoration(
-                    color: kPrimaryColor,
-                    borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        "$resultkeyword",
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      ElevatedButton(
-                        onPressed: _launchUrl1,
-                        child: Text(
-                          "$resulttitle",
-                          style: TextStyle(fontSize: 17, color: Colors.white),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kPrimaryColor),
-                          side: MaterialStateProperty.all(
-                              BorderSide(color: kPrimaryColor, width: 1)),
-                          elevation: MaterialStateProperty.all(0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: 150,
-                margin: const EdgeInsets.only(right: 20),
-                height: categoryHeight,
-                decoration: const BoxDecoration(
-                    color: kSecondaryColor,
-                    borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        "$resultkeyword2",
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      ElevatedButton(
-                        onPressed: _launchUrl2,
-                        child: Text(
-                          "$resulttitle2",
-                          style: TextStyle(fontSize: 17, color: Colors.white),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(kSecondaryColor),
-                          side: MaterialStateProperty.all(
-                              BorderSide(color: kSecondaryColor, width: 1)),
-                          elevation: MaterialStateProperty.all(0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: 150,
-                margin: const EdgeInsets.only(right: 20),
-                height: categoryHeight,
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        "$resultkeyword3",
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      //Image.asset('assets/images/cancel.png',width: 30,),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      ElevatedButton(
-                        onPressed: _launchUrl3,
-                        child: Text(
-                          "$resulttitle3",
-                          style: TextStyle(
-                              fontSize: 17,
-                              color: Color.fromARGB(255, 141, 129, 129)),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.white),
-                          side: MaterialStateProperty.all(
-                              BorderSide(color: Colors.white, width: 1)),
-                          elevation: MaterialStateProperty.all(0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+        physics: const BouncingScrollPhysics(),
+        scrollDirection: Axis.horizontal,
+        child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            child: FittedBox(
+                fit: BoxFit.fill,
+                alignment: Alignment.topCenter,
+                child: Row(children: <Widget>[
+                  Container(
+                      height: 190.0,
+                      child: FutureBuilder<List<Linkstr>>(
+                          future: getnews(),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              List<Color> colors = [
+                                kPrimaryColor,
+                                kSecondaryColor,
+                                Color.fromARGB(255, 229, 236, 244),
+                                Color.fromARGB(255, 158, 118, 130),
+                                Color.fromARGB(255, 96, 87, 112),
+                              ];
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: snapshot.data.length,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    width: 150,
+                                    height: categoryHeight,
+                                    margin: const EdgeInsets.only(right: 20),
+                                    decoration: BoxDecoration(
+                                        color: colors[index % 5],
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(20.0))),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Icon(Icons.newspaper_rounded,
+                                              color: Colors.white),
+                                          const SizedBox(
+                                            height: 20,
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              link(snapshot.data[index].link);
+                                            },
+                                            child: Text(
+                                              snapshot.data[index].title
+                                                      .substring(0, 22) +
+                                                  '...',
+                                              style: TextStyle(
+                                                  fontSize: 17,
+                                                  color: index % 5 == 2 ||
+                                                          index % 5 == 1
+                                                      ? Colors.blueGrey
+                                                      : kBackgroundColor,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            } else {
+                              return SizedBox(
+                                  height: 200,
+                                  child: Center(
+                                      child: LoadingAnimationWidget.flickr(
+                                    rightDotColor: kSecondaryColor,
+                                    leftDotColor: kPrimaryColor,
+                                    size: 50,
+                                  )));
+                            }
+                          }))
+                ]))));
   }
 }
