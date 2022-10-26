@@ -870,9 +870,9 @@ class _IdentityPageState extends State<AnalysisScreen> {
                           }),
                       const SizedBox(height: 30),
                       const AnalysisBar(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
                       const Consumption(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
                       const WaterIntake(),
                       const SizedBox(height: 80),
                     ]))));

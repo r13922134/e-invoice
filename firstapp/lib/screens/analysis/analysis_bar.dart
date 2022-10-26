@@ -51,71 +51,78 @@ var time = DateTime.now();
 var date = DateTime(time.year - 1911, time.month);
 String current = date.year.toString() + date.month.toString();
 
+Future update_detail(String tag, String invNum, String date) async {
+  final SharedPreferences pref = await SharedPreferences.getInstance();
+  String barcode = pref.getString('barcode') ?? "";
+  String password = pref.getString('password') ?? "";
+  var client = http.Client();
+  int timestamp = DateTime.now().millisecondsSinceEpoch + 40000;
+  int exp = timestamp + 65000;
+  List<invoice_details> responseList =
+      await DetailHelper.instance.getDetail(tag, invNum);
+  var rbody;
+
+  if (responseList.length == 0) {
+    rbody = {
+      "version": "0.5",
+      "cardType": "3J0002",
+      "cardNo": barcode,
+      "expTimeStamp": exp.toString().substring(0, 10),
+      "action": "carrierInvDetail",
+      "timeStamp": timestamp.toString().substring(0, 10),
+      "invNum": invNum,
+      "invDate": date,
+      "uuid": '1000',
+      "appID": 'EINV0202204156709',
+      "cardEncrypt": password,
+    };
+    try {
+      var response = await client.post(
+        Uri.parse("https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ"),
+        body: rbody,
+      );
+      if (response.statusCode == 200) {
+        String responseString = response.body;
+        var r = jsonDecode(responseString);
+        List d = r['details'];
+        for (var de in d) {
+          await DetailHelper.instance.add(invoice_details(
+              tag: tag,
+              invNum: invNum,
+              name: de['description'],
+              date: date,
+              quantity: de['quantity'],
+              amount: de['amount'],
+              type: 0));
+        }
+      }
+    } catch (e) {
+      debugPrint("$e");
+    }
+  }
+}
+
 class BarChartSample1State extends State<AnalysisBar> {
   final Color barBackgroundColor = const Color(0xff72d8bf);
   final Duration animDuration = const Duration(milliseconds: 250);
   int touchedIndex = -1;
   bool isPlaying = false;
-  double food = 0, clothe = 0, items = 0, tech = 0, other = 0;
 
+  double food = 0, clothe = 0, items = 0, tech = 0, other = 0;
   Future<void> classify(String current) async {
     food = 0;
     clothe = 0;
     items = 0;
     tech = 0;
     other = 0;
-    List<invoice_details> responseList = [];
-    final SharedPreferences pref = await SharedPreferences.getInstance();
-    String barcode = pref.getString('barcode') ?? "";
-    String password = pref.getString('password') ?? "";
+
     List<Header>? relist = await HeaderHelper.instance.getHeader(current);
+    for (int i = 0; i < relist.length; i++) {
+      await update_detail(relist[i].tag, relist[i].invNum, relist[i].date);
+    }
     List<Bardata> l = await DetailHelper.instance.getmonth(current);
     var client = http.Client();
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 40000;
-    int exp = timestamp + 65000;
 
-    for (int i = 0; i < relist.length; i++) {
-      timestamp += 5000;
-      exp += 5000;
-      responseList = await DetailHelper.instance
-          .getDetail(relist[i].tag, relist[i].invNum);
-      if (responseList.isEmpty) {
-        var rbody = {
-          "version": "0.5",
-          "cardType": "3J0002",
-          "cardNo": barcode,
-          "expTimeStamp": exp.toString().substring(0, 10),
-          "action": "carrierInvDetail",
-          "timeStamp": timestamp.toString().substring(0, 10),
-          "invNum": relist[i].invNum,
-          "invDate": relist[i].date,
-          "uuid": '1000',
-          "appID": 'EINV0202204156709',
-          "cardEncrypt": password,
-        };
-        try {
-          var response = await client.post(
-            Uri.parse(
-                "https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ"),
-            body: rbody,
-          );
-          if (response.statusCode == 200) {
-            String responseString = response.body;
-            var r = jsonDecode(responseString);
-            List d = r['details'];
-            for (var de in d) {
-              l.add(Bardata(name: de['description'], price: de['amount']));
-            }
-          }
-        } catch (e) {
-          debugPrint("$e");
-        }
-      } else {
-        for (invoice_details ind in responseList) {
-          l.add(Bardata(name: ind.name, price: ind.amount));
-        }
-      }
-    }
     List<Ename> tmparray = [];
 
     for (Bardata s in l) {
@@ -183,7 +190,6 @@ class BarChartSample1State extends State<AnalysisBar> {
     setState(() {
       current = date.year.toString() + date.month.toString();
     });
-    classify(current);
   }
 
   void rightclick() {
@@ -191,7 +197,6 @@ class BarChartSample1State extends State<AnalysisBar> {
     setState(() {
       current = date.year.toString() + date.month.toString();
     });
-    classify(current);
   }
 
   @override
