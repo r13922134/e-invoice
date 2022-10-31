@@ -662,8 +662,6 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     date = DateTime(date.year, date.month - 1);
     setState(() {
       current = date.year.toString() + date.month.toString();
-
-      getPostsData(current);
     });
   }
 
@@ -671,19 +669,17 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     date = DateTime(date.year, date.month + 1);
     setState(() {
       current = date.year.toString() + date.month.toString();
-
-      getPostsData(current);
     });
   }
 
   @override
   void initState() {
     controller.addListener(() {
-      double value = controller.offset / 111;
+      double value = controller.offset / 109;
 
       setState(() {
         topContainer = value;
-        closeTopContainer = controller.offset > 550;
+        closeTopContainer = controller.offset > 1000;
       });
     });
     super.initState();
@@ -941,6 +937,15 @@ class CategoriesScroller extends StatelessWidget {
                                     margin: const EdgeInsets.only(right: 20),
                                     decoration: BoxDecoration(
                                         color: colors[index % 5],
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 5,
+                                            blurRadius: 7,
+                                            offset: Offset(4,
+                                                8), // changes position of shadow
+                                          ),
+                                        ],
                                         borderRadius: const BorderRadius.all(
                                             Radius.circular(20.0))),
                                     child: Padding(
@@ -960,13 +965,18 @@ class CategoriesScroller extends StatelessWidget {
                                             },
                                             child: Text(
                                               snapshot.data[index].title
-                                                      .substring(0, 22) +
-                                                  '...',
+                                                          .length >
+                                                      25
+                                                  ? snapshot.data[index].title
+                                                          .substring(0, 26) +
+                                                      '...'
+                                                  : snapshot.data[index].title,
                                               style: TextStyle(
-                                                  fontSize: 17,
+                                                  fontSize: 16,
                                                   color: index % 5 == 2 ||
                                                           index % 5 == 1
-                                                      ? Colors.blueGrey
+                                                      ? Color.fromARGB(
+                                                          255, 96, 87, 112)
                                                       : kBackgroundColor,
                                                   fontWeight: FontWeight.bold),
                                             ),

@@ -46,7 +46,6 @@ class DetailsScreen extends StatelessWidget {
         "appID": 'EINV0202204156709',
         "cardEncrypt": password,
       };
-      print(rbody);
 
       var client = http.Client();
       try {
@@ -164,9 +163,10 @@ class DetailsScreen extends StatelessWidget {
                             );
                           } else {
                             return Center(
-                                child: LoadingAnimationWidget.fourRotatingDots(
-                              color: Colors.white,
-                              size: 40,
+                                child: LoadingAnimationWidget.flickr(
+                              rightDotColor: kSecondaryColor,
+                              leftDotColor: Colors.white,
+                              size: 50,
                             ));
                           }
                         }),

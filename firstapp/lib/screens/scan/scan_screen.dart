@@ -26,7 +26,7 @@ class ScanScreen extends StatelessWidget {
         // padding: const EdgeInsets.all(12.0),
         color: kBackgroundColor,
         width: 500,
-        height: 700,
+        height: 690,
         child: ContainedTabBarView(
           tabBarProperties: TabBarProperties(
               indicatorSize: TabBarIndicatorSize.label,
