@@ -143,9 +143,11 @@ class ProfileBody extends State<Body> {
               t = pic[5];
             }
             c.add(Carrier(name: de['carrierName'], type: t));
-            String encodedData = Carrier.encode(c);
-            pref.setString('CarrierList', encodedData);
           }
+          String encodedData = Carrier.encode(c);
+          pref.setString('CarrierList', encodedData);
+          pref.setString(
+              'serial', (int.parse(serial) + 1).toString().padLeft(10, '0'));
         } else {
           String clist = pref.getString('CarrierList') ?? '';
           if (clist != '') {
@@ -165,8 +167,7 @@ class ProfileBody extends State<Body> {
     client.close();
 
     c.add(Carrier(name: '+', type: '+'));
-    pref.setString(
-        'serial', (int.parse(serial) + 1).toString().padLeft(10, '0'));
+
     return c;
   }
 
