@@ -5,6 +5,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class Linkstr {
   Linkstr({
@@ -165,7 +166,7 @@ class DetailPage extends StatelessWidget {
                                           const SizedBox(
                                             height: 50,
                                           ),
-                                          GestureDetector(
+                                          ZoomTapAnimation(
                                             onTap: () {
                                               link(snapshot.data[index].link);
                                             },
