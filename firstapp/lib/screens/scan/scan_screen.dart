@@ -15,6 +15,7 @@ import 'package:lottie/lottie.dart';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:io';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class ScanScreen extends StatelessWidget {
   @override
@@ -265,7 +266,7 @@ class _QRViewExampleState extends State<QRViewExample> {
         body: Column(children: <Widget>[
       const SizedBox(height: 70),
       Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <Widget>[
-        GestureDetector(
+        ZoomTapAnimation(
           onTap: () {
             scanQR();
           },
@@ -296,7 +297,7 @@ class _QRViewExampleState extends State<QRViewExample> {
             ),
           ),
         ),
-        GestureDetector(
+        ZoomTapAnimation(
           onTap: () {
             Navigator.push(
               context,

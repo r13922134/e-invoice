@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../constants.dart';
 // ignore: import_of_legacy_library_into_null_safe

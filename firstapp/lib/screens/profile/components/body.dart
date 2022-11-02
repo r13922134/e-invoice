@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'profile_menu.dart';
 import 'profile_pic.dart';
 import 'package:crypto/crypto.dart';
@@ -16,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class Carrier {
   Carrier({
@@ -24,6 +24,28 @@ class Carrier {
   });
   String name;
   String type;
+
+  factory Carrier.fromJson(Map<String, dynamic> jsonData) {
+    return Carrier(
+      name: jsonData['name'],
+      type: jsonData['type'],
+    );
+  }
+
+  static Map<String, dynamic> toMap(Carrier carrier) => {
+        'name': carrier.name,
+        'type': carrier.type,
+      };
+  static String encode(List<Carrier> carriers) => json.encode(
+        carriers
+            .map<Map<String, dynamic>>((carrier) => Carrier.toMap(carrier))
+            .toList(),
+      );
+
+  static List<Carrier> decode(String carriers) =>
+      (json.decode(carriers) as List<dynamic>)
+          .map<Carrier>((item) => Carrier.fromJson(item))
+          .toList();
 }
 
 class Body extends StatefulWidget {
@@ -59,6 +81,7 @@ class ProfileBody extends State<Body> {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String barcode = pref.getString('barcode') ?? 'null';
     String password = pref.getString('password') ?? 'null';
+    String serial = pref.getString('serial') ?? '0000000001';
     int timestamp = DateTime.now().millisecondsSinceEpoch + 20000;
     String stamp = timestamp.toString().substring(0, 10);
     var client = http.Client();
@@ -66,7 +89,9 @@ class ProfileBody extends State<Body> {
         password +
         '&cardNo=' +
         barcode +
-        '&cardType=3J0002&serial=0000000001&timeStamp=' +
+        '&cardType=3J0002&serial=' +
+        serial +
+        '&timeStamp=' +
         stamp +
         '&uuid=' +
         password +
@@ -78,7 +103,7 @@ class ProfileBody extends State<Body> {
     String signature = base64UrlEncode(result.bytes);
     var rbody = {
       "version": "1.0",
-      "serial": "0000000001",
+      "serial": serial,
       "action": "qryCarrierAgg",
       "cardType": "3J0002",
       "cardNo": barcode,
@@ -88,7 +113,6 @@ class ProfileBody extends State<Body> {
       "uuid": password,
       "signature": signature,
     };
-
     List<Carrier> c = [];
     try {
       var response = await client.post(
@@ -101,33 +125,48 @@ class ProfileBody extends State<Body> {
       if (response.statusCode == 200) {
         String responseString = response.body;
         var r = jsonDecode(responseString);
-        print(r);
-        List d = r['carriers'];
-        String t = '';
-        for (var de in d) {
-          if (de['carrierType'] == 'EK0002') {
-            t = pic[0];
-          } else if (de['carrierType'] == 'BK0001') {
-            t = pic[1];
-          } else if (de['carrierType'] == '2G0001') {
-            t = pic[2];
-          } else if (de['carrierType'] == '1H0001') {
-            t = pic[3];
-          } else if (de['carrierType'] == '1K0001') {
-            t = pic[4];
-          } else {
-            t = pic[5];
+        if (r['code'] == 200) {
+          List d = r['carriers'];
+          String t = '';
+          for (var de in d) {
+            if (de['carrierType'] == 'EK0002') {
+              t = pic[0];
+            } else if (de['carrierType'] == 'BK0001') {
+              t = pic[1];
+            } else if (de['carrierType'] == '2G0001') {
+              t = pic[2];
+            } else if (de['carrierType'] == '1H0001') {
+              t = pic[3];
+            } else if (de['carrierType'] == '1K0001') {
+              t = pic[4];
+            } else {
+              t = pic[5];
+            }
+            c.add(Carrier(name: de['carrierName'], type: t));
+            String encodedData = Carrier.encode(c);
+            pref.setString('CarrierList', encodedData);
           }
-          c.add(Carrier(name: de['carrierName'], type: t));
+        } else {
+          String clist = pref.getString('CarrierList') ?? '';
+          if (clist != '') {
+            c = Carrier.decode(clist);
+          }
         }
       }
     } catch (e) {
       debugPrint("$e");
+      String clist = pref.getString('CarrierList') ?? '';
+
+      if (clist != '') {
+        c = Carrier.decode(clist);
+      }
     }
 
     client.close();
 
     c.add(Carrier(name: '+', type: '+'));
+    pref.setString(
+        'serial', (int.parse(serial) + 1).toString().padLeft(10, '0'));
     return c;
   }
 
@@ -255,7 +294,8 @@ class ProfileBody extends State<Body> {
                                                   Positioned(
                                                     top: 5,
                                                     right: 28,
-                                                    child: GestureDetector(
+                                                    child: ZoomTapAnimation(
+                                                      end: 0.53,
                                                       onTap: () {
                                                         link(
                                                             'https://www.einvoice.nat.gov.tw/APCONSUMER/BTC504W/');

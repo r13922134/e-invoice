@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:firstapp/screens/analysis/card_detail.dart';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class Body extends StatefulWidget {
   const Body({Key? key}) : super(key: key);
@@ -959,7 +960,7 @@ class CategoriesScroller extends StatelessWidget {
                                           const SizedBox(
                                             height: 20,
                                           ),
-                                          GestureDetector(
+                                          ZoomTapAnimation(
                                             onTap: () {
                                               link(snapshot.data[index].link);
                                             },
