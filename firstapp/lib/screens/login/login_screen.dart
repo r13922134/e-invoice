@@ -10,7 +10,6 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'dart:convert';
 import 'package:firstapp/database/invoice_database.dart';
 import 'package:firstapp/database/winninglist_database.dart';
-import 'dart:math';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -23,8 +22,8 @@ class LoginScreen extends StatelessWidget {
     pref.setString('barcode', data.name);
     pref.setString('password', data.password);
 
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 25000;
-    int exp = timestamp + 65000;
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 100000;
+    int exp = timestamp + 200000;
     var now = DateTime.now();
     var formatter = DateFormat('yyyy/MM/dd');
     String responseString;
@@ -33,15 +32,12 @@ class LoginScreen extends StatelessWidget {
     String edate;
     DateTime last;
     DateTime start;
-    var rng = Random();
-    int uuid;
+
     String term;
 
     var client = http.Client();
 
     for (int j = 5; j >= 0; j--) {
-      uuid = rng.nextInt(1000);
-
       start = DateTime(now.year, now.month - j, 01);
       last = DateTime(start.year, start.month + 1, 0);
       if (start.month < 10) {
@@ -49,31 +45,9 @@ class LoginScreen extends StatelessWidget {
       } else {
         term = (start.year - 1911).toString() + start.month.toString();
       }
-      timestamp += 5000;
-      exp += 5000;
+
       sdate = formatter.format(start);
       edate = formatter.format(last);
-      var rbody = {
-        "version": "0.5",
-        "cardType": "3J0002",
-        "cardNo": data.name,
-        "expTimeStamp": exp.toString().substring(0, 10),
-        "action": "carrierInvChk",
-        "timeStamp": timestamp.toString().substring(0, 10),
-        "startDate": sdate,
-        "endDate": edate,
-        "onlyWinningInv": 'N',
-        "uuid": uuid.toString(),
-        "appID": 'EINV0202204156709',
-        "cardEncrypt": data.password,
-      };
-      var rbody2 = {
-        "version": "0.2",
-        "action": "QryWinningList",
-        "invTerm": term,
-        "UUID": uuid.toString(),
-        "appID": "EINV0202204156709",
-      };
       try {
         var response = await client.post(
             Uri.parse(
@@ -81,14 +55,34 @@ class LoginScreen extends StatelessWidget {
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: rbody);
+            body: {
+              "version": "0.5",
+              "cardType": "3J0002",
+              "cardNo": data.name,
+              "expTimeStamp": exp.toString().substring(0, 10),
+              "action": "carrierInvChk",
+              "timeStamp": timestamp.toString().substring(0, 10),
+              "startDate": sdate,
+              "endDate": edate,
+              "onlyWinningInv": 'N',
+              "uuid": data.password,
+              "appID": 'EINV0202204156709',
+              "cardEncrypt": data.password,
+            });
         var response2 = await client.post(
             Uri.parse(
                 'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invapp/InvApp'),
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: rbody2);
+            body: {
+              "version": "0.2",
+              "action": "QryWinningList",
+              "invTerm": term,
+              "UUID": data.password,
+              "appID": "EINV0202204156709",
+            });
+
         if (response.statusCode == 200 && response2.statusCode == 200) {
           responseString = response.body;
           winlist = response2.body;
@@ -133,6 +127,8 @@ class LoginScreen extends StatelessWidget {
               spcPrizeNo: w['spcPrizeNo'],
             ));
           }
+        } else {
+          print(response.reasonPhrase);
         }
       } catch (e) {
         debugPrint("$e");

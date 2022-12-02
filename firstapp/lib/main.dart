@@ -14,7 +14,6 @@ import 'package:firstapp/screens/account/components/account_revise.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/screens/home/components/home_barcode.dart';
 import 'dart:convert';
-import 'dart:math';
 import 'package:firstapp/database/winninglist_database.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -56,16 +55,14 @@ class Splash extends StatelessWidget {
 
 Future<void> updateData() async {
   List<Header>? responseList2 = await HeaderHelper.instance.getAll();
-
+  print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
   if (responseList2.isNotEmpty) {
     final SharedPreferences pref = await SharedPreferences.getInstance();
     String barcode = pref.getString('barcode') ?? "";
     String password = pref.getString('password') ?? "";
     var client = http.Client();
-    var rng = Random();
     var now = DateTime.now();
-    int uuid = rng.nextInt(1000);
-    int timestamp = DateTime.now().millisecondsSinceEpoch + 25000;
+    int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
     int exp = timestamp + 50000;
 
     var formatter = DateFormat('yyyy/MM/dd');
@@ -75,9 +72,6 @@ Future<void> updateData() async {
     DateTime start;
     String term;
     for (int j = 5; j >= 0; j--) {
-      uuid = rng.nextInt(1000);
-      timestamp += 5000;
-      exp += 5000;
       start = DateTime(now.year, now.month - j, 01);
       last = DateTime(start.year, start.month + 1, 0);
       sdate = formatter.format(start);
@@ -87,41 +81,7 @@ Future<void> updateData() async {
       } else {
         term = (start.year - 1911).toString() + start.month.toString();
       }
-      var rbody1 = {
-        "version": "0.5",
-        "cardType": "3J0002",
-        "cardNo": barcode,
-        "expTimeStamp": exp.toString().substring(0, 10),
-        "action": "carrierInvChk",
-        "timeStamp": timestamp.toString().substring(0, 10),
-        "startDate": sdate,
-        "endDate": edate,
-        "onlyWinningInv": 'N',
-        "uuid": uuid.toString(),
-        "appID": 'EINV0202204156709',
-        "cardEncrypt": password,
-      };
-      var rbody2 = {
-        "version": "0.5",
-        "cardType": "3J0002",
-        "cardNo": barcode,
-        "expTimeStamp": exp.toString().substring(0, 10),
-        "action": "carrierInvChk",
-        "timeStamp": timestamp.toString().substring(0, 10),
-        "startDate": sdate,
-        "endDate": edate,
-        "onlyWinningInv": 'Y',
-        "uuid": uuid.toString(),
-        "appID": 'EINV0202204156709',
-        "cardEncrypt": password,
-      };
-      var rbody3 = {
-        "version": "0.2",
-        "action": "QryWinningList",
-        "invTerm": term,
-        "UUID": uuid.toString(),
-        "appID": "EINV0202204156709",
-      };
+
       try {
         var response = await client.post(
             Uri.parse(
@@ -129,21 +89,53 @@ Future<void> updateData() async {
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: rbody1);
+            body: {
+              "version": "0.5",
+              "cardType": "3J0002",
+              "cardNo": barcode,
+              "expTimeStamp": exp.toString().substring(0, 10),
+              "action": "carrierInvChk",
+              "timeStamp": timestamp.toString().substring(0, 10),
+              "startDate": sdate,
+              "endDate": edate,
+              "onlyWinningInv": 'N',
+              "uuid": password,
+              "appID": 'EINV0202204156709',
+              "cardEncrypt": password,
+            });
         var response2 = await client.post(
             Uri.parse(
                 'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invServ/InvServ'),
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: rbody2);
+            body: {
+              "version": "0.5",
+              "cardType": "3J0002",
+              "cardNo": barcode,
+              "expTimeStamp": exp.toString().substring(0, 10),
+              "action": "carrierInvChk",
+              "timeStamp": timestamp.toString().substring(0, 10),
+              "startDate": sdate,
+              "endDate": edate,
+              "onlyWinningInv": 'Y',
+              "uuid": password,
+              "appID": 'EINV0202204156709',
+              "cardEncrypt": password,
+            });
         var response3 = await client.post(
             Uri.parse(
                 'https://api.einvoice.nat.gov.tw/PB2CAPIVAN/invapp/InvApp'),
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: rbody3);
+            body: {
+              "version": "0.2",
+              "action": "QryWinningList",
+              "invTerm": term,
+              "UUID": password,
+              "appID": "EINV0202204156709",
+            });
         if (response.statusCode == 200 &&
             response2.statusCode == 200 &&
             response3.statusCode == 200) {

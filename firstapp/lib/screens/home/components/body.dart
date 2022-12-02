@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:firstapp/database/winninglist_database.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -493,9 +492,9 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     String barcode = pref.getString('barcode') ?? "";
     String password = pref.getString('password') ?? "";
     var client = http.Client();
-    var rng = Random();
+
     var now = DateTime.now();
-    int uuid = rng.nextInt(1000);
+
     int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
     int exp = timestamp + 50000;
     int m = now.month;
@@ -507,14 +506,11 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
     DateTime start;
 
     for (int j = 5; j >= 0; j--) {
-      uuid = rng.nextInt(1000);
       String term;
       start = DateTime(now.year, now.month - j, 01);
       last = DateTime(start.year, start.month + 1, 0);
       sdate = formatter.format(start);
       edate = formatter.format(last);
-      timestamp += 5000;
-      exp += 5000;
       if (start.month < 10) {
         term = (start.year - 1911).toString() + '0' + start.month.toString();
       } else {
@@ -530,7 +526,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
         "startDate": sdate,
         "endDate": edate,
         "onlyWinningInv": 'N',
-        "uuid": uuid.toString(),
+        "uuid": password,
         "appID": 'EINV0202204156709',
         "cardEncrypt": password,
       };
@@ -544,7 +540,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
         "startDate": sdate,
         "endDate": edate,
         "onlyWinningInv": 'Y',
-        "uuid": uuid.toString(),
+        "uuid": password,
         "appID": 'EINV0202204156709',
         "cardEncrypt": password,
       };
@@ -552,7 +548,7 @@ class _State extends State<Body> with SingleTickerProviderStateMixin {
         "version": "0.2",
         "action": "QryWinningList",
         "invTerm": term,
-        "UUID": uuid.toString(),
+        "UUID": password,
         "appID": "EINV0202204156709",
       };
       try {
@@ -950,7 +946,7 @@ class CategoriesScroller extends StatelessWidget {
                                         borderRadius: const BorderRadius.all(
                                             Radius.circular(20.0))),
                                     child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
+                                      padding: const EdgeInsets.all(11.0),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -973,7 +969,7 @@ class CategoriesScroller extends StatelessWidget {
                                                       '...'
                                                   : snapshot.data[index].title,
                                               style: TextStyle(
-                                                  fontSize: 16,
+                                                  fontSize: 15,
                                                   color: index % 5 == 2 ||
                                                           index % 5 == 1
                                                       ? Color.fromARGB(

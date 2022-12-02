@@ -32,7 +32,7 @@ class DetailsScreen extends StatelessWidget {
 
     if (responseList.isEmpty) {
       int timestamp = DateTime.now().millisecondsSinceEpoch + 10000;
-      int exp = timestamp + 70000;
+      int exp = timestamp + 700000;
       var rbody = {
         "version": "0.5",
         "cardType": "3J0002",
